@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Browser -->
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+
+    <!-- Favicon & page title -->
+    <link rel="icon" href="../../../home/img/logo/green/favicon-32x32.png">
+    <title>dominiccerchio</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <div id="projectBankRewards">
+      <div class="card-body">
+        <h1 class="display-4">Bank Rewards Value</h1>
+        <p class="lead">Find the best value for your bank's points.</p>
+
+        <div class="alert alert-warning" role="alert">Work in progress</div>
+
+        <form>
+          <div class="form-row mb-3">
+            <div class="col">
+              <h3>Input Information</h3>
+              <input class="form-control mb-3" type="number" placeholder="Number of Reward Points" id="bankPoints">
+              <select class="custom-select" id="bankMember">
+                <option value=".00" selected disabled>-- Choose Bank Preferred Membership --</option>
+                <option value=".015">Chase Sapphire Reserve</option>
+                <option value=".025">Chase Sapphire Preferred Card</option>
+                <option value=".021">Chase Ink Business Preferred Credit Card</option>
+                <option value=".021">Chase Freedom</option>
+                <option value=".021">Chase Freedom Unlimited</option>
+              </select>
+            </div>
+            <div class="col">
+              <h3>References</h3>
+              <ul>
+                <li><a href="https://thepointsguy.com/guide/redeeming-chase-ultimate-rewards-maximum-value/">Chase</a></li>
+                <li><a href="https://thepointsguy.com/guide/monthly-valuations/">Bank of America</a></li>
+                <li><a href="#">Discovery</a></li>
+              </ul>
+            </div>
+          </div>
+        </form>
+        <table class="table table-striped table-responsive" id="bankTable">
+          <tr>
+            <th>Bank</th>
+            <th>Redemption Method</th>
+            <th>Value Per Point</th>
+            <th>Total Point Value</th>
+            <th>Notes</th>
+          </tr>
+          <!-- Bank information will be written in <tr>s via JavaScript -->
+        </table>
+        <small>Note: This comparison focuses purely on the differences between redemption options that banks provide for their points. Getting cash back and investing it may or may not yield higher returns.</small>
+      </div>
+    </div>
+
+    <!-- Vendor JS -->
+    <script src="../../../vendor/jquery/js/jquery-3.4.1.min.js"></script>
+    <script src="../../../vendor/tether/js/tether.min.js"></script>
+    <script src="../../../vendor/popper/js/popper.min.js"></script>
+    <script src="../../../vendor/popper/js/tooltip.min.js"></script>
+    <script src="../../../vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  	<!-- Custom JS -->
+    <script src="bankrewards.js"></script>
+  </body>
+</html>

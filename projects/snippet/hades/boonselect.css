@@ -1,0 +1,9 @@
+.boon {
+  cursor: pointer;
+  transition: background-color .25s;
+}
+
+.boon:hover {
+  background-color: #adb5bd;
+  transition: background-color .25s;
+}

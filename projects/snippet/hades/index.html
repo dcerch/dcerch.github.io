@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Browser -->
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+
+    <!-- Favicon & page title -->
+    <link rel="icon" href="../../../home/img/logo/green/favicon-32x32.png">
+    <title>dominiccerchio</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+
+    <!-- Custom CSS -->
+    <link href="boonselect.css" rel="stylesheet">
+  </head>
+  <body class="container-fluid" data-spy="scroll" data-target="#list-example">
+    <h1 class="display-4">Boon Picker</h1>
+    <p class="lead">Keep track of different boon offerings in Hades.</p>
+
+    <article>
+      <h1 class="display-6">Standard Tier 1, No Prerequisites</h1>
+      <button type="button" class="btn btn-primary btn-sm" onclick="openFullscreen();">⛶ Fullscreen Table</button>
+      <div class="form-check form-switch mb-3">
+        <input class="form-check-input" type="checkbox" onclick="toggleDarkmode()">
+        <label class="form-check-label" for="flexSwitchCheckDefault"><small>Dark Mode</small></label>
+      </div>
+    </article>
+
+    <section>
+      <div class="table-responsive-sm">
+        <table class="table table-light" id="boontable">
+          <thead>
+            <tr class="text-center">
+              <th scope="col" class="text-start">Abilities</th>
+              <th scope="col"><h3>Aphrodite</h3><p class="lead">Weak</p><img src="https://static.wikia.nocookie.net/hades_gamepedia_en/images/5/5a/Aphrodite_reward.png/revision/latest?cb=20190119213003" width="32" height="32"></th>
+              <th scope="col"><h3>Ares</h3><p class="lead">Doom</p><img src="https://static.wikia.nocookie.net/hades_gamepedia_en/images/0/06/Ares_reward.png/revision/latest?cb=20181213092542" width="32" height="32"></th>
+              <th scope="col"><h3>Artemis</h3><p class="lead">Critical</p><img src="https://static.wikia.nocookie.net/hades_gamepedia_en/images/2/2c/Artemis_Reward.png/revision/latest?cb=20181214065026" width="32" height="32"></th>
+              <th scope="col"><h3>Athena</h3><p class="lead">Deflect</p><img src="https://static.wikia.nocookie.net/hades_gamepedia_en/images/3/3c/Athena_reward.png/revision/latest?cb=20190119213037" width="32" height="32"></th>
+              <th scope="col"><h3>Chaos</h3><p class="lead">Variety</p><img src="https://static.wikia.nocookie.net/hades_gamepedia_en/images/c/ce/Chaos_reward.png/revision/latest?cb=20190119213332" width="32" height="32"></th>
+              <th scope="col"><h3>Demeter</h3><p class="lead">Chill</p><img src="https://static.wikia.nocookie.net/hades_gamepedia_en/images/4/46/Demeter_reward.png/revision/latest?cb=20200127125835" width="32" height="32"></th>
+              <th scope="col"><h3>Dionysus</h3><p class="lead">Hangover</p><img src="https://static.wikia.nocookie.net/hades_gamepedia_en/images/4/41/Dionysus_reward.png/revision/latest?cb=20190213184821" width="32" height="32"></th>
+              <th scope="col"><h3>Hermes</h3><p class="lead">Speed</p><img src="https://static.wikia.nocookie.net/hades_gamepedia_en/images/c/ce/Hermes_reward.png/revision/latest?cb=20190612154840" width="32" height="32"></th>
+              <th scope="col"><h3>Poseidon</h3><p class="lead">Knockback</p><img src="https://static.wikia.nocookie.net/hades_gamepedia_en/images/9/9d/Poseidon_reward.png/revision/latest?cb=20190119213120" width="32" height="32"></th>
+              <th scope="col"><h3>Zeus</h3><p class="lead">Lightning</p><img src="https://static.wikia.nocookie.net/hades_gamepedia_en/images/b/b2/Zeus_reward.png/revision/latest?cb=20190119213134" width="32" height="32"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row" id="attack">Attack</th></tr>
+            <tr><th scope="row" id="special">Special</th></tr>
+            <tr><th scope="row" id="cast">Cast</th></tr>
+            <tr><th scope="row" id="dash">Dash</th></tr>
+            <tr><th scope="row" id="call">Call</th></tr>
+            <tr><th scope="row" id="other">Other</th></tr>
+            <tr><th scope="row" id="legendary">Legendary</th></tr>
+            <tr><th scope="row" id="duo">Duo</th></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <article>
+      <h1 class="display-6">Standard Tier 1, No Prerequisites</h1>
+      <button type="button" class="btn btn-primary btn-sm" onclick="openFullscreen();">⛶ Fullscreen Table</button>
+      <div class="form-check form-switch mb-3">
+        <input class="form-check-input" type="checkbox" onclick="toggleDarkmode()">
+        <label class="form-check-label" for="flexSwitchCheckDefault"><small>Dark Mode</small></label>
+      </div>
+    </article>
+
+    <!-- Bootstrap Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+
+  	<!-- Custom JS -->
+    <script src="boonslist.js"></script>
+    <script src="boonsdisplay.js"></script>
+    <script src="fullscreen.js"></script>
+    <script src="darkmode.js"></script>
+  </body>
+</html>

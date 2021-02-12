@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+  <meta name="robots" content="none, noarchive">
+
+  <title>Secret Santa</title>
+
+  <!-- Firebase -->
+  <!-- Firebase App is always required and must be first -->
+  <script src="vendor/firebase/js/firebase-app.js"></script>
+
+  <!-- Add additional services that you want to use -->
+  <script src="vendor/firebase/js/firebase-database.js"></script>
+
+  <script src="js/firebase-config.js" type="text/javascript" charset="utf-8"></script>
+
+  <!-- Bootstrap core CSS -->
+  <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Google Fonts and Icons -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto|Amatic+SC|Dancing+Script|Indie+Flower|Lobster|Pacifico|Quicksand|Raleway|Source+Sans+Pro|Puritan|Archivo" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="icon" href="img/favicon.png" type="image/x-icon">
+
+  <!-- Font Awesome (Brands Only) -->
+  <link rel="stylesheet" type="text/css" href="vendor/fontawesome-free-5.5.0-web/css/brands.min.css">
+  <link rel="stylesheet" type="text/css" href="vendor/fontawesome-free-5.5.0-web/css/fontawesome.min.css">
+
+  <!-- Custom Stylings -->
+  <link rel="stylesheet" type="text/css" href="css/base.css">
+  <link rel="stylesheet" type="text/css" href="css/hearts.css">
+</head>
+<body>
+  <header>
+    <div class="container text-center my-5">
+      <h1>Secret Santa</h1>
+      <p class="lead text-white">Quickly set up a secret santa with family, friends or anyone without registration, emails or phone numbers!</p>
+    </div>
+  </header>
+
+  <section class="collapse show" id="section-default">
+    <div class="container">
+      <div class="card-deck">
+        <div class="card">
+          <div class="card-header"><h3>Host a Secret Santa</h3></div>
+          <div class="card-body">
+            <form>
+              <label for="create-input-event">Name of Secret Santa</label>
+              <input type="text" class="form-control" placeholder="Company Gift Giving 2020" id="create-input-event">
+              <div class="form-row">
+                <div class="col-sm mt-3">
+                  <label for="create-input-cost">Max Cost</label>
+                  <input type="number" class="form-control" placeholder="$1, $10, $50" min="1" id="create-input-cost">
+                </div>
+                <div class="col-sm mt-3">
+                  <label for="create-input-category">Category</label>
+                  <input type="text" class="form-control" placeholder="Funny, Star Wars, Winter" id="create-input-category">
+                </div>
+              </div>
+              <hr>
+              <h5>Participants</h5>
+              <div class="form-row" id="create-input-participant">
+                <div class="col-sm-4"><input type="text" class="form-control create-input-participant mb-2" placeholder="Participant Name"></div>
+                <div class="col-sm-4"><input type="text" class="form-control create-input-participant mb-2" placeholder="Participant Name"></div>
+                <div class="col-sm-4"><input type="text" class="form-control create-input-participant mb-2" placeholder="Participant Name"></div>
+              </div>
+              <div class="text-center">
+                <button type="button" class="btn btn-outline-success mt-2 px-5" id="add-input-participant"><i class="material-icons align-middle">add</i></button>
+              </div>
+            </form>
+          </div>
+          <div class="card-footer text-muted">
+            <button type="button" class="btn btn-primary btn-lg btn-block" id="create-submit">Create my Secret Santa Group</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>View Existing Secret Santa</h3></div>
+          <div class="card-body">
+            <form>
+              <label for="create-input-category">Secret Santa ID</label>
+              <input class="form-control form-control-lg" type="text" placeholder="ABCDEFGHIJKLMNOPQRSTUVWXYZ" id="view-input-id">
+            </form>
+          </div>
+          <div class="card-footer text-muted">
+            <button type="button" class="btn btn-primary btn-lg btn-block" id="view-submit">View my Secret Santa Group</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="collapse" id="section-host">
+    <div class="container">
+      <div class="card">
+        <div class="card-header"><h3>Sharing Secret Santa Event</h3></div>
+        <div class="card-body text-center">
+          <h1 class="display-4">Sharing Methods</h1>
+          <p>Use any of the methods below to share your secret santa event with participants! Anyone with the shared event link will be prompted to identify themselves in order to receive their person to gift. This requires a honest group of people!</p>
+          <div class="row">
+            <div class="col-sm-4">
+              <h1>URL</h1>
+              <div class="input-group input-group-lg mb-3">
+                <input class="form-control" type="text" readonly id="host-output-url">
+                <div class="input-group-append">
+                  <button class="btn btn-outline-secondary" type="button" data-toggle="tooltip" data-clipboard-target="#host-output-url"><i class="material-icons">file_copy</i></button>
+                </div>
+              </div>
+              <p>Message participants the URL directly.</p>
+            </div>
+            <div class="col-sm-4">
+              <h1>Social Media</h1>
+              <div class="row">
+                <div class="col-md-3"><button type="button" class="btn btn-outline-dark btn-lg btn-block mb-4 social-media" id="share-google"><i class="fab fa-google"></i></button></div>
+                <div class="col-md-3"><button type="button" class="btn btn-outline-dark btn-lg btn-block mb-4 social-media" id="share-facebook"><i class="fab fa-facebook"></i></button></div>
+                <div class="col-md-3"><button type="button" class="btn btn-outline-dark btn-lg btn-block mb-4 social-media" id="share-reddit"><i class="fab fa-reddit"></i></button></div>
+                <div class="col-md-3"><button type="button" class="btn btn-outline-dark btn-lg btn-block mb-4 social-media" id="share-twitter"><i class="fab fa-twitter"></i></button></div>
+                <div class="col-md-3"><button type="button" class="btn btn-outline-dark btn-lg btn-block mb-4 social-media" id="share-linkedin"><i class="fab fa-linkedin"></i></button></div>
+                <div class="col-md-3"><button type="button" class="btn btn-outline-dark btn-lg btn-block mb-4 social-media" id="share-tumblr"><i class="fab fa-tumblr"></i></button></div>
+                <div class="col-md-3"><button type="button" class="btn btn-outline-dark btn-lg btn-block mb-4 social-media" id="share-pinterest"><i class="fab fa-pinterest"></i></button></div>
+                <div class="col-md-3"><button type="button" class="btn btn-outline-dark btn-lg btn-block mb-4 social-media" id="share-blogger"><i class="fab fa-blogger"></i></button></div>
+                <div class="col-md-3"><button type="button" class="btn btn-outline-dark btn-lg btn-block mb-4 social-media" id="share-getpocket"><i class="fab fa-get-pocket"></i></button></div>
+                <div class="col-md-3"><button type="button" class="btn btn-outline-dark btn-lg btn-block mb-4 social-media" id="share-hackernews"><i class="fab fa-hacker-news"></i></button></div>
+                <div class="col-md-3"><button type="button" class="btn btn-outline-dark btn-lg btn-block mb-4 social-media" id="share-digg"><i class="fab fa-digg"></i></button></div>
+                <div class="col-md-3"><button type="button" class="btn btn-outline-dark btn-lg btn-block mb-4 social-media" id="share-flipboard"><i class="fab fa-flipboard"></i></button></div>
+                <div class="col-md-3"><button type="button" class="btn btn-outline-dark btn-lg btn-block mb-4 social-media" id="share-skype"><i class="fab fa-skype"></i></button></div>
+              </div>
+              <p>Easily share the link via most major social media platforms.</p>
+            </div>
+            <div class="col-sm-4">
+              <h1>ID</h1>
+              <div class="input-group input-group-lg mb-3">
+                <input class="form-control" type="text" readonly id="host-output-id">
+                <div class="input-group-append">
+                  <button class="btn btn-outline-secondary" type="button" data-toggle="tooltip" data-clipboard-target="#host-output-id"><i class="material-icons">file_copy</i></button>
+                </div>
+              </div>
+              <p>Provide participants with an ID that can be used on the homepage.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="collapse" id="section-participant">
+    <div class="container">
+      <div class="card">
+        <div class="card-header"><h3>Secret Santa Details</h3></div>
+        <div class="card-body text-center">
+          <article id="article-participant-input">
+            <label for="participant-input-name">In order to participate in the Secret Santa, you must first choose your name from the dropdown below. Please select honestly.</label>
+            <div class="input-group mb-3">
+              <select class="custom-select" id="participant-input-name"></select>
+            </div>
+            <button type="button" class="btn btn-success btn-lg btn-block" id="participant-submit">Confirm Selected Name</button>
+          </article>
+          <article class="collapse heart-wrapper" id="article-participant-output">
+            <i class="material-icons">person</i>
+            <i class="material-icons">card_giftcard</i>
+            <i class="material-icons">person_outline</i>
+            <p>Your gift will be for...</p>
+            <h1 class="display-3" id="participant-output-name"></h1>
+
+            <!-- Animated Hearts -->
+            <div class="heart x1"></div>
+            <div class="heart x2"></div>
+            <div class="heart x3"></div>
+            <div class="heart x4"></div>
+            <div class="heart x5"> </div>
+            <div class="altheart x6"></div>
+          </article>
+          <hr>
+          <div class="row mb-3">
+            <div class="col-sm">
+              <p>Group Name</p>
+              <h2 id="participant-output-event"></h2>
+            </div>
+            <div class="col-sm">
+              <p>Category</p>
+              <h2 id="participant-output-category"></h2>
+            </div>
+            <div class="col-sm">
+              <p>Max Cost</p>
+              <h2 id="participant-output-cost"></h2>
+            </div>
+          </div>
+          <small class="text-muted">You can keep track of your Secret Santa details by using <a href="#" id="participant-output-link">this link</a> or using this plan ID on the homepage: <i id="participant-output-id"></i></small>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Vendor JS -->
+  <script src="vendor/jquery/js/jquery-3.4.1.min.js"></script>
+  <script src="vendor/tether/js/tether.min.js"></script>
+  <script src="vendor/popper/js/popper.min.js"></script>
+  <script src="vendor/popper/js/tooltip.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+  <script src="vendor/clipboard.js-master/dist/clipboard.min.js"></script>
+
+  <!-- Custom JS -->
+  <script src="js/base.js" type="text/javascript" charset="utf-8"></script>
+  <script src="js/check-url.js" type="text/javascript" charset="utf-8"></script>
+  <script src="js/create-event.js" type="text/javascript" charset="utf-8"></script>
+  <script src="js/share-social-media.js" type="text/javascript" charset="utf-8"></script>
+  <script src="js/view-participant.js" type="text/javascript" charset="utf-8"></script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Browser -->
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+
+    <!-- Favicon & page title -->
+    <link rel="icon" href="../../../home/img/logo/green/favicon-32x32.png">
+    <title>dominiccerchio</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <div id="projectIncomeSavings">
+      <div class="card-body">
+        <h1 class="display-4">Income Savings Calculator</h1>
+        <p class="lead">Calculate the accrued interest from a savings account.</p>
+
+        <div class="row">
+          <div class="col-sm mb-3">
+            <h3>Savings Account Information</h3>
+            <form>
+              <!-- Principal -->
+              <div class="form-group">
+                <label for="incomeFormPrincipal">Principal</label>
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">$</span>
+                  </div>
+                  <input type="number" class="form-control" min="0" id="incomeFormPrincipal" placeholder="Starting money in savings account">
+                </div>
+              </div>
+              <!-- Accurals -->
+              <div class="form-row">
+                <div class="col-sm">
+                  <label for="incomeFormRate">Accural Rate</label>
+                  <div class="input-group mb-3">
+                    <input type="number" class="form-control" min="0" step=".01" value="0.06" id="incomeFormRate" placeholder="Typically under 1%">
+                    <div class="input-group-append">
+                      <span class="input-group-text">%</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm">
+                  <label for="incomeFormFrequency">Accural Frequency</label>
+                  <select class="form-control" id="incomeFormFrequency">
+                    <option>Yearly</option>
+                    <option>Monthly</option>
+                    <option>Daily</option>
+                  </select>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="col-sm">
+            <h3>Savings Account Over Time</h3>
+            <table class="table table-responsive">
+              <thead>
+                <tr>
+                  <th scope="col">1 Month</th>
+                  <th scope="col">6 Months</th>
+                  <th scope="col">1 Year</th>
+                  <th scope="col">3 Years</th>
+                  <th scope="col">5 Years</th>
+                  <th scope="col">10 Years</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td scope="row"></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vendor JS -->
+    <script src="../../../vendor/jquery/js/jquery-3.4.1.min.js"></script>
+    <script src="../../../vendor/tether/js/tether.min.js"></script>
+    <script src="../../../vendor/popper/js/popper.min.js"></script>
+    <script src="../../../vendor/popper/js/tooltip.min.js"></script>
+    <script src="../../../vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  	<!-- Custom JS -->
+    <script src="incomesavings.js"></script>
+  </body>
+</html>

@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Browser -->
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+
+    <!-- Favicon & page title -->
+    <link rel="icon" href="../../../home/img/logo/green/favicon-32x32.png">
+    <title>dominiccerchio</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <div id="projectTicketGenerator">
+      <div class="card-body">
+        <h1 class="display-4">Ticket Generator</h1>
+        <p class="lead">Create your own unique QR code tickets.</p>
+        <div class="alert alert-warning" role="alert">This is a work in progress. Please note that the UX and functionality are subject to change.</div>
+
+        <!-- TODO: Input
+          1. Organization
+          2. Industry (Finance, Technology)
+          3. Name of event
+          4. # of tickets (0 to 50)
+          5. Button to generate
+        -->
+        <form>
+          <div class="form-row">
+            <div class="form-group col">
+              <label for="ticketFormEvent">Name of Event</label>
+              <input type="text" class="form-control" id="ticketFormEvent" placeholder="Super Smash Tournament">
+            </div>
+            <div class="form-group col">
+              <label for="ticketFormAmount">Number of Tickets</label>
+              <input type="number" class="form-control" id="ticketFormAmount" placeholder="The amount of tickets to generate" min="1">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group col">
+              <label for="ticketFormOrganization">Name of Organization</label>
+              <input type="text" class="form-control" id="ticketFormOrganization" placeholder="Aether Cafe">
+            </div>
+            <div class="form-group col">
+              <label for="ticketFormIndustry">Name of Industry</label>
+              <input type="text" class="form-control" id="ticketFormIndustry" placeholder="Gaming">
+            </div>
+          </div>
+        </form>
+
+        <button type="button" class="btn btn-primary btn-lg mb-4">Create Tickets</button>
+        <style>
+        #ticketStage {
+          background-color: #555;
+          background-image:
+            /* Top jagged */
+            linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 50%, rgba(255,255,255,0) 50%, rgba(255,255,255,0) 100%),
+            linear-gradient(-135deg, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 50%, rgba(255,255,255,0) 50%, rgba(255,255,255,0) 100%),
+            /* Bottom jagged */
+            linear-gradient(45deg, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 50%, rgba(255,255,255,0) 50%, rgba(255,255,255,0) 100%),
+            linear-gradient(-45deg, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 50%, rgba(255,255,255,0) 50%, rgba(255,255,255,0) 100%),
+            /* Top and bottom fade  */
+            linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 100%),
+            linear-gradient(to top, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 100%);
+          background-position:
+            /* Top jagged */
+            top center, top center,
+            /* Bottom jagged */
+            bottom center, bottom center,
+            /* Top fade */
+            top center,
+            /* Bottom fade */
+            bottom center;
+          background-size:
+            /* Top + bottom jagged */
+            0.75rem 0.75rem, 0.75rem 0.75rem, 0.75rem 0.75rem, 0.75rem 0.75rem,
+            /* Top + bottom fade */
+            100% 1rem, 100% 1rem;
+          background-repeat: repeat-x;
+          padding: 2rem;
+        }
+        </style>
+        <div id="ticketStage">
+          <div class="card-deck">
+            <div class="card text-center">
+              <div class="card-body">
+                <canvas id="qr"></canvas>
+                <h5 class="card-title">Example Event</h5>
+                <h6 class="card-subtitle mb-2 text-muted text-truncate">Example Organization | Example Industry</h6>
+                <p class="card-text">This ticket provides entry into the Example Event.</p>
+              </div>
+            </div>
+            <div class="card text-center">
+              <div class="card-body">
+                <h5 class="card-title">Special title treatment</h5>
+                <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                <a href="#" class="btn btn-primary">Go somewhere</a>
+              </div>
+            </div>
+            <div class="card text-center">
+              <div class="card-body">
+                <h5 class="card-title">Special title treatment</h5>
+                <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                <a href="#" class="btn btn-primary">Go somewhere</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TODO: Processing
+          0. Listen for button click
+          1. Generate a unique ID for ticket group and assign it to a hash array
+          2. Assign all input information into object
+          3. For each ticket, create a unique ID and store
+          X: Future: how to store them?
+
+          function createTickets() {
+            var ticket = {
+              "ticket_id": "string of generated hash from Firebase",
+              "organization_name": "user's input",
+              "industry_name": "user's input",
+              "event_name": "user's input",
+              "ticket_amount": "user's input",
+              "tickets": {
+                "ticket1":"generated hash from Firebase",
+                "ticket2":"generated hash from Firebase"
+              }
+            };
+            console.log(ticket.event_name);
+          }
+        -->
+
+        <!-- TODO: Displaying
+          1. Create a SVG card for each ticket
+          2. Look into how to make a good printing screen
+
+          function displayTickets() {
+            //Logic
+          }
+        -->
+      </div>
+    </div>
+
+    <!-- Vendor JS -->
+    <script src="../../../vendor/jquery/js/jquery-3.4.1.min.js"></script>
+    <script src="../../../vendor/tether/js/tether.min.js"></script>
+    <script src="../../../vendor/popper/js/popper.min.js"></script>
+    <script src="../../../vendor/popper/js/tooltip.min.js"></script>
+    <script src="../../../vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  	<!-- Custom JS -->
+    <script src="ticketgenerator.js"></script>
+  </body>
+</html>

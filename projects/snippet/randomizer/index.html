@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Browser -->
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+
+    <!-- Favicon & page title -->
+    <link rel="icon" href="../../../home/img/logo/green/favicon-32x32.png">
+    <title>dominiccerchio</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <div id="projectRandomizer">
+      <div class="card-body">
+        <h1 class="display-4">Randomizer</h1>
+        <p class="lead">Compares my custom random algorithm to Javascript's native random functionality.</p>
+        <p><em>The test will choose a random number between 1 and 9,999 and print the results one hundred times.</em></p>
+
+        <div class="card-group">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Javascript's Math.random</h5>
+              <p class="card-text" id="projectRandomizerJS"></p>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">My Randomizer</h5>
+              <p class="card-text" id="projectRandomizerMY"></p>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-primary my-3">Run Randomizer Test</button>
+
+        <h3>Bonus: Random Unicode Symbol Generator</h3>
+        <p>The Unicode character set is grouped by the categories in the dropdown. Choose a category and get a random symbol within that range.</p>
+        <!-- Random Symbol Category -->
+        <select class="form-control form-control-lg">
+          <option selected disabled>Select a Category</option>
+          <option value="" onclick="get_randsym();">All</option>
+          <option value="0" onclick="get_randsym(0);">C0 Controls and Basic Latin</option>
+          <option value="1" onclick="get_randsym(1);">C1 Controls and Latin-1 Supplement</option>
+          <option value="2" onclick="get_randsym(2);">Latin Extended-A</option>
+          <option value="3" onclick="get_randsym(3);">Latin Extended-B</option>
+          <option value="4" onclick="get_randsym(4);">Spacing Modifiers</option>
+          <option value="5" onclick="get_randsym(5);">Diacritical Marks</option>
+          <option value="6" onclick="get_randsym(6);">Greek and Coptic</option>
+          <option value="7" onclick="get_randsym(7);">Cyrillic Basic</option>
+          <option value="8" onclick="get_randsym(8);">Cyrillic Supplement</option>
+          <option value="9" onclick="get_randsym(9);">General Punctuation</option>
+          <option value="10" onclick="get_randsym(10);">Currency Symbols</option>
+          <option value="11" onclick="get_randsym(11);">Letterlike Symbols</option>
+          <option value="12" onclick="get_randsym(12);">Arrows</option>
+          <option value="13" onclick="get_randsym(13);">Mathematical Operators</option>
+          <option value="14" onclick="get_randsym(14);">Box Drawings</option>
+          <option value="15" onclick="get_randsym(15);">Block Elements</option>
+          <option value="16" onclick="get_randsym(16);">Geometric Shapes</option>
+          <option value="17" onclick="get_randsym(17);">Miscellaneous Symbols</option>
+          <option value="18" onclick="get_randsym(18);">Dingbats</option>
+        </select>
+        <!-- Randomizer display area -->
+        <div class="card-body" style="font-size: 700%;" id="randomizeroutput"></div>
+      </div>
+    </div>
+
+    <!-- Vendor JS -->
+    <script src="../../../vendor/jquery/js/jquery-3.4.1.min.js"></script>
+    <script src="../../../vendor/tether/js/tether.min.js"></script>
+    <script src="../../../vendor/popper/js/popper.min.js"></script>
+    <script src="../../../vendor/popper/js/tooltip.min.js"></script>
+    <script src="../../../vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  	<!-- Custom JS -->
+    <script src="randomizer.js"></script>
+    <script src="randomsymbol.js"></script>
+  </body>
+</html>

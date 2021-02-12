@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- *** Browser *** -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- *** Social spiders *** -->
+    <!-- Search Engine -->
+    <meta name="description" content="Dominic's personal website that storytells his upbringing, attaches his resume, and showcases various web development projects.">
+    <meta name="image" content="https://dominiccerchio.com/home/img/logo/blue/android-chrome-512x512.png">
+    <!-- Schema.org for Google -->
+    <meta itemprop="name" content="Dominic's Homepage">
+    <meta itemprop="description" content="Dominic's personal website that storytells his upbringing, attaches his resume, and showcases various web development projects.">
+    <meta itemprop="image" content="https://dominiccerchio.com/home/img/logo/blue/android-chrome-512x512.png">
+    <!-- Open Graph general (Facebook, Pinterest & Google+) -->
+    <meta name="og:title" content="Dominic's Homepage">
+    <meta name="og:description" content="Dominic's personal website that storytells his upbringing, attaches his resume, and showcases various web development projects.">
+    <meta name="og:image" content="https://dominiccerchio.com/home/img/logo/blue/android-chrome-512x512.png">
+    <meta name="og:url" content="https://dominiccerchio.com/">
+    <meta name="og:site_name" content="dominiccerchio">
+    <meta name="og:locale" content="en_US">
+    <meta name="og:type" content="website">
+
+    <!-- Favicon & page title -->
+    <link rel="icon" href="home/img/logo/blue/favicon-32x32.png">
+    <title>dominiccerchio</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+
+    <!-- Shooting Stars CSS -->
+    <link href="home/css/background.css" rel="stylesheet">
+  </head>
+  <body>
+    <section class="container d-flex flex-column min-vh-100 justify-content-center align-items-center">
+      <div class="card text-center mt-5">
+        <div class="card-header">
+          <ul class="nav nav-pills card-header-pills nav-fill flex-column flex-sm-row">
+            <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#aboutme">About Me</a></li>
+            <li class="nav-item"><a class="nav-link" href="home/resume.pdf">Resume</a></li>
+            <li class="nav-item"><a class="nav-link" href="projects/index.html">Projects</a></li>
+          </ul>
+        </div>
+        <div class="card-body m-5">
+          <h1 class="display-2">Dominic Cerchio</h1>
+          <p class="lead fs-3" id="slogan"></p>
+        </div>
+        <div class="card-footer text-muted">
+          <small id="footersymbols" title="c u r i o s i t y is the lust of the mind"></small>
+        </div>
+      </div>
+    </section>
+
+    <article>
+      <div class="modal fade" id="aboutme" tabindex="-1" aria-labelledby="aboutModal" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">About Me</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <p class="card-text">Technology is a huge part of my life and it all started with my family. My father showed me all the different wonders that an old Dell Dimension with a CRT monitor and internet connection can provide. My eldest brother deserves recognition for the introduction to technology opportunities such as System Engineering (by teaching me how to build my own computer) and Software Development (by showing me the different tools and their possibilities). I am grateful for the support not just from my father and brother but also the rest of my family and friends.</p>
+              <p class="card-text">Higher education provided me discipline and creativity in technology, science and art. In addition to academia, I found much delight in captaining intramural soccer and, especially, helping others with their technology struggles. This led to an epiphany many people go through at one point - finding your passion. I found that I wanted to use my Information Technology & Systems degree to not only learn and work in the industry but also help people.</p>
+              <p class="card-text">I'm currently employed as a Customer Success Account Manager in the technology industry.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article>
+      <div class="modal fade" id="memories" tabindex="-1" aria-labelledby="memoriesModal" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Memories</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="list-group">
+                <a href="https://www.pinkelfuneralhome.com/obituaries/Dominick-Cerchio/" class="list-group-item list-group-item-action">Dominick Anthony Cerchio</a>
+                <a href="https://www.pinkelfuneralhome.com/obituaries/Marie-Cerchio/" class="list-group-item list-group-item-action">Marie Antonette Cerchio</a>
+                <a href="https://www.echovita.com/us/obituaries/nj/ridgewood/james-allocco-12278123" class="list-group-item list-group-item-action">James Allocco</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article>
+      <div class="bg"></div>
+      <div class="bg bg2"></div>
+      <div class="bg bg3"></div>
+    </article>
+
+  	<!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
+
+  	<!-- Custom JS -->
+  	<script src="home/js/slogan.js"></script>
+  	<script src="home/js/randomsymbol.js"></script>
+  	<script src="home/js/konami.js"></script>
+  </body>
+</html>

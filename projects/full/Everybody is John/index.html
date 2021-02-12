@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+  <meta name="description" content="Everybody is John: Simplest Role Playing Game">
+  <meta name="author" content="Dominic Cerchio">
+  <link rel="icon" href="img/favicon.png">
+
+  <title>Everybody is John: The Simplest Role Playing Game | dominiccerchio</title>
+
+  <!-- Bootstrap core CSS -->
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Bootstrap Material Design (MDB) // Animations -->
+  <link rel="stylesheet" href="css/mdb.min.css">
+
+  <style>
+  body {
+    background: linear-gradient(#ffffff 50%, rgba(255,255,255,0) 0) 0 0,
+    radial-gradient(circle closest-side, #FFFFFF 53%, rgba(255,255,255,0) 0) 0 0,
+    radial-gradient(circle closest-side, #FFFFFF 50%, rgba(255,255,255,0) 0) 55px 0 #48B;
+    background-size:110px 200px;
+    background-repeat:repeat-x;
+  }
+  </style>
+</head>
+<body>
+<div class="container">
+<p></p>
+<!-- HEADER -->
+<div class="card">
+  <div class="card-block">
+    <h1>Everybody is John</h1>
+    <p>A competitive roleplaying game for three or more imaginative people.</p>
+
+    <!-- GAMEPLAY & RULES BUTTONS -->
+    <div class="btn-toolbar justify-content-between" role="toolbar" aria-label="Toolbar with button groups">
+      <div class="btn-group" role="group" aria-label="Game help group">
+	    <h4>Game Description</h4>
+        <button type="button" class="btn btn-warning" href="#collapseVanDesc" data-toggle="collapse" data-parent="#accordion">Vanilla</button>
+	    <button type="button" class="btn btn-default" href="#collapseSimDesc" data-toggle="collapse" data-parent="#accordion">Simple</button>
+      </div>
+	  <div class="btn-group" role="group" aria-label="Game resource group">
+	    <h4 class="text-right">Resources</h4>
+	    <button type="button" class="btn btn-default" href="#collapseWill" data-toggle="collapse" data-parent="#accordion">Willpower</button>
+        <button type="button" class="btn btn-default" href="#collapseSkil" data-toggle="collapse" data-parent="#accordion">Skills</button>
+	    <button type="button" class="btn btn-default" href="#collapseObse" data-toggle="collapse" data-parent="#accordion">Obsession</button>
+	  </div>
+	  <div class="btn-group" role="group" aria-label="Game control group">
+	    <h4 class="text-right">Game Control</h4>
+        <button type="button" class="btn btn-default" onclick="startGame();">Start</button>
+        <button type="button" class="btn btn-danger" onclick="resetGame();">Reset</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- GAMEPLAY & RULES DISPLAY -->
+<div id="accordion">
+  <div class="card">
+    <div class="collapse" id="collapseVanDesc">
+      <div class="card-block">
+        <p>John is a totally insane man in Minneapolis, New York, Arkham, Smilesville, or wherever today's train wreck is set. He is controlled by the Voices in his head -- one at a time.</p>
+        <p>John is not terribly competent: he has difficulty with a lot of things that you and I might take for granted. <i>Whenever John attempts anything that an ordinary person might have any chance of failure at, he needs to roll for success.</i></p>
+        <p><i>The Voice who is currently in control of John does the rolling. If that Voice has a skill that covers the challenge, the Voice needs to roll a 3 or higher on the single d6. If it doesn't have a skill, it needs to roll a 6.</i> However, before the roll, the Voice can spend any number of willpower points to get a <i>+1 per point spent</i> on the die roll. This can make success automatic.</p>
+        <p>Become the active Voice is a bit of a challenge, though. Whenever John wakes up or gets hurt, a <i>test for control of John</i> happens. Also, whenever the currently active Voice <i>fails a roll</i> or <i>completes its obession</i>, a test for control of John happens.</p>
+        <p>When a test for control of John occurs, all of the Voices who are interested simultaneously bid one or more willpower points (if you're using tokens for Willpower, it's easiest for everyone to just hold out the tokens in their closed hands, and then, when everyone's ready, reveal the number of tokens). Voices don't have to bid if they don't want to (and you can hold out zero tokens if you want to fake out the other Voices). <i>The highest number of willpower becomes the active Voice.</i> If multiple people bid the same highest amount, then they roll off to see who becomes active.</p>
+	    <p>The Voice who becomes active loses the amount of Willpower it bids. All others keep their birds. It's perfectly acceptable for the previously active Voice to win a bid and remain active.</p>
+	    <p>Whenever John wakes up, the struggle for control of John happens <i>before</i> the GM describes the situation John wakes up into.</p>
+	    <p>John is pretty easily distracted. Whenever nothing exciting is happening for ten minutes or more (such as on a bus ride or the like), the GM should roll a die. <i>On a roll of 4 or higher</i>, John goes to sleep and wakes up whenever (prompting a struggle for control of John). Whenever John naps like this, all of the Voices <i>gain one willpower</i>.</p>
+      </div>
+    </div>
+	<div class="collapse" id="collapseSimDesc">
+      <div class="card-block">
+        <p>The main concept is that every player but one plays a Voice in John's head. All of these Voices are trying to get John to do something that they are "obsessed" with using a their limited resource of "willpower".</p>
+	    <p>When a Voice successfully gets John to do their obsession, they gain points equal to how difficult the obsession is to accomplish. The game is over and the scores are tallied once all the Voices are out of willpower or when John perishes, whichever comes first.</p>
+      </div>
+    </div>
+	<div class="collapse" id="collapseWill">
+      <div class="card-block">
+        <p>Willpower is a limited resource that the Voice can spend to take control of John or improve its chance of success for any given dice roll.</p>
+	    <p>You <b>start with 10 willpower</b> at the start of the game. You have the option of spending 3 willpower to gain an additional skill before the game starts.</p>
+      </div>
+    </div>
+	<div class="collapse" id="collapseSkil">
+      <div class="card-block">
+        <p>You <b>start with two skills</b> but you can spend three willpower to have a third skill.</p>
+	    <p>Examples: <i>Talking to adults, driving, flying, shooting, eating in axcess, sneaking, lockpicking, performing (dance, sing, instrument), etc.</i></p>
+      </div>
+    </div>
+	<div class="collapse" id="collapseObse">
+      <div class="card-block">
+        <p>Your <b>obsession is the goal</b> you want John to perform successfully. If John completes your obsession, you gain points equal to how difficult it was to pull off. One point is given to obsessions that are pretty easy to accomplish, two points for obsessions that are more difficult or risky, and three points for ones that are incredibly difficult to complete.</p>
+	    <p>One Point Examples: <i>yelling in public, eating candy, etc.</i></p>
+		<p>Two Point Examples: <i>collecting/throwing baseballs, running a mile in new/stolen shoes, etc.</i></p>
+		<p>Three Point Examples: <i>destroying objects, starting a dark ritual, etc.</i></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PLAYER FORMS -->
+<div class="card-deck">
+  <div class="card" id="p1">
+    <div class="card-block">
+	  <h3 class="card-title">Player One &#8628;</h3>
+	  <input type="text" id="p1name" placeholder="Name of Voice"><br>
+	  <input type="text" id="p1obses" placeholder="Obsession"><br>
+	  <input type="text" id="p1skill" placeholder="Skills">
+	  <p></p>
+	  <input type="checkbox" id="p1adds"> Spend 3 willpower for a third skill?
+	  <p></p>
+	  <button type="button" class="btn btn-info" onclick="submitPlayer('p1');">Submit Player</button>
+	</div>
+  </div>
+  <div class="card" id="p2">
+	<div class="card-block">
+	  <h3 class="card-title">Player Two &#8628;</h3>
+	  <input type="text" id="p2name" placeholder="Name of Voice"><br>
+	  <input type="text" id="p2obses" placeholder="Obsession"><br>
+	  <input type="text" id="p2skill" placeholder="Skills">
+	  <p></p>
+	  <input type="checkbox" id="p2adds"> Spend 3 willpower for a third skill?
+	  <p></p>
+	  <button type="button" class="btn btn-info" onclick="submitPlayer('p2');">Submit Player</button>
+	</div>
+  </div>
+  <div class="card" id="p3">
+	<div class="card-block">
+	  <h3 class="card-title">Player Three &#8628;</h3>
+	  <input type="text" id="p3name" placeholder="Name of Voice"><br>
+	  <input type="text" id="p3obses" placeholder="Obsession"><br>
+	  <input type="text" id="p3skill" placeholder="Skills">
+	  <p></p>
+	  <input type="checkbox" id="p3adds"> Spend 3 willpower for a third skill?
+	  <p></p>
+	  <button type="button" class="btn btn-info" onclick="submitPlayer('p3');">Submit Player</button>
+	</div>
+  </div>
+</div>
+<p></p>
+<div class="card-deck">
+  <div class="card" id="p4">
+	<div class="card-block">
+	  <h3 class="card-title">Player Four &#8628;</h3>
+	  <input type="text" id="p4name" placeholder="Name of Voice"><br>
+	  <input type="text" id="p4obses" placeholder="Obsession"><br>
+	  <input type="text" id="p4skill" placeholder="Skills">
+	  <p></p>
+	  <input type="checkbox" id="p4adds"> Spend 3 willpower for a third skill?
+	  <p></p>
+	  <button type="button" class="btn btn-info" onclick="submitPlayer('p4');">Submit Player</button>
+	</div>
+  </div>
+  <div class="card" id="p5">
+	<div class="card-block">
+	    <h3 class="card-title">Player Five &#8628;</h3>
+	    <input type="text" id="p5name" placeholder="Name of Voice"><br>
+	    <input type="text" id="p5obses" placeholder="Obsession"><br>
+	    <input type="text" id="p5skill" placeholder="Skills">
+	    <p></p>
+	    <input type="checkbox" id="p5adds"> Spend 3 willpower for a third skill?
+		<p></p>
+	    <button type="button" class="btn btn-info" onclick="submitPlayer('p5');">Submit Player</button>
+	</div>
+  </div>
+  <div class="card" id="p6">
+	<div class="card-block">
+	    <h3 class="card-title">Player Six &#8628;</h3>
+	    <input type="text" id="p6name" placeholder="Name of Voice"><br>
+	    <input type="text" id="p6obses" placeholder="Obsession"><br>
+	    <input type="text" id="p6skill" placeholder="Skills">
+	    <p></p>
+	    <input type="checkbox" id="p6adds"> Spend 3 willpower for a third skill?
+		<p></p>
+	    <button type="button" class="btn btn-info" onclick="submitPlayer('p6');">Submit Player</button>
+	</div>
+  </div>
+</div>
+</div>
+
+<!-- Vendor JS -->
+<script src="js/jquery-3.4.1.min.js"></script>
+<script src="js/tether.min.js"></script>
+<script src="js/popper.min.js"></script>
+<script src="js/tooltip.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+
+<!-- Custom JS -->
+<!-- Bootstrap Material Design (MDB) // Animations -->
+<script src="js/gamesetup.js"></script>
+<!-- Helper functions for the game -->
+<script src="js/mdb.min.js"></script>
+</body>
+</html>

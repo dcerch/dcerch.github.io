@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+  <meta name="robots" content="none, noarchive">
+
+  <title>Ranked Choice Voting 🗳️</title>
+
+  <!-- Firebase -->
+  <!-- Firebase App is always required and must be first -->
+  <script src="js/firebase-app.js"></script>
+  <script src="js/firebase-config.js" type="text/javascript" charset="utf-8"></script>
+  <script src="js/firebase-operations.js" type="text/javascript" charset="utf-8"></script>
+
+  <!-- Bootstrap core CSS -->
+  <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Google Fonts and Icons -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto|Amatic+SC|Dancing+Script|Indie+Flower|Lobster|Pacifico|Quicksand|Raleway|Source+Sans+Pro|Puritan|Archivo" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="icon" href="img/favicon.png" type="image/x-icon">
+
+  <!-- Font Awesome (Brands Only) -->
+  <link rel="stylesheet" type="text/css" href="vendor/fontawesome-free-5.5.0-web/css/brands.min.css">
+  <link rel="stylesheet" type="text/css" href="vendor/fontawesome-free-5.5.0-web/css/fontawesome.min.css">
+</head>
+<body>
+  <header>
+    <div class="container text-center my-5">
+      <h1>Ranked Choice Voting 🗳️</h1>
+      <p class="lead">Create polls and allow voters to rank choices in order of preference.</p>
+      <div class="alert alert-warning" role="alert">Work in progress</div>
+    </div>
+  </header>
+
+  <section>
+    <div class="container">
+      <div class="card-deck">
+        <div class="card">
+          <div class="card-header"><h3>Create a Poll</h3></div>
+          <div class="card-body">
+            <form>
+              <h5>Name of Poll</h5>
+              <input type="text" class="form-control" placeholder="Hackathon Competition" id="rcvPollName">
+              <hr>
+              <h5>Rankable Choices in Poll</h5>
+              <div id="rcvPollChoices">
+                <input type="text" class="form-control mb-2" placeholder="Bit Rebels">
+                <input type="text" class="form-control mb-2" placeholder="Java Mayhem">
+                <input type="text" class="form-control mb-2" placeholder="405 Found">
+              </div>
+              <div class="text-center">
+                <button type="button" class="btn btn-outline-success mt-2 px-5" id="rcvPollAddChoices"><i class="material-icons align-middle">add</i></button>
+              </div>
+            </form>
+          </div>
+          <div class="card-footer text-muted">
+            <button type="button" class="btn btn-primary btn-lg btn-block" id="rcvPollCreate">Create Voting Poll</button>
+          </div>
+        </div>
+
+        <div class="text-center mb-3 mx-2 display-4" style="padding: 20% 0;">OR</div>
+
+        <div class="card">
+          <div class="card-header"><h3>Vote or View Results of Existing Poll</h3></div>
+          <div class="card-body">
+            <form>
+              <label for="create-input-category"><abbr title="Unique ID to an existing poll, usually starts with a dash (-)">RCV ID</abbr></label>
+              <input class="form-control form-control-lg" type="text" placeholder="ABCDEFGHIJKLMNOPQRSTUVWXYZ" id="rcvPollID">
+            </form>
+          </div>
+          <div class="card-footer text-muted">
+            <div class="row">
+              <div class="col"><button type="button" class="btn btn-primary btn-lg btn-block" id="rcvPollVote">Vote</button></div>
+              <div class="col"><button type="button" class="btn btn-info btn-lg btn-block" id="rcvPollResults">Results</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container text-center my-5">
+      <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#modalHowRCV">How does it work?</button>
+      <div class="modal fade" id="modalHowRCV" tabindex="-1" role="dialog" aria-labelledby="modalHowRCV" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">How does Ranked Choice Voting work?</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <h3>Imagine an example of an political election</h3>
+              <ol class="text-left">
+                <li>If a candidate wins an outright majority of first-preference votes (i.e., 50 percent plus one), he or she will be declared the winner.</li>
+                <li>If, on the other hand, no candidates win an outright majority of first-preference votes, the candidate with the fewest first-preference votes is eliminated.</li>
+                <li>All first-preference votes for the failed candidate are eliminated, lifting the second-preference choices indicated on those ballots.</li>
+                <li>A new tally is conducted to determine whether any candidate has won an outright majority of the adjusted voters.</li>
+                <li>The process is repeated until a candidate wins a majority of votes cast.</li>
+              </ol>
+              <hr>
+              <img src="img/rcv_flowchart.png" class="img-fluid" alt="RCV Flowchart">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Vendor JS -->
+  <script src="vendor/jquery/js/jquery-3.4.1.min.js"></script>
+  <script src="vendor/tether/js/tether.min.js"></script>
+  <script src="vendor/popper/js/popper.min.js"></script>
+  <script src="vendor/popper/js/tooltip.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  <!-- Custom JS -->
+  <script src="js/button-index.js" type="text/javascript" charset="utf-8"></script>
+  <script src="js/init-index.js" type="text/javascript" charset="utf-8"></script>
+</body>
+</html>

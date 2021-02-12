@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Browser -->
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+
+    <!-- Favicon & page title -->
+    <link rel="icon" href="../../../home/img/logo/green/favicon-32x32.png">
+    <title>dominiccerchio</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <div id="projectMailTo">
+      <div class="card-body">
+        <h1 class="display-4">MailTo Generator</h1>
+        <p class="lead">Fill out the fields below to create a draft email that will open your computer's email client or a HTML anchor tag for websites.</p>
+        <p><em>Note: user input is not validated which can lead to broken HTML and URLs.</em></p>
+
+        <div class="row">
+          <div class="col-sm">
+            <div class="form-group">
+              <label>TO</label>
+              <input type="email" class="form-control" placeholder="name@example.com, name@example.com" id="mailto_to">
+            </div>
+            <div class="form-group">
+              <label title="Carbon Copy">CC</label>
+              <input type="email" class="form-control" placeholder="name@example.com, name@example.com" id="mailto_cc">
+            </div>
+            <div class="form-group">
+              <label title="Blind Carbon Copy">BCC</label>
+              <input type="email" class="form-control" placeholder="name@example.com, name@example.com" id="mailto_bcc">
+            </div>
+          </div>
+          <div class="col-sm">
+            <div class="form-group">
+              <label>Subject</label>
+              <input type="text" class="form-control" id="mailto_subject">
+            </div>
+            <div class="form-group">
+              <label>Body</label>
+              <textarea class="form-control" rows="4" id="mailto_body"></textarea>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-primary">Generate MailTo HTML and URL</button>
+        <div class="collapse">
+          <h4 class="mt-3">Generated MailTo HTML and URL</h4>
+          <div class="row">
+            <div class="col-sm">
+              <div class="input-group mb-3">
+                <input class="form-control" type="text" placeholder="Generated HTML Anchor" readonly>
+                <div class="input-group-append">
+                  <button class="btn btn-outline-secondary" type="button">Copy</button>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm">
+              <a class="btn btn-success" href="#" role="button">Draft New Email</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vendor JS -->
+    <script src="../../../vendor/jquery/js/jquery-3.4.1.min.js"></script>
+    <script src="../../../vendor/tether/js/tether.min.js"></script>
+    <script src="../../../vendor/popper/js/popper.min.js"></script>
+    <script src="../../../vendor/popper/js/tooltip.min.js"></script>
+    <script src="../../../vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  	<!-- Custom JS -->
+    <script src="mailto.js"></script>
+  </body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Browser -->
+  <meta charset="utf-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+
+  <!-- Favicon & page title -->
+  <link rel="icon" href="../../../home/img/logo/green/favicon-32x32.png">
+  <title>dominiccerchio</title>
+
+  <!-- Bootstrap core CSS -->
+  <link href="../../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Material IO Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style>
+    .material-icons.md-18 { font-size: 18px; }
+    .material-icons.md-24 { font-size: 24px; }
+    .material-icons.md-36 { font-size: 36px; }
+    .material-icons.md-48 { font-size: 48px; }
+  </style>
+</head>
+<body class="container-fluid my-2">
+  <header>
+    <h1>Time Wrap ⏰</h1>
+    <p class="lead">Keep track of your time spent on projects.</p>
+  </header>
+  <main>
+    <section id="sectionTimer">
+      <article class="border border-info d-sm-flex justify-content-between mb-3">
+        <input class="form-control m-2" type="text" placeholder="Timer Label">
+        <select class="custom-select m-2">
+          <option selected disabled>Labor Category</option>
+          <option disabled>Overhead</option>
+          <option value="o1">Premier - Presales Activity</option>
+          <option value="o2">General Administration</option>
+          <option value="o3">Meetings & Events</option>
+          <option value="o4">Mentor / Community / Non-Sanctioned IP Dev / Practice Contribution</option>
+          <option value="o5">New Hire Training</option>
+          <option value="o6">Premier Proactive Offerings Accreditation</option>
+          <option value="o7">Training Taken</option>
+          <option value="o8">Standy / Bench Time</option>
+          <option value="o9">Time Away</option>
+          <option value="o10">Travel - Non-Util</option>
+          <option disabled><b>Client Billable</b></option>
+          <option value="c1">Service Delivery Management</option>
+          <option value="c2">Reactive Service Management</option>
+          <option value="c3">Cloud Consumption Management</option>
+          <option value="c4">Advisory Services</option>
+          <option value="c5">Travel (Non-Billable)</option>
+          <option value="c6">Travel (Billable)</option>
+        </select>
+        <input class="form-control timerInput m-2" type="text" placeholder="HH:MM:SS" readonly>
+        <a href="javascript:void(0)" class="align-self-center startTimer m-2" title="Start Timer"><i class="material-icons md-36">timer</i></a>
+        <a href="javascript:void(0)" class="align-self-center pauseTimer m-2 collapse" title="Pause Timer"><i class="material-icons md-36">timer_off</i></a>
+      </article>
+    </section>
+
+    <section class="text-center" id="sectionCreate">
+      <button type="button" class="btn btn-outline-primary">Add New Timer</button>
+    </section>
+
+    <section id="sectionTotal">
+      <h3>Total Time: <b>00:00:00</b></h3>
+    </section>
+
+    <section>
+      <hr>
+      <h3>References</h3>
+      <ul>
+        <li><a href="http://flipclockjs.com/#">Flip Clock</a></li>
+        <li><a href="https://www.w3schools.com/graphics/canvas_clock_start.asp">W3 Schools Canvas Clock Start</a></li>
+        <li><a href="https://www.w3schools.com/js/tryit.asp?filename=tryjs_timing_clock">W3 Schools Timer</a></li>
+        <li><a href="https://cssanimation.rocks/clocks/">Analog Clock</a></li>
+      </ul>
+    </section>
+  </main>
+  <footer>
+    <small>Copyright ©️ Time Wrap 2018. All rights reserved.</small>
+  </footer>
+  <!-- JavaScript Core Files
+  ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <!-- Bootstrap -->
+  <script src="../../../vendor/jquery/js/jquery-3.4.1.min.js"></script>
+  <script src="../../../vendor/tether/js/tether.min.js"></script>
+  <script src="../../../vendor/popper/js/popper.min.js"></script>
+  <script src="../../../vendor/popper/js/tooltip.min.js"></script>
+  <script src="../../../vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  <!-- Easy Timer -->
+  <script src="easytimer.min.js"></script>
+
+  <!-- Custom -->
+  <script src="timer.js"></script>
+</body>
+</html>

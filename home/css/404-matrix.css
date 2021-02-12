@@ -1,0 +1,83 @@
+/*
+  **********
+  404 MATRIX
+  **********
+*/
+@import 'https://fonts.googleapis.com/css?family=Roboto+Mono:100';
+html, body {
+  font-family: 'Roboto Mono', monospace;
+  background: #212121;
+  height: 100%;
+}
+h1 {
+  font-size: 100px;
+  padding: 10px 10px;
+}
+.matrix-container {
+  height: 70%;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+.matrix-text {
+  font-weight: 100;
+  font-size: 28px;
+  color: #FAFAFA;
+}
+.matrix-dud {
+  color: #757575;
+}
+/* 3D Cube */
+.matrix-wrap {
+	perspective: 800px;
+	perspective-origin: 10% 300px;
+	cursor: pointer;
+}
+.matrix-cube {
+	position: relative;
+	width: 50px;
+	transform-style: preserve-3d;
+	animation: spin 8s infinite linear;
+	left: 40px;
+	top: 50px;
+}
+.matrix-cube div {
+	position: absolute;
+	width: 50px;
+	height: 50px;
+	border: 1px solid #1ec503;
+	color: #1ec503;
+	box-shadow: inset 0px 0px 3px 3px rgba(30,197,3,0.5);
+	text-align: center;
+	line-height: 50px;
+	font-weight: bold;
+}
+.matrix-back {
+	transform: translateZ(-25px) rotateY(180deg);
+}
+.matrix-right {
+	transform: rotateY(-270deg) translateX(25px);
+	transform-origin: top right;
+	font-size: 200%;
+}
+.matrix-left {
+	transform: rotateY(270deg) translateX(-25px);
+	transform-origin: center left;
+	font-size: 200%;
+}
+.matrix-top {
+	transform: rotateX(-90deg) translateY(-25px);
+	transform-origin: top center;
+}
+.matrix-bottom {
+	transform: rotateX(90deg) translateY(25px);
+	transform-origin: bottom center;
+}
+.matrix-front {
+	transform: translateZ(25px);
+}
+@keyframes spin {
+	from { transform: rotateY(0); }
+	to { transform: rotateY(360deg); }
+}

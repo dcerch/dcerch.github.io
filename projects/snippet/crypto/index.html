@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Browser -->
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+
+    <!-- Favicon & page title -->
+    <link rel="icon" href="../../../home/img/logo/green/favicon-32x32.png">
+    <title>dominiccerchio</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <div id="projectCrypto">
+      <div class="card-body">
+        <h1 class="display-4">Cryptocurrency</h1>
+        <p class="lead">Determine how much you have earned based on your transaction history.</p>
+      </div>
+      <div class="card-deck">
+        <div class="card mx-sm-5">
+          <div class="card-header">Transaction History</div>
+          <div class="card-body">
+            <p><small class="mb-3">Manually input the amount of USD you spent to get X amount of coin(s) or use an exported Coinbase transaction history report.</small></p>
+            <hr>
+            <h5>Manual Transaction Input</h5>
+            <input type="number" step="0.01" class="form-control" placeholder="How much USD did you pay?">
+            <input type="number" step="0.01" class="form-control mt-3" placeholder="How many coins did you get?">
+            <p class="mt-3">Submit transaction for which of the following coins?</p>
+            <div class="btn-group mb-3" role="group" aria-label="Cryptocurrency">
+              <button class="btn btn-outline-info" type="button" title="Bitcoin">BTC</button>
+              <button class="btn btn-outline-info" type="button" title="Bitcoin Cash">BCH</button>
+              <button class="btn btn-outline-info" type="button" title="Ethereum">ETH</button>
+              <button class="btn btn-outline-info" type="button" title="Litecoin">LTC</button>
+            </div>
+            <p class="text-center">OR</p>
+            <h5>Coinbase CSV Report Upload</h5>
+            <input type="file" style="overflow: hidden;" class="form-control">
+          </div>
+        </div>
+        <div class="card mr-sm-5">
+          <div class="card-header">Gain/Loss Calculator</div>
+          <div class="card-body table-responsive">
+            <p><small class="mb-3">Your gain/loss per transaction will appear in the table below along with your grand total gain/loss.</small></p>
+            <hr>
+            <table class="table table-sm table-striped">
+            <tr>
+            <th>Transaction</th>
+            <th>Current Coin Price</th>
+            <th>Gain/Loss</th>
+            </tr>
+            </table>
+            <h6>Net Total: $<b>0.00</b></h6>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <h4>Privacy</h4>
+        <p>Your input is processed completely on the frontend, which means the data you provide does not get stored anywhere other than your browser.</p>
+      </div>
+      <!-- Cryptonator Information -->
+      <div class="card-body">
+        <h3>Cryptonator Widgets</h3>
+        <p>Cryptonator is a direct cryptocurrency exchange. They make <a href="https://www.cryptonator.com/widget/">widgets</a> as shown below. Note: You will be redirected to Cryptonator's site since the widgets are not intergrated with this site due to performance reasons.</p>
+      </div>
+      <div class="card-deck mb-4">
+        <div class="card bg-light border-secondary ml-sm-5">
+          <div class="card-body">
+            <h5>Multicurrency Calculator</h5>
+            <button type="button" class="btn btn-primary" id="cryptonatorCalc">Open Cryptonator's Calculator</button>
+          </div>
+        </div>
+        <div class="card bg-light border-secondary mr-sm-5">
+          <div class="card-body">
+            <h5>Cryptocurrency Price Ticker</h5>
+            <button type="button" class="btn btn-primary" id="cryptonatorPrice">Open Cryptonator's Price Ticker</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vendor JS -->
+    <script src="../../../vendor/jquery/js/jquery-3.4.1.min.js"></script>
+    <script src="../../../vendor/tether/js/tether.min.js"></script>
+    <script src="../../../vendor/popper/js/popper.min.js"></script>
+    <script src="../../../vendor/popper/js/tooltip.min.js"></script>
+    <script src="../../../vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="../../../vendor/papaparse/js/papaparse.min.js"></script>
+
+  	<!-- Custom JS -->
+    <script src="crypto.js"></script>
+  </body>
+</html>

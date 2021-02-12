@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Browser -->
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+
+    <!-- Favicon & page title -->
+    <link rel="icon" href="../../../home/img/logo/green/favicon-32x32.png">
+    <title>dominiccerchio</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <div id="projectPackage">
+      <div class="card-body">
+        <h1 class="display-4">Package Tracker</h1>
+        <p class="lead">Track one or more of your packages via one of the carriers below.</p>
+        <input class="form-control" type="text" placeholder="Enter a tracking number" id="trackingnumber"/>
+
+        <div class="btn-group mb-3" role="group" aria-label="Carriers">
+          <button type="button" class="btn btn-info" onclick="trackPackage('ups')">UPS</button>
+          <button type="button" class="btn btn-info" onclick="trackPackage('fedex')">FEDEX</button>
+          <button type="button" class="btn btn-info" onclick="trackPackage('usps')">USPS</button>
+          <button type="button" class="btn btn-info" onclick="trackPackage('dhl')">DHL</button>
+        </div>
+
+        <h3>Recent Tracking Numbers</h3>
+        <div class="list-group mb-3" id="trackingarea"></div>
+        <button type="button" class="btn btn-danger btn-sm" onclick="clearTracking()">Clear Number(s)</button>
+      </div>
+    </div>
+
+    <!-- Vendor JS -->
+    <script src="../../../vendor/jquery/js/jquery-3.4.1.min.js"></script>
+    <script src="../../../vendor/tether/js/tether.min.js"></script>
+    <script src="../../../vendor/popper/js/popper.min.js"></script>
+    <script src="../../../vendor/popper/js/tooltip.min.js"></script>
+    <script src="../../../vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  	<!-- Custom JS -->
+    <script src="package.js"></script>
+  </body>
+</html>

@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="Dominic's Personal Projects"/>
+    <meta name="author" content="Dominic Cerchio"/>
+    <link rel="icon" href="img/favicon.ico">
+
+    <title>Lost at Sea | dominiccerchio</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="css/custom.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="display-4 text-center mt-3 mb-5">Lost at Sea ⛵</h1>
+      <br><br>
+      <div class="card">
+        <div class="card-body">
+          <div id="latIntroduction">
+            <h3>Situation Description</h3>
+            <p>You have chartered a yacht with three friends, for the holiday trip of a lifetime across the Atlantic Ocean. Because none of you have any previous sailing experience, you have hired an experienced skipper and two-person crew. About half way through your journey in the mid-Atlantic, a fierce fire breaks out in the ships galley. The skipper and crew have been lost whilst trying to fight the blaze. Much of the yacht is destroyed and is slowly sinking. Your location is unclear because vital navigational and radio equipment have been damaged in the fire. Your best estimate is that you are many hundreds of miles from the land.</p>
+            <p>You and your friends have managed to save 15 items, undamaged and intact after the fire. <strong>In addition, you have salvaged a four man rubber life raft and a box of matches.</strong> Your task is to rank the 15 items in terms of their importance to your survival as you wait to be rescued.</p>
+
+            <div class="alert alert-warning text-center" role="alert">
+              After clicking the "Start Game" button, you'll have 4 minutes to drag and drop items in order of their importance to your survival. After your time has run out, your list will be finalized, your score will be calculated and the "View Results" button will activate. The results screen will reveal if you survived, your chance to be rescued and how you match up against the US Coast Guard's ranks.
+            </div>
+            <button type="button" class="btn btn-primary btn-lg btn-block" id="latStart">Start Game</button>
+          </div>
+          <div class="collapse" id="latGame">
+            <h1 class="display-3 text-center" id="latTimer"></h1>
+            <p class="border border-bottom-0 rounded-top border-success text-center pt-2"><small class="text-muted">Highest Priority</small></p>
+            <ul class="list-group mb-2" id="latList">
+              <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-warning" value="15">An octant <span>🧭</span></li>
+              <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-warning" value="1">A shaving mirror <span>🔲</span></li>
+              <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-warning" value="14">A quantity of mosquito netting <span>🦟</span></li>
+              <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-warning" value="3">A 25 liter container of water <span>🌊</span></li>
+              <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-warning" value="4">A case of army rations <span>🥫</span></li>
+              <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-warning" value="13">Maps of the Atlantic Ocean <span>🗺️</span></li>
+              <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-warning" value="9">A floating seat cushion <span>💺</span></li>
+              <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-warning" value="2">A 10 liter can of oil/petrol mixture <span>🛢️</span></li>
+              <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-warning" value="12">A small transistor radio <span>📻</span></li>
+              <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-warning" value="5">20 square feet of opaque plastic sheeting <span>⬜</span></li>
+              <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-warning" value="10">A can of shark repellent <span>🦈</span></li>
+              <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-warning" value="11">One bottle of 160 proof rum <span>🥃</span></li>
+              <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-warning" value="8">15 feet of nylon rope <span>🌿</span></li>
+              <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-warning" value="6">2 boxes of chocolate bars <span>🍫</span></li>
+              <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-warning" value="7">An ocean fishing kit & pole <span>🎣</span></li>
+            </ul>
+            <p class="border border-top-0 rounded-bottom border-danger text-center pb-2"><small class="text-muted">Least Priority</small></p>
+            <button type="button" class="btn btn-success btn-lg btn-block" id="latFinish" disabled>View Results</button>
+          </div>
+          <div class="collapse" id="latResults">
+            <div id="latRescue"></div>
+            <h3>Quick Explanation</h3>
+            <p>According to the US Coast Guard, the basic supplies needed when a person is stranded mid-ocean are articles to attract attention and aid survival until rescue arrives. A transatlantic trip takes roughly 20 days; significantly less with good winds and significantly more without them.</p>
+            <p>Articles for navigation are of little importance since even if a small life raft were capable of reaching land, it would be impossible to store enough food and water to survive for that amount of time. Without signaling devices, there is almost no chance of being spotted and rescued.</p>
+            <div class="table-responsive-md">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th scope="col">Priority</th>
+                    <th scope="col">Your Choice</th>
+                    <th scope="col">Coast Guard Choice</th>
+                    <th scope="col">Coast Guard Jusification</th>
+                  </tr>
+                </thead>
+                <tbody id="latTable"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vendor JS -->
+    <script src="vendor/jquery/js/jquery-3.4.1.min.js"></script>
+    <script src="vendor/tether/js/tether.min.js"></script>
+    <script src="vendor/popper/js/popper.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="vendor/easytimer/js/easytimer.min.js"></script>
+    <script src="vendor/jquery/js/jquery-ui.min.js"></script>
+    <script src="vendor/jquery/js/jquery.ui.touch-punch.min.js"></script>
+
+  	<!-- Custom JS -->
+    <script src="js/choices.js"></script>
+    <script src="js/logic.js"></script>
+  </body>
+</html>

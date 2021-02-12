@@ -1,0 +1,49 @@
+/*
+  *************
+  404 STAR WARS
+  *************
+*/
+body, html {
+  background: url("../img/404-moseisley.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+.starwars {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  text-align: center;
+  color: #fff;
+}
+.starwars img {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  border: 2px solid #3784d6;
+  box-shadow: 0 0 15px #9ecaed;
+  border-radius: 10px;
+}
+.starwars h1 {
+  font-size: 100px;
+  color: #feda4a;
+  font-family: 'Pathway Gothic One', sans-serif;
+  font-weight: bold;
+  letter-spacing: 6px;
+  transform-origin: 50% 100%;
+  transform: perspective(300px) rotateX(25deg);
+}
+.starwars p {
+  font-size: 120%;
+  display: none;
+}
+.starwars button {
+  display: none;
+  z-index: 100000;
+}

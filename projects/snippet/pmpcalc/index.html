@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Browser -->
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+
+    <!-- Favicon & page title -->
+    <link rel="icon" href="../../../home/img/logo/green/favicon-32x32.png">
+    <title>dominiccerchio</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <div id="projectPMPCalc">
+      <div class="card-body">
+        <h1 class="display-4">PMP Calculator</h1>
+        <p class="lead">Approximate work hours spent on a project and compare with a standard PMP project lifecycle curve.</p>
+        <form>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="projectStartDate">Project Start Date</label>
+              <input type="date" class="form-control" id="projectStartDate"/>
+            </div>
+            <div class="form-group col-md-6">
+              <label for="projectEndDate">Project End Date</label>
+              <input type="date" class="form-control" id="projectEndDate"/>
+            </div>
+          </div>
+        </form>
+        <button type="button" class="btn btn-primary btn-lg btn-block mb-3">Calculate</button>
+        <table class="table">
+          <thead>
+            <tr>
+            <td>PMP Phase</td>
+            <td>Standard Phase Involvement</td>
+            <td>Hours Worked</td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th>Initiation</th>
+              <td>13%</td>
+              <td><input class="form-control" type="text" placeholder="0" readonly="1" id="phaseInitiation" /></td>
+            </tr>
+            <tr>
+              <th>Planning</th>
+              <td>24%</td>
+              <td><input class="form-control" type="text" placeholder="0" readonly="1" id="phasePlanning" /></td>
+            </tr>
+            <tr>
+              <th>Executing</th>
+              <td>31%</td>
+              <td><input class="form-control" type="text" placeholder="0" readonly="1" id="phaseExecuting" /></td>
+            </tr>
+            <tr>
+              <th>Monitoring and Controlling</th>
+              <td>25%</td>
+              <td><input class="form-control" type="text" placeholder="0" readonly="1" id="phaseMonitoring" /></td>
+            </tr>
+            <tr>
+              <th>Closing</th>
+              <td>7%</td>
+              <td><input class="form-control" type="text" placeholder="0" readonly="1" id="phaseClosing" /></td>
+            </tr>
+            <tr>
+              <th>Total</th>
+              <td>100%</td>
+              <td><input class="form-control" type="text" placeholder="0" readonly="1" id="phaseTotal" /></td>
+            </tr>
+          </tbody>
+        </table>
+        <small>Calculations based on a non-overlapping 8 hour work days, 5 days a week. Please note that typical 2 week vacations are not taken into account with this tool. There are 50 work weeks in a year max which equates to 2000 work hours. For comparsion purposes, 4500 hours and a four-year higher education degree are requirements for PMP eligibility. See <a href="https://www.interfacett.com/blogs/applying-for-the-pmp-exam-hours-what-about-my-hours/">this blog</a> for more details.</small>
+      </div>
+    </div>
+
+    <!-- Vendor JS -->
+    <script src="../../../vendor/jquery/js/jquery-3.4.1.min.js"></script>
+    <script src="../../../vendor/tether/js/tether.min.js"></script>
+    <script src="../../../vendor/popper/js/popper.min.js"></script>
+    <script src="../../../vendor/popper/js/tooltip.min.js"></script>
+    <script src="../../../vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  	<!-- Custom JS -->
+    <script src="pmpcalc.js"></script>
+  </body>
+</html>

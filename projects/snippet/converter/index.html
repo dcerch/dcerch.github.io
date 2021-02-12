@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Browser -->
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+
+    <!-- Favicon & page title -->
+    <link rel="icon" href="../../../home/img/logo/green/favicon-32x32.png">
+    <title>dominiccerchio</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <div id="projectConverter">
+      <div class="card-body">
+        <h1 class="display-4">Converter</h1>
+        <p class="lead">Convert your plain old text into valid URLs, Unicode (UTF-8) characters or JavaScript keystroke codes!</p>
+        <!-- Converter input area -->
+        <textarea class="form-control mb-4" rows="5" id="converterinput" placeholder="Write your text here (for example, 'mountain')"></textarea>
+
+        <!-- Converters -->
+        <button type="button" class="btn btn-outline-primary" onclick="decodeURL();">Decode URL</button>
+        <button type="button" class="btn btn-outline-primary" onclick="encodeURL();">Encode URL</button>
+        <button type="button" class="btn btn-outline-primary" onclick="convertUTF();">UTF-8 (Emoji)</button>
+        <button type="button" class="btn btn-outline-primary" onclick="convertKey();">JS Keycodes</button>
+
+        <!-- Converter display area -->
+        <div class="mt-3"><small>For reference: <a href="https://unicode.org/emoji/charts/full-emoji-list.html">Full Browser Emoji List Website</a></small></div>
+        <p class="display-3 my-3" id="converteroutput"></p>
+      </div>
+    </div>
+
+    <!-- Vendor JS -->
+    <script src="../../../vendor/jquery/js/jquery-3.4.1.min.js"></script>
+    <script src="../../../vendor/tether/js/tether.min.js"></script>
+    <script src="../../../vendor/popper/js/popper.min.js"></script>
+    <script src="../../../vendor/popper/js/tooltip.min.js"></script>
+    <script src="../../../vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  	<!-- Custom JS -->
+    <script src="url.js"></script>
+    <script src="convertkey.js"></script>
+    <script src="convertutf.js"></script>
+  </body>
+</html>

@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="robots" content="none, noarchive">
+
+    <title>Raspberry Pi Designer | dominiccerchio</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body class="bg-secondary">
+    <!-- Banner -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="#">Raspberry Pi Designer</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#banner" aria-controls="banner" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="banner">
+        <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+          <li class="nav-item active">
+            <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#about" data-toggle="modal">About</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#hardware" data-toggle="modal">Hardware Specifications</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#examples" data-toggle="modal">Build Examples</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Choose RPI Jumbotron -->
+    <div class="container mt-3" id="RPIJumbtron">
+      <div class="jumbotron">
+        <h1 class="display-4">Raspberry Pi Designer</h1>
+        <p class="lead">Customize an entire Raspberry Pi kit using the designer below.</p>
+        <hr class="my-4">
+        <p>Start by choosing the board you'd like to design, browse the different components for your kit and view more details and pricing on Amazon.</p>
+        <div class="btn-group">
+          <button type="button" class="btn btn-primary btn-lg dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">choose your board </button>
+          <div class="dropdown-menu" id="rpiChoice">
+            <a class="dropdown-item" href="#rpi0">Raspberry Pi 0</a>
+            <a class="dropdown-item" href="#rpi3">Raspberry Pi 3</a>
+            <a class="dropdown-item" href="#rpi4">Raspberry Pi 4</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Product Families -->
+    <div class="carousel slide collapse mt-3" data-ride="carousel" data-interval="false" id="productDisplay">
+      <div class="carousel-inner container" id="productCarousel"></div>
+      <a class="carousel-control-prev" href="#productDisplay" role="button" data-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+      </a>
+      <a class="carousel-control-next" href="#productDisplay" role="button" data-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+      </a>
+    </div>
+
+    <!-- Modal: About -->
+    <div class="modal fade" id="about" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">About Raspberry Pi Designer</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          </div>
+          <div class="modal-body">
+            <p>The Raspberry Pi Designer is an easy to use tool in efforts to customize an entire Raspberry Pi kit for any of your DIY projects. The main purpose is to bring you one step closer to making your dreams a realty and provide some inspiration along the way.</p>
+            <h4>Simple Instructions</h4>
+            <ol>
+              <li>Select your board (only RP0, RPI3, and RPI4 available).</li>
+              <li>Browse the different components: cases, storage, power, controllers, travel, and accessories.</li>
+              <li>Open any product you may be interested in using the button to Amazon to learn details, reviews and pricing.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Hardware -->
+    <div class="modal fade" id="hardware" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Hardware Specifications</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          </div>
+          <div class="modal-body">
+            <div class="table-responsive">
+              <table class="table table-striped">
+                <thead class="thead-dark">
+                  <tr>
+                    <th scope="col">Component</th>
+                    <th scope="col">RPI0</th>
+                    <th scope="col">RPI3</th>
+                    <th scope="col">RPI4</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">SOC</th>
+                    <td>Broadcom BCM2835, single-core ARM11 @ 1.0 GHz</td>
+                    <td>Broadcom BCM2837B0, quad-core Cortex-A53 @ 1.4 GHz</td>
+                    <td>Broadcom BCM2711, quad-core Cortex-A72 @ 1.5 GHz</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">GPU</th>
+                    <td>None</td>
+                    <td>VideoCore IV with OpenGL ES 1.1, 2.0</td>
+                    <td>VideoCore VI with OpenGL ES 1.1, 2.0, 3.0</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Video Decode</th>
+                    <td>Unknown</td>
+                    <td>H.264 & MPEG-4 1080p30</td>
+                    <td>H.265 4Kp60, H.264 1080p60</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Video Encode</th>
+                    <td>Unknown</td>
+                    <td>H.264 1080p30</td>
+                    <td>H.264 1080p30</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Memory</th>
+                    <td>512MB LPDDR2 SDRAM</td>
+                    <td>1GB LPDDR2</td>
+                    <td>1GB, 2GB, or 4GB LPDDR4</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Storage</th>
+                    <td>microSD card</td>
+                    <td>microSD card</td>
+                    <td>microSD card</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Video & Audio Output</th>
+                    <td>1x mini-HDMI, no audio output</td>
+                    <td>1x HDMI 1.4 port up to 1080p60, 3.5mm AV port (composite + audio), MIPI DSI connector</td>
+                    <td>2x micro HDMI ports up to 4Kp60, 3.5mm AV port (composite + audio), MIPI DSI connector</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Camera</th>
+                    <td>MIPI CSI connector</td>
+                    <td>MIPI CSI connector</td>
+                    <td>MIPI CSI connector</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Ethernet</th>
+                    <td>None</td>
+                    <td>Gigabit Ethernet over USB (300 Mbps max.)</td>
+                    <td>Native Gigabit Ethernet</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">WiFi</th>
+                    <td>Dual band 802.11 n</td>
+                    <td>Dual band 802.11 b/g/n/ac</td>
+                    <td>Dual band 802.11 b/g/n/ac</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Bluetooth</th>
+                    <td>Bluetooth 4.0</td>
+                    <td>Bluetooth 4.2 + BLE</td>
+                    <td>Bluetooth 5.0 + BLE</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">USB</th>
+                    <td>1x micro-USB</td>
+                    <td>4x USB 2.0</td>
+                    <td>2x USB 3.0 + 2x USB 2.0</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Expansion</th>
+                    <td>40-pin GPIO (unpopulated)</td>
+                    <td>40-pin GPIO header</td>
+                    <td>40-pin GPIO header</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Power Supply</th>
+                    <td>3.3V via micro-USB up to .23A</td>
+                    <td>5V via micro-USB up to 2.5A, 5V via GPIO header up to 3A, Power over Ethernet via PoE HAT</td>
+                    <td>5V via USB type-C up to 3A, 5V via GPIO header up to 3A, Power over Ethernet via PoE HAT</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Dimensions</th>
+                    <td>65 x 30 x 05 mm</td>
+                    <td>85 × 56 x 17 mm</td>
+                    <td>85 × 56 x 17 mm</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Examples -->
+    <div class="modal fade" id="examples" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Build Examples</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          </div>
+          <div class="modal-body">
+            <p>View the wide amount of creative projects that the raspberry pi can accomplish.</p>
+            <ul class="list-group">
+              <li class="list-group-item">
+                <h5>Weather Station</h5>
+                <p>Sure, sure, you could always just look out the window to see what the weather is like, but where’s the fun in that when you could have precise temperature, atmospheric pressure, wind speed, and a forecast along with all of that? Look no further than your Raspberry Pi, and a few extra components.</p>
+              </li>
+              <li class="list-group-item">
+                <h5>Photo Booth</h5>
+                <p>What’s more fun than taking lots of great photos with your friends when you’re all hanging out having a great time? Turn the Pi you’ve had sitting around for ages into a photo booth designed specifically to capture those awesome moments, and then share them with your friends.</p>
+              </li>
+              <li class="list-group-item">
+                <h5>Home Surveillance System</h5>
+                <p>The beauty of the Raspberry Pi is that it’s a pocket-sized computer. That means it can go virtually anywhere, like in the garage, near the front door, or anywhere else you need a pair of eyes and have a power outlet. This beginner project will turn your Pi into a home security system in no time.</p>
+              </li>
+              <li class="list-group-item">
+                <h5>DIY Arcade Stick</h5>
+                <p>By far one of the most popular Pi projects is an arcade machine, and we’ll get to that. We’re putting the cart before the horse a little bit and suggesting that you put your retro game console inside an arcade stick, so you can play your favorite old school games on the perfect controller for those games all at once.</p>
+              </li>
+              <li class="list-group-item">
+                <h5>Completely Portable, Digital eBook Library</h5>
+                <p>If ebooks are your thing, and carrying around tons of them—or even sharing them with others—is your jam, this mobile digital library is ideal for keeping, sharing, and trading books with your friends. Best of all, it’s completely powered by a Raspberry Pi. It’s portable, and turns your Pi into a Wi-Fi hotspot that others can connect to, find something to read, and grab it to take with them. Isn’t sharing wonderful?</p>
+              </li>
+              <li class="list-group-item">
+                <h5>Go-Anywhere, Wearable Camera</h5>
+                <p>Maybe you want to chronicle your life, or do one of those “day in the life” experimental videos where someone can walk a mile in your shoes. Maybe you’re just planning an awesome hike or bike ride and want to take a video of the whole trip. Well, if you have a Pi, you have a perfect project to capture all the fun. This wearable camera is powered by a Pi and a battery, and is small enough to tuck on a shirt or around your neck on a lanyard.</p>
+              </li>
+              <li class="list-group-item">
+                <h5>Whole-Network Ad Blocker</h5>
+                <p>If you’re a little more tech-inclined, consider this whole-network ad blocker that’ll protect all the devices and systems on your network from ads, malvertising, and other annoying hover-over and pop-over ads, even on your mobile devices. It’s a little work, but it’s worth it.</p>
+              </li>
+              <li class="list-group-item">
+                <h5>Streaming Internet Radio</h5>
+                <p>Using a Raspberry Pi to stream Spotify, Pandora, Google Music, and other streaming internet radio and podcasts is another super popular project. And why not? It’s easy, and depending on how much energy you want to put into the project you can have a touch-screen capable jukebox that anyone who wants to control the playlist can use, or you can have something beautiful that sits on a shelf and looks like a vintage Hi-Fi.</p>
+              </li>
+              <li class="list-group-item">
+                <h5>DIY Amazon Echo</h5>
+                <p>Amazon practically wants you to turn your Raspberry Pis into Echo Dots. Seriously, they released the official instructions on how to do so (after people started doing it themselves, of course,) and then not too long ago they unlocked the only thing they held back in the first place—triggering it with a wake word.</p>
+              </li>
+              <li class="list-group-item">
+                <h5>Retro Gaming Console</h5>
+                <p>We’ve teased at it, and covered in the past, but by far our preferred suggestion for beginners is to build your own Raspberry Pi-powered retro game console and play the hell out of your favorite old school titles.</p>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="vendor/jquery/js/jquery-3.4.1.min.js"></script>
+    <script src="vendor/popper/js/popper.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+
+    <!-- Custom CSS -->
+    <script src="js/products.js"></script>
+    <script src="js/productbuilder.js"></script>
+    <script src="js/cart.js"></script>
+  </body>
+</html>

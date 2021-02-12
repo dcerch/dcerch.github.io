@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /home/
+Disallow: /projects/full/
+Disallow: /projects/snippet/
+Disallow: /vendor/

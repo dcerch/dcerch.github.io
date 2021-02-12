@@ -1,0 +1,17 @@
+var officialChoices = [
+  {'item': 'A shaving mirror 🔲', 'justification': 'Of all the items, the mirror is absolutely critical. It is the most powerful tool you have for communicating your presence. In sunlight, a simple mirror can generate five to seven million candlepower of light. The reflected sunbeam can even be seen beyond the horizon.', 'priority': '1'},
+  {'item': 'A 10 liter can of oil/petrol mixture 🛢️', 'justification': 'The second most critical item for signaling. The mixture will float on water and can be ignited using the matches.', 'priority': '2'},
+  {'item': 'A 25 liter container of water 🌊', 'justification': 'Vital to restore fluids lost through perspiration. 25 liters will supply water rations for your group for several days.', 'priority': '3'},
+  {'item': 'A case of army rations 🥫', 'justification': 'This is your basic food intake.', 'priority': '4'},
+  {'item': '20 square feet of opaque plastic sheeting ⬜', 'justification': 'Can be used to collect rain water and shelter from the wind and waves.', 'priority': '5'},
+  {'item': '2 boxes of chocolate bars 🍫', 'justification': 'Your reserve food supply.', 'priority': '6'},
+  {'item': 'An ocean fishing kit & pole 🎣', 'justification': 'Ranked lower than the chocolate as there is no guarantee you will catch any fish. The pole might be used as a tent pole.', 'priority': '7'},
+  {'item': '15 feet of nylon rope 🌿', 'justification': 'Could be used to lash people or equipment together to prevent being washed overboard. There are a variety of other uses, but none high on the list for survival.', 'priority': '8'},
+  {'item': 'A floating seat cushion 💺', 'justification': 'Useful as a life preserver if someone fell overboard.', 'priority': '9'},
+  {'item': 'A can of shark repellent 🦈', 'justification': 'To repel sharks, of course!', 'priority': '10'},
+  {'item': 'One bottle of 160 proof rum 🥃', 'justification': 'Contains 80% alcohol, which means it can be used as an antiseptic for any injuries, otherwise of little value. Very dangerous if drunk, as it would cause the body to dehydrate, the opposite of what you need to survive.', 'priority': '11'},
+  {'item': 'A small transistor radio 📻', 'justification': 'You would be out of range of any radio station.', 'priority': '12'},
+  {'item': 'Maps of the Atlantic Ocean 🗺️', 'justification': 'Worthless without navigation equipment.', 'priority': '13'},
+  {'item': 'A quantity of mosquito netting 🦟', 'justification': 'There are NO mosquitoes in the middle of the Atlantic Ocean and the netting is useless for anything else.', 'priority': '14'},
+  {'item': 'An octant 🧭', 'justification': 'Useless without the relevant tables and a chronometer.', 'priority': '15'},
+];

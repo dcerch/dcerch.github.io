@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <link rel="icon" href="img/favicon.png">
+
+    <title>Kojima Name Generator</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="css/custom.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="container">
+      <div class="card mt-5" id="sectionInformation">
+        <div class="card-body">
+          <h1 class="display-4 text-center">Kojima Name Generator</h1>
+          <h3>Overview</h3>
+          <p>This name generator is an adaptation of Brian David Gilbert's Kojima Name Generator. The original 11-page worksheet that was used to create a Kojima name is now a webapp; slightly modified to automate the process. You do not need to figure out name alternatives, conditions, or categories. In this version, all you need to do is fill out the personal and Kojima information - the webapp will take care of the rest.</p>
+
+          <h3>Instructions</h3>
+          <p>Fill out both the personal information and Kojima information sections then click on "Generate Kojima Name" to get your results instantly.</p>
+
+          <hr>
+
+          <div class="card-deck mb-3">
+            <div class="card bg-light mb-3">
+              <div class="card-body">
+                <h5 class="card-title">Personal Information</h5>
+                <p class="card-text">Kojima's characters have names that are directly related to their own character traits. This information will make sure your name fits your personality.</p>
+              </div>
+              <div class="card-footer text-center">
+                <button type="button" class="btn btn-outline-dark btn-block btn-sm" data-toggle="modal" data-target="#modalPersonal">Fill out Personal Form</button>
+              </div>
+            </div>
+            <div class="card text-white bg-dark mb-3">
+              <div class="card-body">
+                <h5 class="card-title">Kojima Information</h5>
+                <p class="card-text">Kojima character names reflect his own idiosyncrasies. He can’t help himself.</p>
+              </div>
+              <div class="card-footer text-center">
+                <button type="button" class="btn btn-outline-light btn-block btn-sm" data-toggle="modal" data-target="#modalKojima">Fill out Kojima Form</button>
+              </div>
+            </div>
+          </div>
+
+          <button type="button" class="btn btn-success btn-lg btn-block mb-3" id="generate">Generate Kojima Name</button>
+          <small >All credit goes to <a href="https://www.twitter.com/briamgilbert">Brian Gilbert</a> from <a href="https://www.polygon.com/">Polygon</a> for <a href="https://www.polygon.com/videos/2019/11/11/20959269/unraveled-kojima-name-generator-death-stranding">this amazing worksheet</a>.</small>
+        </div>
+      </div>
+      <div class="card mt-5 collapse" id="sectionResults">
+        <div class="card-body">
+          <!-- TODO: put inline style into custom.css and tooltip each word from the section it came from (i.e. condition and category) -->
+          <div class="text-center" id="resultsName"></div>
+
+          <hr>
+
+          <h4>Explaining Your Name</h4>
+          <p>Kojima's characters know that their names are meaningful, and they will tell you it completely unprompted. You, too, must explain your name to any potential friends, foes, or shadowy government institutions. Use the following sentence to start your monologue and explain your Kojima name to the best of your ability. Feel free to draw from personal experience.</p>
+          <p>Hi, I'm <b id="resultsExplanation"></b>, and if you're wondering how I got this name, well, let me tell you...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Personal Information -->
+    <div class="modal fade" id="modalPersonal" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Personal Information Form</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="form-group row">
+                <label for="formPersonalName" class="col-sm col-form-label">What is your full name?</label>
+                <div class="col-sm"><input type="text" class="form-control" id="formPersonalName" placeholder="Hideo Kojima"></div>
+              </div>
+              <div class="form-group row">
+                <label for="formPersonalOccupation" class="col-sm col-form-label">What do you do at your occupation?</label>
+                <div class="col-sm"><input type="text" class="form-control" id="formPersonalOccupation" placeholder="Farmer"><small class="form-text text-muted">Condense the verb in your answer into a single "-er" noun.</small></div>
+              </div>
+              <div class="form-group row">
+                <label for="formPersonalPet" class="col-sm col-form-label">What was your first pet's specific species/breed?</label>
+                <div class="col-sm"><input type="text" class="form-control" id="formPersonalPet" placeholder="Cat"><small class="form-text text-muted">If you never had a pet, please answer with an animal you wish you owned.</small></div>
+              </div>
+              <div class="form-group row">
+                <label for="formPersonalChildhood" class="col-sm col-form-label">What's your most embarrassing childhood memory?</label>
+                <div class="col-sm"><input type="text" class="form-control" id="formPersonalChildhood" placeholder="Missing Pantaloons"><small class="form-text text-muted">Condense this story into two words.</small></div>
+              </div>
+              <div class="form-group row">
+                <label for="formPersonalStab" class="col-sm col-form-label">What is the object you'd least like to be stabbed by?</label>
+                <div class="col-sm"><input type="text" class="form-control" id="formPersonalStab" placeholder="Spoon"></div>
+              </div>
+              <div class="form-group row">
+                <label for="formPersonalGood" class="col-sm col-form-label">What is something you are good at?</label>
+                <div class="col-sm"><input type="text" class="form-control" id="formPersonalGood" placeholder="Eating"><small class="form-text text-muted">Condense the verb in your answer into a single "-ing" word.</small></div>
+              </div>
+              <div class="form-group row">
+                <label for="formPersonalCarrots" class="col-sm col-form-label">How many full-sized carrots do you believe you could eat in one sitting?</label>
+                <div class="col-sm"><input type="text" class="form-control" id="formPersonalCarrots" placeholder="3" type="number" min="0"></div>
+              </div>
+              <div class="form-group row">
+                <label for="formPersonalIntangible" class="col-sm col-form-label">What is your greatest intangible fear?</label>
+                <div class="col-sm"><input type="text" class="form-control" id="formPersonalIntangible" placeholder="Loneliness"></div>
+              </div>
+              <div class="form-group row">
+                <label for="formPersonalTangible" class="col-sm col-form-label">What is your greatest tangible fear?</label>
+                <div class="col-sm"><input type="text" class="form-control" id="formPersonalTangible" placeholder="Horses"></div>
+              </div>
+              <div class="form-group row">
+                <label for="formPersonalWorksheet" class="col-sm col-form-label">What is the last thing you did before starting this worksheet?</label>
+                <div class="col-sm"><input type="text" class="form-control" id="formPersonalWorksheet" placeholder="Slept"><small class="form-text text-muted">Condense the verb in your answer into a single, past-tense word.</small></div>
+              </div>
+              <div class="form-group row">
+                <label for="formPersonalCondition" class="col-sm col-form-label">What condition is your body currently in?</label>
+                <div class="col-sm"><input type="text" class="form-control" id="formPersonalCondition" placeholder="Exhausted"><small class="form-text text-muted">Condense the verb in your answer into a single, past-tense word.</small></div>
+              </div>
+              <div class="form-group row">
+                <label for="formPersonalMatter" class="col-sm col-form-label">Favorite state of matter?</label>
+                <div class="col-sm"><input type="text" class="form-control" id="formPersonalMatter" placeholder="Liquid"></div>
+              </div>
+              <div class="form-group row">
+                <label for="formPersonalSound" class="col-sm col-form-label">What word does your name kind of sound like?</label>
+                <div class="col-sm"><input type="text" class="form-control" id="formPersonalSound" placeholder="Brain (for Brian)"></div>
+              </div>
+              <div class="form-group row">
+                <label for="formPersonalZodiac" class="col-sm col-form-label">What is your Zodiac sign?</label>
+                <div class="col-sm"><input type="text" class="form-control" id="formPersonalZodiac" placeholder="Leo"></div>
+              </div>
+              <div class="form-group row">
+                <label for="formPersonalPersonality" class="col-sm col-form-label">If you had to define your personality in one word, what would it be?</label>
+                <div class="col-sm"><input type="text" class="form-control" id="formPersonalPersonality" placeholder="Sarcastic"></div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer"><button type="button" class="btn btn-primary" data-dismiss="modal">Save & Close</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Kojima Information -->
+    <div class="modal fade" id="modalKojima" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Kojima Information Form</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="form-group row">
+                <label for="formKojimaKurt" class="col-sm col-form-label">Who is your favorite film character played by Kurt Russell?</label>
+                <div class="col-sm"><input type="text" class="form-control" id="formKojimaKurt" placeholder="Ego"><small class="form-text text-muted">Check out <a href="https://www.imdb.com/name/nm0000621/#actor" target="_blank">Kurt Russell's IMDB page</a> for a list of characters Kurt has played. If you don't like Kurt Russell and/or do not want to pick a character he has played, pick a character from any actor/actress.</small></div>
+              </div>
+              <div class="form-group row">
+                <label for="formKojimaKubrick" class="col-sm col-form-label">What is the last word of the title of your favorite Kubrick film?</label>
+                <div class="col-sm"><input type="text" class="form-control" id="formKojimaKubrick" placeholder="Odyssey"><small class="form-text text-muted">Check out <a href="https://www.imdb.com/name/nm0000040/#filmography" target="_blank">Stanley Kubrick's IMDB page</a> for a list of movies Mr. Kubrick has worked on. If you don't like Stanley Kubrick and/or do not want to pick a movie he has worked on, pick a move from any director/writer/producer.</small></div>
+              </div>
+              <div class="form-group row">
+                <label for="formKojimaJoy" class="col-sm col-form-label">What is the first word in the title of your favorite Joy Division album?</label>
+                <div class="col-sm"><input type="text" class="form-control" id="formKojimaJoy" placeholder="YMCA"><small class="form-text text-muted">Check out <a href="https://www.discogs.com/artist/3898-Joy-Division" target="_blank">Joy Division's discography page</a> for a list of albums Joy Division has worked on. If you don't like Joy Division and/or do not want to pick an album he has worked on, pick a album from any artist.</small></div>
+              </div>
+              <div class="form-group row">
+                <label for="formKojimaNPR" class="col-sm col-form-label">What is a scientific term you picked up from listening to NPR once?</label>
+                <div class="col-sm"><input type="text" class="form-control" id="formKojimaNPR" placeholder="Umbra"><small class="form-text text-muted">If you don't listen to NPR, pick any <a href="http://www.english-for-students.com/Science-Words.html" target="_blank">scientific word</a> you fancy.</small></div>
+              </div>
+              <div class="form-group row">
+                <label for="formKojimaWar" class="col-sm col-form-label">What is a piece of military hardware you think looks cool even though war is bad?</label>
+                <div class="col-sm"><input type="text" class="form-control" id="formKojimaWar" placeholder="FGM-148 Javelin"><small class="form-text text-muted">Check out <a href="https://www.military.com/equipment" target="_blank">military equipment</a> for inspiration.</small></div>
+              </div>
+              <div class="form-group row">
+                <label for="formKojimaMads" class="col-sm col-form-label">What is something you'd enjoy watching Mads Mikkelsen do?</label>
+                <div class="col-sm"><input type="text" class="form-control" id="formKojimaMads" placeholder="Stare"><small class="form-text text-muted">Please condense into one word. Check out <a href="https://www.imdb.com/name/nm0586568/" target="_blank">Mad Mikkelsen's IMDB page</a> for more information on roles he has played.</small></div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer"><button type="button" class="btn btn-primary" data-dismiss="modal">Save & Close</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vendor JS -->
+    <script src="vendor/jquery/js/jquery-3.4.1.min.js"></script>
+    <script src="vendor/tether/js/tether.min.js"></script>
+    <script src="vendor/popper/js/popper.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  	<!-- Custom JS -->
+    <script src="js/dice.js"></script>
+    <script src="js/generatename.js"></script>
+    <script src="js/showname.js"></script>
+    <script src="js/debug.js"></script>
+  </body>
+</html>

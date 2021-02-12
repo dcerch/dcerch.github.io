@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+  <meta name="robots" content="none, noarchive">
+
+  <title>Fearless Sign In</title>
+
+  <!-- Bootstrap core CSS -->
+  <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Google Fonts and Icons -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto|Amatic+SC|Dancing+Script|Indie+Flower|Lobster|Pacifico|Quicksand|Raleway|Source+Sans+Pro|Puritan|Archivo" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="icon" href="img/favicon.png" type="image/x-icon">
+
+  <!-- Custom Stylings -->
+  <link rel="stylesheet" type="text/css" href="css/base.css">
+</head>
+<body class="container text-center">
+  <header class="mb-4">
+    <h1 class="display-3">Fearless Sign In</h1>
+  </header>
+
+  <section class="mb-4" id="signin">
+    <form id="signinform">
+      <div class="form-group">
+        <label for="fearlessphone">Please enter your phone number to sign in</label>
+        <input type="tel" class="form-control form-control-lg" id="signinphone" placeholder="(XXX) XXX-XXXX" pattern="^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}$" required>
+      </div>
+      <button type="submit" class="btn btn-primary btn-lg btn-block">Sign In</button>
+    </form>
+  </section>
+
+  <section class="mb-4 collapse" id="verify"></section>
+
+  <section class="mb-4 collapse" id="welcome"></section>
+
+  <section class="mb-4 collapse" id="add">
+    <h1 class="display-4">Looks like you're new!</h1>
+    <p>We need to gather some contact information from you for registration. Check out the fields below for what we're looking for.</p>
+    <form id="addform">
+      <div class="row">
+        <div class="col-sm">
+          <div class="form-group">
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="newleader" name="leader">
+              <label class="custom-control-label" for="newleader">Check box if Fearless leader/instructor</label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <hr>
+      <div class="row">
+        <div class="col-sm">
+          <div class="form-group">
+            <label for="newfirst">First Name</label>
+            <input type="text" class="form-control" placeholder="John" id="newfirst" name="userfirst" required>
+          </div>
+        </div>
+        <div class="col-sm">
+          <div class="form-group">
+            <label for="newlast">Last Name</label>
+            <input type="text" class="form-control" placeholder="Doe" id="newlast" name="userlast" required>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm">
+          <div class="form-group">
+            <label for="newbirthday">Birthday</label>
+            <input type="date" class="form-control" placeholder="John" id="newbirthday" name="birthday" required>
+          </div>
+        </div>
+        <div class="col-sm">
+          <div class="form-group">
+            <label for="newgrade">Grade</label>
+            <select class="form-control" id="newgrade" name="grade" required>
+              <option value="" name="grade" selected="selected" disabled></option>
+              <option value="6th grade">6th grade (middle school)</option>
+              <option value="7th grade">7th grade (middle school)</option>
+              <option value="8th grade">8th grade (middle school)</option>
+              <option value="9th grade">9th grade (high school)</option>
+              <option value="10th grade">10th grade (high school)</option>
+              <option value="11th grade">11th grade (high school)</option>
+              <option value="12th grade">12th grade (high school)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm">
+          <div class="form-group">
+            <label for="newparentfirst">Parent/Guardian First Name</label>
+            <input type="text" class="form-control" placeholder="Jane" id="newparentfirst" name="parentfirst" required>
+          </div>
+        </div>
+        <div class="col-sm">
+          <div class="form-group">
+            <label for="newparentlast">Parent/Guardian Last Name</label>
+            <input type="text" class="form-control" placeholder="Doe" id="newparentlast" name="parentlast" required>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm">
+          <div class="form-group">
+            <label for="newparentemail">Parent/Guardian Email</label>
+            <input type="email" class="form-control" placeholder="jane.doe@email.com" id="newparentemail" name="parentemail">
+          </div>
+        </div>
+        <div class="col-sm">
+          <div class="form-group">
+            <label for="newparentphone">Parent/Guardian Phone</label>
+            <input type="tel" class="form-control" id="newparentphone" placeholder="(XXX) XXX-XXXX" pattern="^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}$" name="parentphone">
+          </div>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary btn-lg mt-2">Register</button>
+    </form>
+  </section>
+
+  <!-- Vendor JS -->
+  <script src="vendor/jquery/js/jquery-3.4.1.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  <!-- Firebase -->
+  <!-- Firebase App is always required and must be first -->
+  <script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.8.0/firebase-firestore.js"></script>
+  <script src="js/firebase-config.js" type="text/javascript" charset="utf-8"></script>
+  <script src="js/firestore-config.js" type="text/javascript" charset="utf-8"></script>
+  <script src="js/phone-formatter.js" type="text/javascript" charset="utf-8"></script>
+
+  <!-- Custom JS -->
+  <!--<script src="js/workflow-demo.js" type="text/javascript" charset="utf-8"></script>-->
+</body>
+</html>
