@@ -1,3 +1,6 @@
+/*
+  TEMPLATES
+*/
 var blank = {
   "content": null,
   "embeds": [
@@ -49,6 +52,9 @@ var blank = {
   "avatar_url": ""
 };
 
+/*
+  CHARACTERS
+*/
 var augustin = {
   "content": null,
   "embeds": [
@@ -112,6 +118,9 @@ var augustin = {
   "avatar_url": "https://i.imgur.com/73Cs5G2.png"
 };
 
+/*
+  GAMEPLAY MECHANICS
+*/
 var characters = {
   "content": null,
   "embeds": [
@@ -296,3 +305,77 @@ var classes = {
   "username": "Earthrise Helper",
   "avatar_url": "https://i.imgur.com/73Cs5G2.png"
 };
+
+/*
+  REMINDERS
+*/
+var reminderzero = {
+  "content": null,
+  "embeds": [
+    {
+      "title": "Session starts next week!",
+      "description": "If you may be late or cannot make it, please let the DM know ahead of time! See you all soon!\n\n** Discord Channels **\n```• #dice for rolling dice; example syntax is !r 1d20 (one 20 sided die) or !r 2d6 (two 6 sided dice)\n• #maps to help visualize current situations\n• #table for anything else (or maybe everything, who knows)\n• #earthrise-info for basic gameplay mechanics```",
+      "color": 7997447,
+      "author": {
+        "name": "Earthrise Session Reminder",
+        "icon_url": "https://i.imgur.com/blZEhaF.png"
+      },
+      "footer": {
+        "text": ddquotes[Math.floor(Math.random() * ddquotes.length)]
+      },
+      "thumbnail": {
+        "url": "https://i.imgur.com/cqYIZFb.png"
+      }
+    }
+  ],
+  "username": "Earthrise Helper",
+  "avatar_url": "https://i.imgur.com/73Cs5G2.png"
+};
+
+var reminderone = {
+  "content": null,
+  "embeds": [
+    {
+      "title": "Session starts tomorrow!",
+      "description": "One day away from our campaign session. If anything came up last minute, keep the group informed.\n\n** Discord Channels **\n```• #dice for rolling dice; example syntax is !r 1d20 (one 20 sided die) or !r 2d6 (two 6 sided dice)\n• #maps to help visualize current situations\n• #table for anything else (or maybe everything, who knows)\n• #earthrise-info for basic gameplay mechanics```",
+      "color": 12455179,
+      "author": {
+        "name": "Earthrise Session Reminder",
+        "icon_url": "https://i.imgur.com/blZEhaF.png"
+      },
+      "footer": {
+        "text": ddquotes[Math.floor(Math.random() * ddquotes.length)]
+      },
+      "thumbnail": {
+        "url": "https://i.imgur.com/sQzrwu0.png"
+      }
+    }
+  ],
+  "username": "Earthrise Helper",
+  "avatar_url": "https://i.imgur.com/73Cs5G2.png"
+};
+
+var remindertwo = {
+  "content": null,
+  "embeds": [
+    {
+      "title": "Session starts in 1 hour!",
+      "description": "Huzzah adventurers! The time for our reunion is nigh! Prepare thy self then join ye olde vocals voice channel in due time.\n\n** Discord Channels **\n```• #dice for rolling dice; example syntax is !r 1d20 (one 20 sided die) or !r 2d6 (two 6 sided dice)\n• #maps to help visualize current situations\n• #table for anything else (or maybe everything, who knows)\n• #earthrise-info for basic gameplay mechanics```",
+      "color": 15536142,
+      "author": {
+        "name": "Earthrise Session Reminder",
+        "icon_url": "https://i.imgur.com/blZEhaF.png"
+      },
+      "footer": {
+        "text": ddquotes[Math.floor(Math.random() * ddquotes.length)]
+      },
+      "thumbnail": {
+        "url": "https://i.imgur.com/l5zcqVz.png"
+      }
+    }
+  ],
+  "username": "Earthrise Helper",
+  "avatar_url": "https://i.imgur.com/73Cs5G2.png"
+};
+
+//(new Date())
