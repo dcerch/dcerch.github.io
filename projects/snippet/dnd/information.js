@@ -105,9 +105,9 @@ var augustin = {
         "text": "Don't worry, Chief! I'm always on duty!",
         "icon_url": "https://i.imgur.com/r0PAQqe.png"
       },
-      "timestamp": "1983-09-12T16:00:00.000Z",
+      "timestamp": "1923-09-12T16:00:00.000Z",
       "image": {
-        "url": "https://i.imgur.com/3DqJuwc.png"
+        "url": "https://i.imgur.com/HJNSgAa.png"
       },
       "thumbnail": {
         "url": "https://i.imgur.com/KYP0wHd.png"
