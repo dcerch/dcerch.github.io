@@ -84,7 +84,7 @@ var slogan = [
   "Speak The Truth",
   "Stay The Course",
   "Stop Underestimating Yourself",
-  "Success Breads Success",
+  "Success Breeds Success",
   "Success Is Yours",
   "Take Action Now",
   "Take The Risk",
