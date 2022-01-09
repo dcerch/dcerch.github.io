@@ -47,6 +47,7 @@ window.onload = function() {
 
         //Parse and add model total
         totalprice = parseFloat(totalprice) + parseFloat(value["productprice"]);
+        totalprice = totalprice.toFixed(2);
       }
     );
 
