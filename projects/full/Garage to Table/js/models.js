@@ -1,7 +1,6 @@
 var modelsobject = {
   "models": [
     {
-      "id": "0",
       "img": "img/models/Archmodels_112_001.jpg",
       "title": "Cabinet 6 Slot, Closed",
       "description": "Archmodels series #112",
@@ -29,7 +28,6 @@ var modelsobject = {
       ]
     },
     {
-      "id": "0",
       "img": "img/models/Archmodels_112_002.jpg",
       "title": "Cabinet 4 Slot, Closed",
       "description": "Archmodels series #112",
@@ -57,7 +55,6 @@ var modelsobject = {
       ]
     },
     {
-      "id": "0",
       "img": "img/models/Archmodels_112_003.jpg",
       "title": "Cabinet 3 Slot, Open",
       "description": "Archmodels series #112",
@@ -85,7 +82,6 @@ var modelsobject = {
       ]
     },
     {
-      "id": "0",
       "img": "img/models/Archmodels_112_004.jpg",
       "title": "Drawer 9 Slot, Open",
       "description": "Archmodels series #112",
@@ -113,7 +109,6 @@ var modelsobject = {
       ]
     },
     {
-      "id": "0",
       "img": "img/models/Archmodels_112_005.jpg",
       "title": "Drawer 6 Slot, Closed",
       "description": "Archmodels series #112",
@@ -141,7 +136,6 @@ var modelsobject = {
       ]
     },
     {
-      "id": "0",
       "img": "img/models/Archmodels_112_006.jpg",
       "title": "Drawer 6 Slot, Closed (Long)",
       "description": "Archmodels series #112",
@@ -169,7 +163,6 @@ var modelsobject = {
       ]
     },
     {
-      "id": "0",
       "img": "img/models/Archmodels_112_007.jpg",
       "title": "Drawer 4 Slot, Closed",
       "description": "Archmodels series #112",
@@ -197,7 +190,6 @@ var modelsobject = {
       ]
     },
     {
-      "id": "0",
       "img": "img/models/Archmodels_112_008.jpg",
       "title": "Shelf 5 Slot, Open",
       "description": "Archmodels series #112",
@@ -225,7 +217,6 @@ var modelsobject = {
       ]
     },
     {
-      "id": "0",
       "img": "img/models/Archmodels_112_009.jpg",
       "title": "Shelf 3 Slot, Open",
       "description": "Archmodels series #112",
@@ -253,7 +244,6 @@ var modelsobject = {
       ]
     },
     {
-      "id": "0",
       "img": "img/models/Archmodels_112_010.jpg",
       "title": "Shelf 6 Slot, Open",
       "description": "Archmodels series #112",
@@ -281,7 +271,6 @@ var modelsobject = {
       ]
     },
     {
-      "id": "0",
       "img": "img/models/Archmodels_112_011.jpg",
       "title": "Shelf 3 Slot, Open",
       "description": "Archmodels series #112",
@@ -309,7 +298,6 @@ var modelsobject = {
       ]
     },
     {
-      "id": "0",
       "img": "img/models/Archmodels_112_012.jpg",
       "title": "Shelf 1 Slot, Open (Long)",
       "description": "Archmodels series #112",
@@ -337,7 +325,6 @@ var modelsobject = {
       ]
     },
     {
-      "id": "0",
       "img": "img/models/Archmodels_112_013.jpg",
       "title": "Shelf 1 Slot, Open (Short)",
       "description": "Archmodels series #112",
@@ -365,7 +352,6 @@ var modelsobject = {
       ]
     },
     {
-      "id": "0",
       "img": "img/models/Archmodels_112_014.jpg",
       "title": "Shelf 1 Slot, Open (Stylized)",
       "description": "Archmodels series #112",

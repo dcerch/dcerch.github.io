@@ -13,7 +13,7 @@ window.onload = function() {
       cardbuilder += '<img src="' + value["img"] + '" class="card-img-top p-2">';
       cardbuilder += '<div class="card-body"><h5 class="card-title">' + value["title"] + '</h5>';
       cardbuilder += '<p class="card-text">' + value["description"] + '</p>';
-      cardbuilder += '<a href="#" class="btn btn-primary modelbutton" data-bs-target="#carouselExampleIndicators" data-bs-slide="next" data-modelid="' + value["id"] + '">Choose this model</a>';
+      cardbuilder += '<a href="#" class="btn btn-primary modelbutton" data-bs-target="#carouselExampleIndicators" data-bs-slide="next" data-modelid="' + key + '">Choose this model</a>';
       cardbuilder += '</div></div></div>';
 
       //Apply card to DOM
@@ -53,8 +53,6 @@ window.onload = function() {
     //Build last part
     listbuilder += '</div>';
     listbuilder += '<h1 class="mt-4 display-6">Model total: $' + totalprice + ' dollars</h1>';
-
-    console.log(listbuilder);
 
     //Apply card to DOM
     modeldetails.innerHTML += listbuilder;
