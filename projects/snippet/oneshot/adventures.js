@@ -767,7 +767,7 @@ var adventures = [
     '<h4>Factory Scene</h4><p>Enslaved metal-benders are given the orders to increase productivity but are vocal about not being able to do so. With every ore dug, it becomes more and more difficult to go deeper and pull more. After a few violent brainstorming sessions, one enslaved metal-bender speaks up to explore the volcano outside of the city since there is a high potential for easy to gather ore.</p>' +
     '<h4>Resident Scene</h4><p>On particularly bad collection days, fights between resistance groups or fed-up civilians and the ember squads are numerous; leading to the destruction of property such as houses or land and the deaths of families.</p>' +
     '<h3>Story So Far</h3>' +
-    '<p><a class="btn btn-primary" href="story.txt" role="button" target="_blank">View Story</a></p>' +
+    '<p><a class="btn btn-primary" href="wof/wof_story.txt" role="button" target="_blank">View Story</a></p>' +
     '<h3>Special Events/Rules</h3>' +
     '<h4>Weather Patterns</h4><p>1d10: evens is normal day, 1/3/5 is rain, 7 is solar flare, 9 is windy.</p>' +
     '<h4>Global Strategy</h4><p>If a major city is controlled, the group can prepare a military play and use any resources at their disposal to take other parts of the world.</p>' +
@@ -782,7 +782,7 @@ var adventures = [
     areas: [
       {
         name: 'World Map',
-        img: './wof_world.jpg',
+        img: './wof/wof_world.jpg',
         description:
           '<p>World map of Earth.</p>',
       },
@@ -1283,6 +1283,173 @@ var adventures = [
         name: '',
         img: '',
         description: '',
+      },
+    ],
+  },
+  {
+    title: 'Squid Games',
+    description: 'Once fun and careless children\'s games have become fatal. You and other participants must compete or work together to see another day.',
+    backstory:
+    '<p>456 cash-strapped people battle each other in six games inspired by children\'s games played in South Korea and other countries for the chance to win 45.6 billion Korean won (around $38.4 million). The losers from each game face death.</p>' +
+    '<h3>Special Rules</h3>' +
+    '<h4>Game Announcement</h4><p>All of you are participants in a series of games that will test your mind and body. You will play six games over six days, and whoever wins all six games will win up to $40 million dollars in cash.</p>' +
+    '<h4>Participant Voting</h4><p>After every mini game, the staff will provide an opportunity to vote on canceling the game and allowing the participants to go home.</p>' +
+    '<h4>Participant Meals</h4><p>After every mini game, the staff will provide a number of small meals equal to the remaining participants. There are no rules on participants taking someone elses meal.</p>' +
+    '<h4>Black Market Deals</h4><p>There is a doctor participant working with 2 soldiers and 2 workers to sell organs on the black market. In exchange, the participant is provided an advantage on the upcoming mini games.</p>' +
+    '<h4>One Lucky Day</h4><p>If there one person remaining, he or she wins the game and is given a bank card with the prize money.</p>',
+    areas: [
+      {
+        name: 'Participant Holding',
+        img: './sg/sg_holding.png',
+        description: '<p>This gymnasium-like room is where the players eat and sleep between mini games. Inside there are enough 5-story bunk beds for each player, two large doors that lead to the other parts of the facility, a large monitor for displaying remaining players and voting casts, and two doors on opposite ends that lead to gendered bathrooms.</p><p></p>',
+      },
+      {
+        name: '[Mini Game] Red Light, Green Light',
+        img: './sg/sg_lights.png',
+        description: '<p>All 456 contestants are brought into a simulated open field type setting where the players must move closer towards a finish line near a giant robotic doll resembling a little girl. The contestants could only make a move when they heard the words (in Korean): "The mugunghwa flower has bloomed" (which are eerily broadcast in a child-like voice), after which they had to stay frozen in place. Those who moved during the silence were eliminated from the game and shot dead.</p><p>[450 players left] 120 yards (football field), 1 minute, 3 STR or DEX saving rolls for the spotter (3 or less means they trip but are saved by a person behind them).</p>',
+      },
+      {
+        name: '[Mini Game] Dalgona Candy Challenge',
+        img: './sg/sg_dalgona.png',
+        description: '<p>Tasked with carving out different shapes from Dalgona candy, a type of honeycomb cookie. It comes with a shape pressed into it and children often try to eat around the outline of the shape without breaking it, which was the challenge given to the players in the Squid Game series—except they were each given a tiny needle pin to do so. Monitored by staff members ready to eliminate losers, any players who broke the outline of the shape they were given (either a circle, triangle, star or umbrella) were immediately shot dead.</p>[250 players left] Depending on the shape picked, the player must succeed a varying degree of a DEX saving throw (5+ for easy, 10+ for medium, 15+ for hard)<p></p>',
+      },
+      {
+        name: '[Mini Game] Tug of War',
+        img: './sg/sg_war.png',
+        description: '<p>The contestants were divided into groups and made to play tug of war against each other in teams. Played on an elevated platform with a large gap in the middle separating the two teams, the wrists of the contestants are chained to the rope used in tug of war. Once the losing team got pushed over the edge of the platform and fell through the gap, the rope was cut off by a giant guillotine, leaving the losing players to fall to their deaths.</p><p>[100 players left] 10 groups of 10, 1d10 + STR mods per person, must win 3 in a row to pull team off.</p>',
+      },
+      {
+        name: '[Mini Game] Marbles',
+        img: './sg/sg_marbles.png',
+        description: '<p>The players were asked to form groups of two and compete against each other within the pair. They were allowed to choose whichever marble game they\'d like to play and some were seen guessing how many marbles the other person held in their hand, while others threw the marbles on the ground toward a target. Each contestant was given 10 marbles and to win the game, one player had to win all 10 of the other player\'s marbles, with the loser being immediately shot dead by a staff member.</p><p>[50 players left] Player characters can decide to match with each other or with a NPC.</p>',
+      },
+      {
+        name: '[Mini Game] Stepping Stone Bridge',
+        img: './sg/sg_bridge.png',
+        description: '<p>The stepping bridge in the series featured glass panels instead of stones and was placed at a deadly elevated height. Each of the players was required to walk across the bridge. Some of the panels were made of stronger, tempered glass, while others were made of the weaker, normal glass. So depending on the panel they stepped on, some players plunged to their death.</p><p>[20 players left] Identical glass panels (one is weak, the other strong) next to each other for 20 steps.</p>',
+      },
+      {
+        name: '[Mini Game] The Squid Game',
+        img: './sg/sg_squad.png',
+        description: '<p>The game entails two people (or teams) having to combat each other within a grid drawn on the ground that roughly looks like the outline of a squid. Before starting the game, it must be decided who or which team will play the attacker (offense) and who will play defense, as there are different restrictions for each role. The rules of the retro game are explained by the narrator in the opening scene of the Squid Game series, which shows children playing the game. "In order to win, the attackers must tap the small closed-off space on the squid\'s head with their foot. But if someone on the defense manages to push you outside the squid\'s boundary, you die," the narrator says.</p><p>[2-6 players left] Must touch 3 parts of the squid\'s head without being pushed out.</p>',
+      },
+    ],
+    characters: [
+      {
+        name: 'Workers ◯',
+        img: './sg/sg_worker.png',
+        description: 'Workers are the "civilians" of the guards. They cannot speak without permission from Managers (similar to Soldiers), move beyond their designated post, or use firearms. Their role is simply reduced into menial labour: transporting and cremating deceased contestants, maintaining the Game facilities, and distributing food to the players.',
+        level: '3',
+        race: 'Human',
+        alignment: 'Neutral Evil',
+        health: '100',
+        armor: '10',
+        speed: '10',
+        strength: '10 (+0)',
+        dexterity: '10 (+0)',
+        constitution: '10 (+0)',
+        intelligence: '10 (+0)',
+        wisdom: '10 (+0)',
+        charisma: '10 (+0)',
+        abilities: '<li class="list-group-item"><h4>[title]</h4><p><small class="text-muted">[combat/RP], [action], [cooldown]</small></p><p>[description]</p></li>',
+      },
+      {
+        name: 'Soldiers △',
+        img: './sg/sg_soldier.png',
+        description: 'Soldiers act on orders given by Managers, and are often assigned to specific players during certain games to oversee the elimination of players. Their primary role is to terminate eliminated players, execute any players caught breaking the rules, and to keep the players in-line during the intermission period between games. In addition to their role as adjudicators, they are often seen flanking important personnel, such as Managers and the Front Man, as bodyguards; and assist in the search and capture efforts of Hwang Jun-ho.',
+        level: '5',
+        race: 'Human',
+        alignment: 'Neutral Evil',
+        health: '300',
+        armor: '10',
+        speed: '10',
+        strength: '10 (+0)',
+        dexterity: '10 (+0)',
+        constitution: '10 (+0)',
+        intelligence: '10 (+0)',
+        wisdom: '10 (+0)',
+        charisma: '10 (+0)',
+        abilities: '<li class="list-group-item"><h4>MP5</h4><p><small class="text-muted">5d20 damage, 1 action, no cooldown</small></p><p>Target can roll DEX saving of 15 or more to take half damage.</p></li><li class="list-group-item"><h4>Revolver</h4><p><small class="text-muted">2d20 damage, 1 action, no cooldown</small></p><p>Target can roll DEX saving of 15 or more to take half damage.</p></li><li class="list-group-item"><h4>Reload</h4><p><small class="text-muted">No damage, 1/2 action, no cooldown</small></p><p>Refills current weapons with ammo.</p></li>',
+      },
+      {
+        name: 'Managers ☐',
+        img: './sg/sg_manager.png',
+        description: 'These Managers are responsible for organising, monitoring, and (in some cases) enforcing the Games. This is done by giving orders to Soldiers, disciplining guards who step out of line, and making objective decisions on the spot. Managers are permitted to speak more freely than other guards, allowing them to relay scheduled information to the players and act as ambassadors of the Squid Games. Despite this, they are the most enigmatic guards given their position of authority.',
+        level: '7',
+        race: 'Human',
+        alignment: 'Lawful Evil',
+        health: '200',
+        armor: '10',
+        speed: '10',
+        strength: '10 (+0)',
+        dexterity: '10 (+0)',
+        constitution: '10 (+0)',
+        intelligence: '10 (+0)',
+        wisdom: '10 (+0)',
+        charisma: '10 (+0)',
+        abilities: '<li class="list-group-item"><h4>Radio</h4><p><small class="text-muted">Call in 2 soldier backups that arrive next turn, 1 action, 1 turn cooldown</small></p><p>Managers can request support from other parts of the facility.</p></li><li class="list-group-item"><h4>Revolver</h4><p><small class="text-muted">2d20 damage, 1 action, no cooldown</small></p><p>Target can roll DEX saving of 15 or more to take half damage.</p></li><li class="list-group-item"><h4>Reload</h4><p><small class="text-muted">No damage, 1/2 action, no cooldown</small></p><p>Refills current weapons with ammo.</p></li>',
+      },
+      {
+        name: 'The Front Man',
+        img: './sg/sg_front.png',
+        description: 'The Front Man observes the survival competition games through several monitoring screens as the games unfold. He sometimes steps in when a situation gets out of control during the games, such as when the identity of a staff member is somehow revealed (which is forbidden in the games), in which case the Front Man storms in and executes the exposed staffer. The Front Man also is often seen answering phone calls back at his quarters, communicating with the person on the other line about the ongoing competition. This is usually the host, whose orders he carries out. He also ensures that the VIPs have a good time while watching the game.',
+        level: '10',
+        race: 'Human',
+        alignment: 'Lawful Evil',
+        health: '400',
+        armor: '15',
+        speed: '20',
+        strength: '12 (+1)',
+        dexterity: '14 (+2)',
+        constitution: '10 (+0)',
+        intelligence: '14 (+2)',
+        wisdom: '14 (+2)',
+        charisma: '10 (+0)',
+        abilities: '<li class="list-group-item"><h4>[title]</h4><p><small class="text-muted">[combat/RP], [action], [cooldown]</small></p><p>[description]</p></li>',
+      },
+      {
+        name: 'The VIPs',
+        img: './sg/sg_vip.png',
+        description: 'The VIPs are a collection of rich men who observe the Squid Games as spectators. They wear golden masks resembling various animals (lion, bull, panther, elk, falcon, bear). These masked men place bets on players of the Squid Games, in hopes to make more money. The majority of the VIPs appear to be American, though one; the Deer-Masked VIP, speaks with a Chinese accent.',
+        level: '10',
+        race: 'Human',
+        alignment: 'Chaotic Evil',
+        health: '100',
+        armor: '10',
+        speed: '5',
+        strength: '8 (-1)',
+        dexterity: '8 (-1)',
+        constitution: '8 (-1)',
+        intelligence: '8 (-1)',
+        wisdom: '8 (-1)',
+        charisma: '16 (+3)',
+        abilities: '<li class="list-group-item"><h4>[title]</h4><p><small class="text-muted">[combat/RP], [action], [cooldown]</small></p><p>[description]</p></li>',
+      },
+      {
+        name: '',
+        img: '',
+        description: '',
+        level: '',
+        race: '',
+        alignment: '',
+        health: '100',
+        armor: '10',
+        speed: '10',
+        strength: '10 (+0)',
+        dexterity: '10 (+0)',
+        constitution: '10 (+0)',
+        intelligence: '10 (+0)',
+        wisdom: '10 (+0)',
+        charisma: '10 (+0)',
+        abilities: '<li class="list-group-item"><h4>[title]</h4><p><small class="text-muted">[combat/RP], [action], [cooldown]</small></p><p>[description]</p></li>',
+      },
+    ],
+    items: [
+      {
+        name: '',
+        img: '',
+        description: '<p></p>',
+        cost: '',
       },
     ],
   },
