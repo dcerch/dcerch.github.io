@@ -1094,6 +1094,13 @@ var adventures = [
       */
     ],
     items: [
+      /*
+      {
+        name: '',
+        img: '',
+        description: '',
+      },
+      */
     ],
   },
   {
@@ -1101,23 +1108,16 @@ var adventures = [
     description: 'Survive the unknown while the planet falls into chaos.',
     backstory: '',
     areas: [
+      /*
       {
         name: '',
         img: '',
         description: '',
       },
-      {
-        name: '',
-        img: '',
-        description: '',
-      },
-      {
-        name: '',
-        img: '',
-        description: '',
-      },
+      */
     ],
     characters: [
+      /*
       {
         name: '',
         img: '',
@@ -1136,59 +1136,16 @@ var adventures = [
         charisma: '',
         abilities: '',
       },
-      {
-        name: '',
-        img: '',
-        description: '',
-        level: '',
-        race: '',
-        alignment: '',
-        health: '',
-        armor: '',
-        speed: '',
-        strength: '',
-        dexterity: '',
-        constitution: '',
-        intelligence: '',
-        wisdom: '',
-        charisma: '',
-        abilities: '',
-      },
-      {
-        name: '',
-        img: '',
-        description: '',
-        level: '',
-        race: '',
-        alignment: '',
-        health: '',
-        armor: '',
-        speed: '',
-        strength: '',
-        dexterity: '',
-        constitution: '',
-        intelligence: '',
-        wisdom: '',
-        charisma: '',
-        abilities: '',
-      },
+      */
     ],
     items: [
+      /*
       {
         name: '',
         img: '',
         description: '',
       },
-      {
-        name: '',
-        img: '',
-        description: '',
-      },
-      {
-        name: '',
-        img: '',
-        description: '',
-      },
+      */
     ],
   },
   {
@@ -1204,23 +1161,16 @@ var adventures = [
       '<h4>Drunken Angel</h4><p>When entering the dining area of the castle, the doors close and lock. Golden chalices of infinite wine lift up and attempt to be poured into the mouths of the player characters. If wine reaches the mouth, the player characters immediately feel drunk and high. Player characters gain CHA +5, INT -5, immunity to mind affects, have a slight golden glow, wings burst from their backs allowing them to fly (albeit poorly), demons have combat advantage on affected player characters.</p>' +
       '<h4>The Kill</h4><p>When the player characters sleeps for the first time, their dreams are nightmares. Each player character is randomly split amongst two opposing nations in the midst of a battle. There are hundreds of soldiers attacking each other, each player character is "attacked" by a random soldier but it is the player characters attacking each other. Player character\'s stats are kept in the dream state. When one player character receives fatal damage, both identities are revealed. The feeling of remorse and shame befalls the victor while the feeling of hopelessness and brokeness befalls the defeated. When waking up, victorious player characters gain STR +5, DEX +5, and disadvantage on mental checks. The defeated player characters only have 1 death saving roll.</p>',
     areas: [
+      /*
       {
         name: '',
         img: '',
         description: '',
       },
-      {
-        name: '',
-        img: '',
-        description: '',
-      },
-      {
-        name: '',
-        img: '',
-        description: '',
-      },
+      */
     ],
     characters: [
+      /*
       {
         name: '',
         img: '',
@@ -1239,59 +1189,16 @@ var adventures = [
         charisma: '',
         abilities: '',
       },
-      {
-        name: '',
-        img: '',
-        description: '',
-        level: '',
-        race: '',
-        alignment: '',
-        health: '',
-        armor: '',
-        speed: '',
-        strength: '',
-        dexterity: '',
-        constitution: '',
-        intelligence: '',
-        wisdom: '',
-        charisma: '',
-        abilities: '',
-      },
-      {
-        name: '',
-        img: '',
-        description: '',
-        level: '',
-        race: '',
-        alignment: '',
-        health: '',
-        armor: '',
-        speed: '',
-        strength: '',
-        dexterity: '',
-        constitution: '',
-        intelligence: '',
-        wisdom: '',
-        charisma: '',
-        abilities: '',
-      },
+      */
     ],
     items: [
+      /*
       {
         name: '',
         img: '',
         description: '',
       },
-      {
-        name: '',
-        img: '',
-        description: '',
-      },
-      {
-        name: '',
-        img: '',
-        description: '',
-      },
+      */
     ],
   },
   {
@@ -1433,6 +1340,7 @@ var adventures = [
         charisma: '16 (+3)',
         abilities: '<li class="list-group-item"><h4>[title]</h4><p><small class="text-muted">[combat/RP], [action], [cooldown]</small></p><p>[description]</p></li>',
       },
+      /*
       {
         name: '',
         img: '',
@@ -1451,14 +1359,17 @@ var adventures = [
         charisma: '10 (+0)',
         abilities: '<li class="list-group-item"><h4>[title]</h4><p><small class="text-muted">[combat/RP], [action], [cooldown]</small></p><p>[description]</p></li>',
       },
+      */
     ],
     items: [
+      /*
       {
         name: '',
         img: '',
         description: '<p></p>',
         cost: '',
       },
+      */
     ],
   },
   {
@@ -1469,13 +1380,16 @@ var adventures = [
     '<h3>Special Rules</h3>' +
     '<h4>Personality Quiz Character Creation</h4><p>The gimmick to this one-shot is that you must choose an individual character from <a href="https://openpsychometrics.org/tests/characters/">this personality quiz</a>. If you\'d like to join as a couple, use <a href="https://openpsychometrics.org/tests/characters/couples/">this personality quiz</a>.</p>',
     areas: [
+      /*
       {
         name: '',
         img: '',
         description: '<p></p>',
       },
+      */
     ],
     characters: [
+      /*
       {
         name: '',
         img: '',
@@ -1494,14 +1408,17 @@ var adventures = [
         charisma: '10 (+0)',
         abilities: '<li class="list-group-item"><h4>[title]</h4><p><small class="text-muted">[combat/RP], [action], [cooldown]</small></p><p>[description]</p></li>',
       },
+      */
     ],
     items: [
+      /*
       {
         name: '',
         img: '',
         description: '<p></p>',
         cost: '',
       },
+      */
     ],
   },
 ];
