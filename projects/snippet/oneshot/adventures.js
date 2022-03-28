@@ -1194,7 +1194,15 @@ var adventures = [
   {
     title: 'Oblivion\'s Sanctuary',
     description: 'Solve the mystery to disappearances in a town seemingly controlled by supernatural forces.',
-    backstory: '',
+    backstory:
+      '<p>This story is played out completely ad-hoc since it is highly dependent on the player characters in the story.</p>' +
+      '<h3>Special Rules</h3>' +
+      '<h4>Calling Lights</h4><p>The sunlight begins to pull and concentrate in certain areas of the world. After 5 minutes, the contrast between lit areas and darkness becomes stark. The beams begin to rapidy heat up the areas where they are shining. Completely dark areas have voices that can be heard spewing madness and beckoning for each player character\'s comfort. Each player must make a 18 CHA saving throw or call out for what gives them comfort. If the former fails, the player character moves 15 feet toward the darkness. If the latter, an apparition of that comfort comes from the darkness, only visible to that player, and is immediately hostile.</p>' +
+      '<h4>Lord of Clarity</h4><p>Ghosts of citizens haunt the village but remain neutral, performing the tasks they normally would if they were alive. Each citizen has a piece of their soul that was taken from them, keeping them as servants of their ghost lord. Lord is keeping part of their souls since he feels bad for the burden they carry. Killing the ghost lord will return the pieces of their soul back to them so they can finally rest. Alternatively, each citizen can be made aware of that piece that is missing and that part of them can be returned through a ritual. The following are the pieces: every day fear of being murdered, parent denial that child died from a shipwreck, sadness of fighting a deadly disease.</p>' +
+      '<h4>Poet\'s Heart</h4><p>Random encounter with a ragged bard, singing the following song: "Now that she\'s back in the atmosphere. With drops of Jupiter in her hair. She acts like summer and walks like rain. Reminds me that there\'s a time to change, hey. Since the return of her stay on the moon. She listens like spring and she talks like June, hey. Hey, hey-yeah." He may stop and ask the group if they know who his heart speaks of. If they guess incorrectly, he\'s gets absurdly upset and hostile toward the group. If they guess right, he awards them with a magical lute that can cause hostile enemies to become neutral for a turn.</p>' +
+      '<h4>Death\'s Door</h4><p>When exploring the upper rafts of the castle, there is a rigged chest. When opening the chest without inspection, the player character requires a 19 DEX saving throw to avoid breathing in a toxic fume that comes out. If affected, the player character immediately loses vision of their reality and sees an entire world full of red (fire, lava, brimstone, etc). Demons flying around the castle take notice of the player character in this world and turn hostile toward the player character. Each hit can be avoided by a 10 CHA saving throw. If hit 3 times, player character moves toward the castle edge and jumps off.</p>' +
+      '<h4>Drunken Angel</h4><p>When entering the dining area of the castle, the doors close and lock. Golden chalices of infinite wine lift up and attempt to be poured into the mouths of the player characters. If wine reaches the mouth, the player characters immediately feel drunk and high. Player characters gain CHA +5, INT -5, immunity to mind affects, have a slight golden glow, wings burst from their backs allowing them to fly (albeit poorly), demons have combat advantage on affected player characters.</p>' +
+      '<h4>The Kill</h4><p>When the player characters sleeps for the first time, their dreams are nightmares. Each player character is randomly split amongst two opposing nations in the midst of a battle. There are hundreds of soldiers attacking each other, each player character is "attacked" by a random soldier but it is the player characters attacking each other. Player character\'s stats are kept in the dream state. When one player character receives fatal damage, both identities are revealed. The feeling of remorse and shame befalls the victor while the feeling of hopelessness and brokeness befalls the defeated. When waking up, victorious player characters gain STR +5, DEX +5, and disadvantage on mental checks. The defeated player characters only have 1 death saving roll.</p>',
     areas: [
       {
         name: '',
@@ -1454,12 +1462,12 @@ var adventures = [
     ],
   },
   {
-    title: '',
-    description: '',
+    title: 'Universal Collision',
+    description: 'Assume the role of a famous character or couple in an on-the-fly adventure.',
     backstory:
-    '<p>[backstory]</p>' +
+    '<p>This story is played out completely ad-hoc since it is highly dependent on the player characters in the story.</p>' +
     '<h3>Special Rules</h3>' +
-    '<h4>[title]</h4><p>[description]</p>',
+    '<h4>Personality Quiz Character Creation</h4><p>The gimmick to this one-shot is that you must choose an individual character from <a href="https://openpsychometrics.org/tests/characters/">this personality quiz</a>. If you\'d like to join as a couple, use <a href="https://openpsychometrics.org/tests/characters/couples/">this personality quiz</a>.</p>',
     areas: [
       {
         name: '',
@@ -1497,3 +1505,53 @@ var adventures = [
     ],
   },
 ];
+
+/*
+
+ONE SHOT OBJECT TEMPLATE
+
+{
+  title: '',
+  description: '',
+  backstory:
+  '<p>[backstory]</p>' +
+  '<h3>Special Rules</h3>' +
+  '<h4>[title]</h4><p>[description]</p>',
+  areas: [
+    {
+      name: '',
+      img: '',
+      description: '<p></p>',
+    },
+  ],
+  characters: [
+    {
+      name: '',
+      img: '',
+      description: '',
+      level: '',
+      race: '',
+      alignment: '',
+      health: '100',
+      armor: '10',
+      speed: '10',
+      strength: '10 (+0)',
+      dexterity: '10 (+0)',
+      constitution: '10 (+0)',
+      intelligence: '10 (+0)',
+      wisdom: '10 (+0)',
+      charisma: '10 (+0)',
+      abilities: '<li class="list-group-item"><h4>[title]</h4><p><small class="text-muted">[combat/RP], [action], [cooldown]</small></p><p>[description]</p></li>',
+    },
+  ],
+  items: [
+    {
+      name: '',
+      img: '',
+      description: '<p></p>',
+      cost: '',
+    },
+  ],
+},
+
+*/
