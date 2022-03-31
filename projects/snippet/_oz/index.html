@@ -1,59 +1,19 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <!-- Browser -->
-    <meta charset="utf-8"/>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Favicon & page title -->
-    <link rel="icon" href="../../../home/img/logo/green/favicon-32x32.png">
-    <title>dominiccerchio</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 
-    <!-- Bootstrap core CSS -->
-    <link href="../../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Custom CSS -->
-    <link href="change-default-colors.css" rel="stylesheet">
+    <title>Song and Film Studio Designer</title>
   </head>
-  <body class="container-fluid">
-    <h1 class="display-2">Oz's Current Blockers</h1>
-    <h1 class="display-4 text-primary">Audio from OneDrive</h1>
-    <p class="lead">Playing audio files from OneDrive using native audio and Bootstrap audio.</p>
+  <body>
+    <h1>Song and Film Studio Designer</h1>
 
-    <!-- EXAMPLE 1 -->
-    <h3>Example 1: Native HTML Audio Element from OneDrive</h3>
-    <audio controls>
-      <source src="https://onedrive.live.com/download?cid=7EDBFADE6A44F6A3&resid=7EDBFADE6A44F6A3%2148758&authkey=AOwN3KppxMTXcaY" type="audio/mpeg">
-      Your browser does not support the audio tag.
-    </audio>
-
-    <!-- EXAMPLE 2 -->
-    <h3 class="mt-3">Example 2: Dynamically Pulled Metadata</h3>
-    <div class="card-columns" id="audioMetadata"></div>
-    <a class="btn btn-info mb-3" href="audio-metadata.js" role="button" target="_blank">View audio-metadata.js</a>
-    <p><small><i>Note: This uses a JS library (JS MediaTags) to pull the file metadata. There are native ways to get metadata through FileReader but the library makes it much easier for demonstration purposes. Also, these songs are hosted on Google Drive.</i></small></p>
-
-    <hr>
-
-    <h1 class="display-4 text-primary">Default Colors on Bootstrap</h1>
-    <p class="lead">Changing default colors of Bootstrap without using Sass preprocessor (produces scss).</p>
-
-    <div class="alert alert-primary" role="alert">This alert is set to alert-primary, which should be blue. However, due to my custom change-default-colors.css, it is now purple!</div>
-    <a class="btn btn-info mb-3" href="change-default-colors.css" role="button" target="_blank">View change-default-colors.css</a>
-    <p><small><i>Note: In the current version of Bootstrap, CSS variables are set after Sass compiles the CSS. This means you cannot change all of the default colors easily through a small set of variables in root. Since each class or element color would need to be changed manually, Sass is the ideal way to change these default colors.</i></small></p>
-
-    <!-- Vendor JS -->
-    <script src="../../../vendor/jquery/js/jquery-3.4.1.min.js"></script>
-    <script src="../../../vendor/tether/js/tether.min.js"></script>
-    <script src="../../../vendor/popper/js/popper.min.js"></script>
-    <script src="../../../vendor/popper/js/tooltip.min.js"></script>
-    <script src="../../../vendor/bootstrap/js/bootstrap.min.js"></script>
-
-    <!-- JS MediaTags for metadata collection -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.3/jsmediatags.min.js"></script>
-
-  	<!-- Custom JS -->
-    <script src="audio-metadata.js"></script>
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
   </body>
 </html>
