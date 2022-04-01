@@ -15,13 +15,6 @@
         background-image:  repeating-radial-gradient( circle at 0 0, transparent 0, #dadada 40px ), repeating-linear-gradient( #ffffff55, #ffffff );
         height: 100%;
       }
-      .jumbotron {
-        background-color: #cccccc;
-        opacity: 1;
-        background-image:  linear-gradient(30deg, #ffffff 12%, transparent 12.5%, transparent 87%, #ffffff 87.5%, #ffffff), linear-gradient(150deg, #ffffff 12%, transparent 12.5%, transparent 87%, #ffffff 87.5%, #ffffff), linear-gradient(30deg, #ffffff 12%, transparent 12.5%, transparent 87%, #ffffff 87.5%, #ffffff), linear-gradient(150deg, #ffffff 12%, transparent 12.5%, transparent 87%, #ffffff 87.5%, #ffffff), linear-gradient(60deg, #ffffff77 25%, transparent 25.5%, transparent 75%, #ffffff77 75%, #ffffff77), linear-gradient(60deg, #ffffff77 25%, transparent 25.5%, transparent 75%, #ffffff77 75%, #ffffff77);
-        background-size: 80px 140px;
-        background-position: 0 0, 0 0, 40px 70px, 40px 70px, 0 0, 40px 70px;
-      }
     </style>
 
     <title>Song and Film Studio</title>
@@ -68,37 +61,53 @@
       </div>
     </header>
 
-    <section class="container px-4 py-5 my-5 text-center bg-light rounded-3 jumbotron">
-      <img class="d-block mx-auto mb-4" src="https://github.com/twbs.png" alt="" width="72" height="72">
-      <h1 class="display-5 fw-bold">Song and Film Studio</h1>
-      <div class="mx-auto">
-        <p class="lead mb-4">The fastest and easiest way to discover and purchase songs for your film and TV scenes.</p>
-      </div>
+    <!-- Page title -->
+    <section class="container mt-5">
+      <h1 class="display-3">Welcome Back, Oz!</h1>
+      <p class="lead">Find your contact information, stored payment options, transaction history and licensed songs.</p>
+    </section>
 
-      <!-- Cards -->
-      <div class="mx-auto row row-cols-1 row-cols-md-2 g-4 mt-5">
+    <!-- Support cards -->
+    <section class="container mb-5">
+      <div class="row row-cols-1 row-cols-md-2 g-4">
         <div class="col">
-          <div class="card">
-            <img src="supervisor.jpg" class="card-img-top" alt="Supervisor">
+          <div class="card" style="cursor: pointer;">
             <div class="card-body">
-              <h3 class="card-title">CALLING ALL MOVIE SUPERVISORS</h3>
-              <p class="card-text">Are you a movie supervisor looking for the best song to fit your film/scene or need a simple way to purchase licenses to songs? Easily upload a scene from your film and allow our recommendations engine to find the best songs that fit that scene.</p>
-              <a class="btn btn-primary" href="studio.html" role="button">Learn More</a>
+              <h5 class="card-title">Contact Information</h5>
+              <p class="card-text">Update your name, email, phone number or physical address.</p>
             </div>
           </div>
         </div>
         <div class="col">
-          <div class="card">
-            <img src="musician.jpg" class="card-img-top" alt="Musician">
+          <div class="card" style="cursor: pointer;">
             <div class="card-body">
-              <h3 class="card-title">CALLING ALL MUSICIANS</h3>
-              <p class="card-text">Are you musician who wants to get their song played on the big screen while protecting your IP? Upload your song to our secure and de-centralized network for others to license and track who has proper ownership and rights to your songs.</p>
-              <a class="btn btn-primary" href="songs.html" role="button">Learn More</a>
+              <h5 class="card-title">Stored Payment Options</h5>
+              <p class="card-text">Add or delete stored payment options.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card" style="cursor: pointer;">
+            <div class="card-body">
+              <h5 class="card-title">Transaction History</h5>
+              <p class="card-text">See all transaction history on purchased licenses or payment made for storage.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card" style="cursor: pointer;">
+            <div class="card-body">
+              <h5 class="card-title">Licensed Songs</h5>
+              <p class="card-text">View and download all licensed songs.</p>
             </div>
           </div>
         </div>
       </div>
     </section>
+
+    <!-- Support alert -->
+    <div class="alert alert-warning text-center container" role="alert">Having trouble finding something you're looking for? Please contact our support team.</div>
+
 
     <footer class="navbar navbar-expand-lg navbar-light bg-light fixed-bottom">
       <div class="container-fluid">
