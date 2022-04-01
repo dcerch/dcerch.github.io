@@ -28,47 +28,69 @@
     <title>dominiccerchio</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../vendor/bootstrap/bootstrap-5.1.3-dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+      /* https://www.magicpattern.design/tools/css-backgrounds */
+      body, html {
+        background-color: #ffffff;
+        opacity: 1;
+        background-image:  linear-gradient(#dadada 6px, transparent 6px), linear-gradient(90deg, #dadada 6px, transparent 6px), linear-gradient(#dadada 3px, transparent 3px), linear-gradient(90deg, #dadada 3px, #ffffff 3px);
+        background-size: 150px 150px, 150px 150px, 30px 30px, 30px 30px;
+        background-position: -6px -6px, -6px -6px, -3px -3px, -3px -3px;
+        height: 100%;
+      }
+      .jumbotron {
+        background-color: #cccccc;
+        opacity: 1;
+        background-image:  linear-gradient(30deg, #ffffff 12%, transparent 12.5%, transparent 87%, #ffffff 87.5%, #ffffff), linear-gradient(150deg, #ffffff 12%, transparent 12.5%, transparent 87%, #ffffff 87.5%, #ffffff), linear-gradient(30deg, #ffffff 12%, transparent 12.5%, transparent 87%, #ffffff 87.5%, #ffffff), linear-gradient(150deg, #ffffff 12%, transparent 12.5%, transparent 87%, #ffffff 87.5%, #ffffff), linear-gradient(60deg, #ffffff77 25%, transparent 25.5%, transparent 75%, #ffffff77 75%, #ffffff77), linear-gradient(60deg, #ffffff77 25%, transparent 25.5%, transparent 75%, #ffffff77 75%, #ffffff77);
+        background-size: 80px 140px;
+        background-position: 0 0, 0 0, 40px 70px, 40px 70px, 0 0, 40px 70px;
+      }
+    </style>
   </head>
-  <body class="jumbotron">
-    <div class="container">
+  <body>
+    <section class="container px-4 py-5 my-5 text-center bg-light rounded-3 jumbotron border border-secondary">
       <h1 class="display-3">Projects</h1>
+
+      <!-- Snippets -->
       <h3 class="mt-4">Snippets</h3>
       <p class="lead">Short, custom written Javascript applications that achieve trivial tasks or objectives.</p>
-      <ul class="list-group list-group-horizontal-sm mb-2 text-center">
-        <a class="list-group-item list-group-item-action list-group-item-primary" href="snippet/converter/index.html" target="_blank">Converter</a>
-        <a class="list-group-item list-group-item-action list-group-item-primary" href="snippet/mailto/index.html" target="_blank">MailTo Generator</a>
-        <a class="list-group-item list-group-item-action list-group-item-primary" href="snippet/randomizer/index.html" target="_blank">Randomizer</a>
-        <a class="list-group-item list-group-item-action list-group-item-primary" href="snippet/cookie/index.html" target="_blank">Cookie Storage</a>
-        <a class="list-group-item list-group-item-action list-group-item-primary" href="snippet/strobe/index.html" target="_blank">Strobe</a>
-        <a class="list-group-item list-group-item-action list-group-item-primary" href="snippet/package/index.html" target="_blank">Package Tracker</a>
-        <a class="list-group-item list-group-item-action list-group-item-primary" href="snippet/crypto/index.html" target="_blank">Cryptocurrency</a>
-        <a class="list-group-item list-group-item-action list-group-item-primary" href="snippet/pmpcalc/index.html" target="_blank">PMP Calculator</a>
-      </ul>
-      <ul class="list-group list-group-horizontal-sm mb-2 text-center">
-        <a class="list-group-item list-group-item-action list-group-item-primary" href="snippet/pmpref/index.html" target="_blank">PMP Quick Reference</a>
-        <a class="list-group-item list-group-item-action list-group-item-primary" href="snippet/bankrewards/index.html" target="_blank">Bank Rewards Value</a>
-        <a class="list-group-item list-group-item-action list-group-item-primary" href="snippet/moviedraft/index.html" target="_blank">Movie Draft 2018</a>
-        <a class="list-group-item list-group-item-action list-group-item-primary" href="snippet/explorerails/index.html" target="_blank">Explore the Rails</a>
-        <a class="list-group-item list-group-item-action list-group-item-primary" href="snippet/ticketgenerator/index.html" target="_blank">Ticket Generator</a>
-        <a class="list-group-item list-group-item-action list-group-item-primary" href="snippet/incomesavings/index.html" target="_blank">Income Savings Calculator</a>
-        <a class="list-group-item list-group-item-action list-group-item-primary" href="snippet/weatheradvisor/index.html" target="_blank">Weather Clothing Advisor</a>
-        <a class="list-group-item list-group-item-action list-group-item-primary" href="snippet/deviceenvironment/index.html" target="_blank">Device Environment Information</a>
-      </ul>
-      <ul class="list-group list-group-horizontal-sm mb-2 text-center">
-        <a class="list-group-item list-group-item-action list-group-item-primary" href="snippet/elderscrolls/index.html" target="_blank">Elder Scrolls Blades Equipment</a>
-        <a class="list-group-item list-group-item-action list-group-item-primary" href="snippet/timewrap/index.html" target="_blank">Time Wrap</a>
-        <a class="list-group-item list-group-item-action list-group-item-primary" href="snippet/pointkeeper/index.html" target="_blank">Point Keeper</a>
-        <a class="list-group-item list-group-item-action list-group-item-primary" href="snippet/oneshot/index.html" target="_blank">One Shot Adventures</a>
-        <a class="list-group-item list-group-item-action list-group-item-primary" href="snippet/hades/index.html" target="_blank">Boon Picker</a>
-        <a class="list-group-item list-group-item-action list-group-item-primary" href="snippet/dnd/index.html" target="_blank">Discord Campaign</a>
-        <a class="list-group-item list-group-item-action list-group-item-primary" href="snippet/phonename/index.html" target="_blank">Friendly Phone Number Name</a>
-        <a class="list-group-item list-group-item-action list-group-item-primary" href="snippet/_oz/index.html" target="_blank">Oz</a>
-        <a class="list-group-item list-group-item-action list-group-item-primary" href="snippet/../index.html" target="_blank"></a>
-      </ul>
+      <div class="row">
+        <div class="col-2 mt-3 d-grid"><a class="btn btn-outline-dark btn-lg" href="snippet/converter/index.html" target="_blank" role="button">Converter</a></div>
+        <div class="col-2 mt-3 d-grid"><a class="btn btn-outline-dark btn-lg" href="snippet/mailto/index.html" target="_blank" role="button">MailTo Generator</a></div>
+        <div class="col-2 mt-3 d-grid"><a class="btn btn-outline-dark btn-lg" href="snippet/randomizer/index.html" target="_blank" role="button">Randomizer</a></div>
+        <div class="col-2 mt-3 d-grid"><a class="btn btn-outline-dark btn-lg" href="snippet/cookie/index.html" target="_blank" role="button">Cookie Storage</a></div>
+        <div class="col-2 mt-3 d-grid"><a class="btn btn-outline-dark btn-lg" href="snippet/strobe/index.html" target="_blank" role="button">Strobe</a></div>
+        <div class="col-2 mt-3 d-grid"><a class="btn btn-outline-dark btn-lg" href="snippet/package/index.html" target="_blank" role="button">Package Tracker</a></div>
+        <div class="col-2 mt-3 d-grid"><a class="btn btn-outline-dark btn-lg" href="snippet/crypto/index.html" target="_blank" role="button">Cryptocurrency</a></div>
+        <div class="col-2 mt-3 d-grid"><a class="btn btn-outline-dark btn-lg" href="snippet/pmpcalc/index.html" target="_blank" role="button">PMP Calculator</a></div>
+        <div class="col-2 mt-3 d-grid"><a class="btn btn-outline-dark btn-lg" href="snippet/pmpref/index.html" target="_blank" role="button">PMP Quick Reference</a></div>
+        <div class="col-2 mt-3 d-grid"><a class="btn btn-outline-dark btn-lg" href="snippet/bankrewards/index.html" target="_blank" role="button">Bank Rewards Value</a></div>
+        <div class="col-2 mt-3 d-grid"><a class="btn btn-outline-dark btn-lg" href="snippet/moviedraft/index.html" target="_blank" role="button">Movie Draft 2018</a></div>
+        <div class="col-2 mt-3 d-grid"><a class="btn btn-outline-dark btn-lg" href="snippet/explorerails/index.html" target="_blank" role="button">Explore the Rails</a></div>
+        <div class="col-2 mt-3 d-grid"><a class="btn btn-outline-dark btn-lg" href="snippet/ticketgenerator/index.html" target="_blank" role="button">Ticket Generator</a></div>
+        <div class="col-2 mt-3 d-grid"><a class="btn btn-outline-dark btn-lg" href="snippet/incomesavings/index.html" target="_blank" role="button">Income Savings Calculator</a></div>
+        <div class="col-2 mt-3 d-grid"><a class="btn btn-outline-dark btn-lg" href="snippet/weatheradvisor/index.html" target="_blank" role="button">Weather Clothing Advisor</a></div>
+        <div class="col-2 mt-3 d-grid"><a class="btn btn-outline-dark btn-lg" href="snippet/deviceenvironment/index.html" target="_blank" role="button">Device Environment Information</a></div>
+        <div class="col-2 mt-3 d-grid"><a class="btn btn-outline-dark btn-lg" href="snippet/elderscrolls/index.html" target="_blank" role="button">Elder Scrolls Blades Equipment</a></div>
+        <div class="col-2 mt-3 d-grid"><a class="btn btn-outline-dark btn-lg" href="snippet/timewrap/index.html" target="_blank" role="button">Time Wrap</a></div>
+        <div class="col-2 mt-3 d-grid"><a class="btn btn-outline-dark btn-lg" href="snippet/pointkeeper/index.html" target="_blank" role="button">Point Keeper</a></div>
+        <div class="col-2 mt-3 d-grid"><a class="btn btn-outline-dark btn-lg" href="snippet/oneshot/index.html" target="_blank" role="button">One Shot Adventures</a></div>
+        <div class="col-2 mt-3 d-grid"><a class="btn btn-outline-dark btn-lg" href="snippet/hades/index.html" target="_blank" role="button">Boon Picker</a></div>
+        <div class="col-2 mt-3 d-grid"><a class="btn btn-outline-dark btn-lg" href="snippet/dnd/index.html" target="_blank" role="button">Discord Campaign</a></div>
+        <div class="col-2 mt-3 d-grid"><a class="btn btn-outline-dark btn-lg" href="snippet/phonename/index.html" target="_blank" role="button">Friendly Phone Number Name</a></div>
+        <div class="col-2 mt-3 d-grid"><a class="btn btn-outline-dark btn-lg" href="snippet/_oz/index.html" target="_blank" role="button">Oz</a></div>
+        <!-- <div class="col-2 mt-3 d-grid"><a class="btn btn-outline-dark btn-lg" href="snippet/converter/index.html" target="_blank" role="button"></a></div> -->
+      </div>
 
+      <!-- Full Applications -->
       <h3 class="mt-4">Full applications</h3>
       <p class="lead">Large, custom written Javascript applications that provide a wholistic experience.</p>
+
+
+    </section>
+
       <div class="card-columns">
         <div class="card text-center mb-3">
           <div class="card-body text-white bg-info">
@@ -137,10 +159,6 @@
     </div>
 
     <!-- Vendor JS -->
-    <script src="../../vendor/jquery/js/jquery-3.4.1.min.js"></script>
-    <script src="../../vendor/tether/js/tether.min.js"></script>
-    <script src="../../vendor/popper/js/popper.min.js"></script>
-    <script src="../../vendor/popper/js/tooltip.min.js"></script>
-    <script src="../../vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="../vendor/bootstrap/bootstrap-5.1.3-dist/js/bootstrap.min.js"></script>
   </body>
 </html>
