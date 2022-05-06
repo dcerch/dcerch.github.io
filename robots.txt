@@ -1,5 +1,7 @@
 User-agent: *
-Disallow: /home/
+Disallow: /home/css
+Disallow: /home/js
+Disallow: /home/resume.pdf
 Disallow: /projects/full/
 Disallow: /projects/snippet/
 Disallow: /projects/showcase/
