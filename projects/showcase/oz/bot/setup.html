@@ -43,11 +43,11 @@
       <div id="setupcarousel" class="carousel slide carousel-dark text-dark container mt-5" data-bs-interval="false" data-bs-wrap="false">
         <div class="carousel-inner">
           <!-- Step 1 -->
-          <div class="carousel-item active p-3 border rounded-4 border-bottom-0">
-            <h1 class="display-5 text-light mb-3">Contact Information</h1>
+          <div class="carousel-item active p-3 border rounded-4 text-bg-light">
+            <h1 class="display-5 mb-3">Contact Information</h1>
             <div class="row">
               <div class="col">
-                <h3 class="text-light mb-3">Company Information</h3>
+                <h3 class="mb-3">Company Information</h3>
                 <div class="form-floating mb-3">
                   <input type="text" class="form-control" id="setupform1" placeholder="Contoso">
                   <label for="setupform1">Company Name</label>
@@ -58,7 +58,7 @@
                 </div>
               </div>
               <div class="col">
-                <h3 class="text-light mb-3">Owner Information</h3>
+                <h3 class="mb-3">Owner Information</h3>
                 <div class="form-floating mb-3">
                   <input type="text" class="form-control" id="setupform3" placeholder="John">
                   <label for="setupform3">First Name</label>
@@ -83,13 +83,13 @@
             </div>
           </div>
           <!-- Step 2 -->
-          <div class="carousel-item p-3 border rounded-4 border-bottom-0">
-            <h1 class="display-5 text-light mb-3">Pick Your Plan</h1>
-            <p class="text-light mb-4">Choose your plan based on the complexity of your conversation. How long should it take for the average prospect to complete your conversation? The average time sales professionals spend with prospects is about 5 minutes. It's okay for this to be an estimate. We will automatically bump you up to the next plan and discount as your business needs. You will not have to worry about outages.</p>
+          <div class="carousel-item p-3 border rounded-4 text-bg-light">
+            <h1 class="display-5 mb-3">Pick Your Plan</h1>
+            <p class="mb-4">Choose your plan based on the complexity of your conversation. How long should it take for the average prospect to complete your conversation? The average time sales professionals spend with prospects is about 5 minutes. It's okay for this to be an estimate. We will automatically bump you up to the next plan and discount as your business needs. You will not have to worry about outages.</p>
             <div class="row row-cols-1 row-cols-md-3 g-4 text-center">
               <div class="col">
                 <div class="card h-100 mb-4 rounded-3 shadow-sm">
-                  <div class="card-header py-3">
+                  <div class="card-header py-3 text-bg-warning">
                     <h4 class="my-0 fw-normal">Jump Start</h4>
                   </div>
                   <div class="card-body">
@@ -100,12 +100,12 @@
                       <li>200 minutes included</li>
                     </ul>
                   </div>
-                  <div class="card-footer"><button type="button" class="w-100 btn btn-lg btn-outline-primary">Choose this plan</button></div>
+                  <div class="card-footer"><button type="button" class="w-100 btn btn-lg btn-outline-dark">Choose this plan</button></div>
                 </div>
               </div>
               <div class="col">
                 <div class="card h-100 mb-4 rounded-3 shadow-sm">
-                  <div class="card-header py-3">
+                  <div class="card-header py-3 text-bg-warning">
                     <h4 class="my-0 fw-normal">Active Business</h4>
                   </div>
                   <div class="card-body">
@@ -117,12 +117,12 @@
                       <li>Email support</li>
                     </ul>
                   </div>
-                  <div class="card-footer"><button type="button" class="w-100 btn btn-lg btn-outline-primary">Choose this plan</button></div>
+                  <div class="card-footer"><button type="button" class="w-100 btn btn-lg btn-outline-dark">Choose this plan</button></div>
                 </div>
               </div>
               <div class="col">
                 <div class="card h-100 mb-4 rounded-3 shadow-sm">
-                  <div class="card-header py-3">
+                  <div class="card-header py-3 text-bg-warning">
                     <h4 class="my-0 fw-normal">Enterprise Business</h4>
                   </div>
                   <div class="card-body">
@@ -135,40 +135,48 @@
                       <li>Help center access</li>
                     </ul>
                   </div>
-                  <div class="card-footer"><button type="button" class="w-100 btn btn-lg btn-outline-primary">Choose this plan</button></div>
+                  <div class="card-footer"><button type="button" class="w-100 btn btn-lg btn-outline-dark">Choose this plan</button></div>
                 </div>
               </div>
             </div>
           </div>
           <!-- Step 3 -->
-          <div class="carousel-item p-3 border rounded-4 border-bottom-0">
-            <h1 class="display-5 text-light mb-3">PayPal Subscription</h1>
+          <div class="carousel-item p-3 border rounded-4 text-bg-light">
+            <h1 class="display-5 mb-3">PayPal Subscription</h1>
             <img src="paypal.png" class="my-5 mx-auto d-block container p-3" alt="Example image">
           </div>
           <!-- Step 4 -->
-          <div class="carousel-item p-3 border rounded-4 border-bottom-0">
-            <h1 class="display-5 text-light mb-3">Your Greeting Questions</h1>
-            <p class="text-light">Greeting questions are your beginning and ending questions to your prospect. Here is where you name your BOT as an additional electronic member of your team and ask the first question you need to know - usually their name.</p>
-            <p class="text-light">The end greeting question is where you will let the prospect know what will happen next on their journey with your business.</p>
-            <p class="text-light mb-4">The decision question is where you get your prospect to inform you why they called. It allows you to ask them pertinent questions for the area of focus they need more information on. Example: "Are you calling to learn more about THIS or THAT?"</p>
+          <div class="carousel-item p-3 border rounded-4 text-bg-light">
+            <h1 class="display-5  mb-3">Let's Setup Your Automated Assistant</h1>
+            <p>Here's where you make your BOT as interactive as possible. In this section, you're going to set up an experience that your prospective customers will engage.</p>
+            <p>This is how your Bot will sound when it first answers your prospective clients. This will dynamically get filled in when the user answers the questions above. It allows for them to see what the introduction statement of the Bot will look like.</p>
+            <p class="mb-4">For example, "Hello, my name is [BOT NAME], an automated assistant for [COMPANY NAME]. I'm here to help you with [MISSION STATEMENT]. [INTRO QUESTION]?" When the chat session is over, your Bot will say [ENDING STATEMENT].</p>
             <div class="form-floating mb-3">
-              <textarea class="form-control" placeholder="Introduction Greeting Question" id="setupform8" style="height: 100px"></textarea>
-              <label for="setupform8">Introduction Greeting Question</label>
+              <input type="text" class="form-control" id="setupform8" placeholder="Name your bot">
+              <label for="setupform1">Name your Bot</label>
             </div>
             <div class="form-floating mb-3">
-              <textarea class="form-control" placeholder="Ending Question" id="setupform9" style="height: 100px"></textarea>
-              <label for="setupform9">Ending Question</label>
+              <textarea class="form-control" placeholder="What does your Bot assist with solving?" id="setupform9" style="height: 100px"></textarea>
+              <label for="setupform8">What does your Bot assist with solving?</label>
+            </div>
+            <div class="form-floating mb-3">
+              <textarea class="form-control" placeholder="First or introduction question" id="setupform10" style="height: 100px"></textarea>
+              <label for="setupform9">First or introduction question</label>
             </div>
             <div class="form-floating">
-              <textarea class="form-control" placeholder="Decision Question" id="setupform10" style="height: 100px"></textarea>
-              <label for="setupform10">Decision Question</label>
+              <textarea class="form-control" placeholder="Ending statement" id="setupform11" style="height: 100px"></textarea>
+              <label for="setupform10">Ending statement</label>
             </div>
           </div>
           <!-- Step 5 -->
-          <div class="carousel-item p-3 border rounded-4 border-bottom-0">
-            <h1 class="display-5 text-light mb-4">Your Decision Points and Questions</h1>
-            <p class="text-light">What are the areas of focus your prospects need to know about your business and what questions would you ask? For example, a real estate firm might ask if you are a "buyer" or "seller" with those two decision points. A generator contract may ask if you need "plumbing", "electrical", or "kitchen remodeling".</p>
-            <article id="setupform11">
+          <div class="carousel-item p-3 border rounded-4 text-bg-light">
+            <h1 class="display-5 mb-4">Your Decision Points and Questions</h1>
+            <p>What are the areas of focus your prospects need to know about your business and what questions would you ask? For example, a real estate firm might ask if you are a "buyer" or "seller" with those two decision points. A generator contract may ask if you need "plumbing", "electrical", or "kitchen remodeling".</p>
+            <div class="form-floating mb-3">
+              <textarea class="form-control" placeholder="How will you ask your prospects why they are talking to you?" id="setupform12" style="height: 100px"></textarea>
+              <label for="setupform8">How will you ask your prospects why they are talking to you?</label>
+            </div>
+            <article id="setupform13">
               <div class="input-group mb-3">
                 <div class="form-floating">
                   <input type="text" class="form-control" id="decisionpoint" placeholder="Plumbing">
@@ -182,7 +190,87 @@
               </div>
             </article>
             <div class="d-grid gap-2 col-3 mx-auto mt-5">
-              <button class="btn btn-outline-light" type="button" onclick="addDecision();">Add</button>
+              <button class="btn btn-outline-dark" type="button" onclick="addDecision(13);">Add</button>
+            </div>
+          </div>
+          <!-- Step 6 -->
+          <div class="carousel-item p-3 border rounded-4 text-bg-light">
+            <h1 class="display-5 mb-4">Adding FAQs</h1>
+            <p>In this section, you can fill in or acquire all the Frequently Asked Questions your business uses to answer questions. This shows the intelligence of your Bot. The more questions you allow it to answer, the more confident your prospects will be in your services and offerings.</p>
+            <h5>Add FAQ from URL</h5>
+            <div class="form-floating mb-3">
+              <input type="text" class="form-control" id="setupform14" placeholder="URL">
+              <label for="setupform1">FAQ URL</label>
+            </div>
+            <h3 class="text-center my-3">OR</h3>
+            <h5>Upload FAQ Documents</h5>
+            <input class="form-control form-control-lg" type="file" id="setupform15" multiple>
+            <h3 class="text-center my-3">OR</h3>
+            <h5>Manually Input FAQs</h5>
+            <article id="setupform16">
+              <div class="input-group mb-3">
+                <div class="form-floating">
+                  <input type="text" class="form-control" id="decisionpoint" placeholder="Question">
+                  <label for="decisionpoint">Question</label>
+                </div>
+                <div class="form-floating">
+                  <input type="text" class="form-control" id="decisionquestion" placeholder="Answer">
+                  <label for="decisionquestion">Answer</label>
+                </div>
+                <button class="btn btn-danger" type="button" onclick="this.parentNode.remove();">Remove</button>
+              </div>
+            </article>
+            <div class="d-grid gap-2 col-3 mx-auto mt-5">
+              <button class="btn btn-outline-dark" type="button" onclick="addDecision(16);">Add</button>
+            </div>
+          </div>
+          <!-- Step 7 -->
+          <div class="carousel-item p-3 border rounded-4 text-bg-light">
+            <h1 class="display-5 mb-4">Confirmation</h1>
+            <p>This is a summary of your bot.</p>
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+              <div class="col">
+                <div class="card h-100">
+                  <div class="card-body">
+                    <h5 class="card-title">Bot Introduction</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">Your prospects will first interact with the bot in this way:</h6>
+                    <p class="card-text">"Hello, my name is [BOT NAME], an automated assistant for [COMPANY NAME]. I'm here to help you with [MISSION STATEMENT]. [INTRO QUESTION]?" When the chat session is over, your Bot will say [ENDING STATEMENT].</p>
+                    <a href="#" class="card-link" data-bs-target="#setupcarousel" data-bs-slide-to="3">Edit</a>
+                  </div>
+                </div>
+              </div>
+              <div class="col">
+                <div class="card h-100">
+                  <div class="card-body">
+                    <h5 class="card-title">Decision Points</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">Your prospects can inquire about the following areas of your business:</h6>
+                    <p class="card-text">
+                      <ul class="list-group">
+                        <li class="list-group-item">Plumbing — 7 Questions</li>
+                        <li class="list-group-item">Electrical — 5 Questions</li>
+                        <li class="list-group-item">Kitchen Remodeling — 10 Questions</li>
+                      </ul>
+                    </p>
+                    <a href="#" class="card-link" data-bs-target="#setupcarousel" data-bs-slide-to="4">Edit</a>
+                  </div>
+                </div>
+              </div>
+              <div class="col">
+                <div class="card h-100">
+                  <div class="card-body">
+                    <h5 class="card-title">Frequently Asked Questions</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">Your prospects can inquire about the following FAQs about your business:</h6>
+                    <p class="card-text">
+                      <ul class="list-group">
+                        <li class="list-group-item">What does your business do?</li>
+                        <li class="list-group-item">How do I make help desk requests?</li>
+                        <li class="list-group-item">+ 48 more questions</li>
+                      </ul>
+                    </p>
+                    <a href="#" class="card-link" data-bs-target="#setupcarousel" data-bs-slide-to="5">Edit</a>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -221,18 +309,18 @@
       const decisionhtml = `
       <div class="input-group mb-3">
         <div class="form-floating">
-          <input type="text" class="form-control" id="decisionpoint" placeholder="Plumbing">
-          <label for="decisionpoint">Decision</label>
+          <input type="text" class="form-control" id="decisionpoint" placeholder="Question">
+          <label for="decisionpoint">Question</label>
         </div>
         <div class="form-floating">
-          <input type="text" class="form-control" id="decisionquestion" placeholder="What services do you have?">
-          <label for="decisionquestion">Question</label>
+          <input type="text" class="form-control" id="decisionquestion" placeholder="Answer">
+          <label for="decisionquestion">Answer</label>
         </div>
         <button class="btn btn-danger" type="button" onclick="this.parentNode.remove();">Remove</button>
       </div>
       `;
 
-      function addDecision() { document.getElementById("setupform11").insertAdjacentHTML("beforeend", decisionhtml); }
+      function addDecision(section) { document.getElementById("setupform" + section).insertAdjacentHTML("beforeend", decisionhtml); }
     </script>
   </body>
 </html>
