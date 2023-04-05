@@ -10,7 +10,7 @@ if (selectedtheme !== null) {
 }
 else {
   localStorage.setItem("dtheme", "light");
-  setTheme(themelist[selectedtheme]);
+  setTheme(themelist[selectedtheme][1], themelist[selectedtheme][2]);
 }
 
 //If theme picker icon is clicked

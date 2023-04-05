@@ -28,17 +28,17 @@ switch(screens[Math.floor(Math.random()*screens.length)]) {
 
 //APPLY SPACE
 function applySpace() {
-  $('body').append('<link href="home/css/404-space.css" rel="stylesheet"><div class="space-background"><div class="space-foreground"><iframe src="https://www.youtube.com/embed/W0LHTWG-UmQ?controls=0&showinfo=0&rel=0&autoplay=1&loop=1&playlist=W0LHTWG-UmQ" frameborder="0" allowfullscreen></iframe></div></div><div class="space-info floating"><h1>404</h1><p>Actual live footage of trying to find the page you wanted... It is not looking so good.</p><p>Please check the URL for mistakes and try again or return <a href="index.html">home</a>... the website homepage... not Earth.</p></div>');
+  $('body').append('<link href="home/css/404-space.css" rel="stylesheet"><div class="space-background"><div class="space-foreground"><img class="img-fluid" src="home/img/404-earth.gif" alt="404"></div></div><div class="space-info floating"><h1>404</h1><p>Actual live footage of trying to find the page you wanted... It is not looking so good.</p><p>Return to <a href="index.html">Earth</a>?</p></div>');
 }
 
 //APPLY STARWARS
 function applyStarwars() {
-  $('body').append('<link href="home/css/404-starwars.css" rel="stylesheet"><div class="starwars"><div><h1>404</h1><p>This is not the page you are looking for...</p><button type="button" class="btn btn-warning btn-lg">Move Along</button></div><img src="home/img/404-droids.gif" alt="404"></div>');
+  $('body').append('<link href="home/css/404-starwars.css" rel="stylesheet"><div class="starwars"><div><h1>404</h1><button type="button" class="btn btn-warning btn-lg">Move Along</button></div><img class="img-fluid" src="home/img/404-droids.gif" alt="404"></div>');
 }
 
 //APPLY MATRIX
 function applyMatrix() {
-  $('body').append('<link href="home/css/404-matrix.css" rel="stylesheet"><h1>404</h1><div class="matrix-container"><div class="matrix-text"></div></div><div class="matrix-wrap" title="Take the Blue Pill"><div class="matrix-cube"><div class="matrix-front">404</div><div class="matrix-back">404</div><div class="matrix-top"></div><div class="matrix-bottom"></div><div class="matrix-left">&#8962;</div><div class="matrix-right">&#8962;</div></div></div>');
+  $('body').append('<link href="home/css/404-matrix.css" rel="stylesheet"><h1>404</h1><div class="matrix-container container text-center"><div class="matrix-text"></div></div><div class="matrix-wrap" title="Take the Blue Pill"><div class="matrix-cube"><div class="matrix-front">404</div><div class="matrix-back">404</div><div class="matrix-top"></div><div class="matrix-bottom"></div><div class="matrix-left">&#8962;</div><div class="matrix-right">&#8962;</div></div></div>');
 
   'use strict';
   function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -132,7 +132,7 @@ function applyMatrix() {
   var counter = 0;
   var next = function next() {
     fx.setText(phrases[counter]).then(function () {
-      setTimeout(next, 800);
+      setTimeout(next, 1100);
     });
     counter = (counter + 1) % phrases.length;
   };
