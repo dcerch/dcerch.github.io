@@ -124,7 +124,7 @@ function applyMatrix() {
     Start text scramble
   */
 
-  var phrases = ['User,', 'sooner or later', 'you\'re going to realize', 'just as I did', 'that there\'s a difference', 'between knowing the page', 'and finding the page'];
+  var phrases = ['User,', 'sooner or later', 'you\'re going to realize', 'just as I did', 'that there\'s a difference', 'between knowing the page', 'and finding the page.'];
 
   var el = document.querySelector('.matrix-text');
   var fx = new TextScramble(el);
