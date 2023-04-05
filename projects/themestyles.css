@@ -1,0 +1,47 @@
+/* https://www.magicpattern.design/tools/css-backgrounds */
+
+#themepicker {
+  cursor: pointer;
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+}
+
+.light {
+  color: #121212;
+  background-color: #121212 !important;
+  opacity: 1;
+  background-image:  linear-gradient(#dadada 6px, transparent 6px), linear-gradient(90deg, #dadada 6px, transparent 6px), linear-gradient(#dadada 3px, transparent 3px), linear-gradient(90deg, #dadada 3px, #ffffff 3px);
+  background-size: 150px 150px, 150px 150px, 30px 30px, 30px 30px;
+  background-position: -6px -6px, -6px -6px, -3px -3px, -3px -3px;
+  height: 100%;
+}
+
+.light .jumbotron {
+  background-color: #fafafa !important;
+  opacity: 1;
+  background-image:  linear-gradient(30deg, #f3f3f3 12%, transparent 12.5%, transparent 87%, #f3f3f3 87.5%, #f3f3f3), linear-gradient(150deg, #f3f3f3 12%, transparent 12.5%, transparent 87%, #f3f3f3 87.5%, #f3f3f3), linear-gradient(30deg, #f3f3f3 12%, transparent 12.5%, transparent 87%, #f3f3f3 87.5%, #f3f3f3), linear-gradient(150deg, #f3f3f3 12%, transparent 12.5%, transparent 87%, #f3f3f3 87.5%, #f3f3f3), linear-gradient(60deg, #f3f3f377 25%, transparent 25.5%, transparent 75%, #f3f3f377 75%, #f3f3f377), linear-gradient(60deg, #f3f3f377 25%, transparent 25.5%, transparent 75%, #f3f3f377 75%, #f3f3f377);
+  background-size: 80px 140px;
+  background-position: 0 0, 0 0, 40px 70px, 40px 70px, 0 0, 40px 70px;
+}
+
+.dark {
+  color: #fafafa;
+  background-color: #121212 !important;
+  opacity: 1;
+  background-image:  linear-gradient(#222222 6px, transparent 6px), linear-gradient(90deg, #222222 6px, transparent 6px), linear-gradient(#222222 3px, transparent 3px), linear-gradient(90deg, #222222 3px, #121212 3px);
+  background-size: 150px 150px, 150px 150px, 30px 30px, 30px 30px;
+  background-position: -6px -6px, -6px -6px, -3px -3px, -3px -3px;
+  height: 100%;
+}
+
+.dark .jumbotron {
+  background-color: #080808 !important;
+  opacity: 1;
+  background-image:  linear-gradient(30deg, #181818 12%, transparent 12.5%, transparent 87%, #181818 87.5%, #181818), linear-gradient(150deg, #181818 12%, transparent 12.5%, transparent 87%, #181818 87.5%, #181818), linear-gradient(30deg, #181818 12%, transparent 12.5%, transparent 87%, #181818 87.5%, #181818), linear-gradient(150deg, #181818 12%, transparent 12.5%, transparent 87%, #181818 87.5%, #181818), linear-gradient(60deg, #18181877 25%, transparent 25.5%, transparent 75%, #18181877 75%, #18181877), linear-gradient(60deg, #18181877 25%, transparent 25.5%, transparent 75%, #18181877 75%, #18181877);
+  background-size: 80px 140px;
+  background-position: 0 0, 0 0, 40px 70px, 40px 70px, 0 0, 40px 70px;
+}

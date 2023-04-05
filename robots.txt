@@ -2,6 +2,7 @@ User-agent: *
 Disallow: /home/css
 Disallow: /home/js
 Disallow: /home/resume.pdf
+Disallow: /home/lostluggage.html
 Disallow: /projects/full/
 Disallow: /projects/snippet/
 Disallow: /projects/showcase/
