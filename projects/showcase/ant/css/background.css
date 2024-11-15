@@ -17,9 +17,15 @@ img {
     -moz-user-select: none;
     -webkit-user-select: none;
     -ms-user-select: none;
-    max-width: 300px;
-    max-height: 300px;
+    max-width: 256px;
+    max-height: 256px;
     margin: auto;
+}
+
+.card {
+  background-color: #f9ebf2;
+  background-image: linear-gradient(160deg, #f9ebf2 0%, #e08ca8 100%);
+  border: 0;
 }
 
 .ebook-header-dunes {
@@ -72,14 +78,6 @@ h4 {font-size: 22px;}
 }
 
 /* TWINKLING */
-
-/* Keenan, you'll nbeed to add the following after the div .ebook-header-dunes:
-
-<div class="stars"></div>
-<div class="twinkling"></div>
-<div class="clouds"></div>
-
-*/
 
 @keyframes move-twink-back {
   from {background-position: 0 0;}
