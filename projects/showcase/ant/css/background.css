@@ -17,8 +17,8 @@ img {
     -moz-user-select: none;
     -webkit-user-select: none;
     -ms-user-select: none;
-    max-width: 256px;
-    max-height: 256px;
+    max-width: 200px;
+    max-height: 200px;
     margin: auto;
 }
 
