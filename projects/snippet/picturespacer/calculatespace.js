@@ -8,10 +8,12 @@ function displayAlignment(e) {
   if(artWidth == '') { artWidth = 1; }
   if(artCount == '') { artCount = 1; }
 
+  let artSpacing = (wallWidth-(artWidth*artCount))/(artCount+1);
+
   let alignmentViewHTML = '';
 
   //Build start of table and first header row
-  alignmentViewHTML = `<table style="table-layout: fixed" class="table table-bordered border-dark table-sm"><tr class="table-secondary text-center"><th class="py-2" scope="col" colspan="${wallWidth}">This will show you where to hang the art center to the wall (assuming center hanging as well) with a ruler for reference</th></tr>`;
+  alignmentViewHTML = `<table style="table-layout: fixed" class="table table-bordered border-dark table-sm"><tr class="table-secondary text-center"><th class="py-2" scope="col" colspan="${wallWidth}">This will show you where to hang the art evenly (assuming center hanging as well) with a ruler for reference</th></tr>`;
 
   //Add ruler row
   alignmentViewHTML += `<tr class="text-right">`;
@@ -23,7 +25,7 @@ function displayAlignment(e) {
   //Add art row
   alignmentViewHTML += `<tr class="text-center">`;
   for (let i = 1; i <= artCount; i++) {
-    alignmentViewHTML += `<td class="py-5"></td><td class="py-5 bg-dark text-light" colspan="${artWidth}">Art #${i}</td>`;
+    alignmentViewHTML += `<td class="py-5" colspan="${Math.round(artSpacing)}"></td><td class="py-5 bg-dark text-light" colspan="${artWidth}">Art #${i}</td>`;
   }
   alignmentViewHTML += `</tr>`;
 
@@ -32,13 +34,14 @@ function displayAlignment(e) {
 
   //Overwrite the table
   document.getElementById('alignmentView').innerHTML = alignmentViewHTML;
+  document.getElementById('artSpacing').value = `~` + artSpacing;
 
   //Testing values
   console.log(`
     wallWidth=${wallWidth}
     artWidth=${artWidth}
     artCount=${artCount}
-    artCount=${(wallWidth-(artWidth*artCount))/(artCount+1)}
+    artSpacing=${artSpacing}
   `);
 }
 

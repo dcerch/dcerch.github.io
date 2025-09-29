@@ -21,15 +21,19 @@
         <div style="max-width: 30rem;">
           <div class="mb-2">
             <label for="wallWidth" class="form-label">How wide is the wall you want to cover?</label>
-            <input type="number" min="1" step="1" class="form-control" id="wallWidth" placeholder="Round down to the nearest inch" onkeypress="return (event.charCode == 8 || event.charCode == 0 || event.charCode == 13) ? null : event.charCode >= 48 && event.charCode <= 57">
+            <input type="number" min="1" step="1" class="form-control" id="wallWidth" placeholder="Round down to the nearest inch or foot" onkeypress="return (event.charCode == 8 || event.charCode == 0 || event.charCode == 13) ? null : event.charCode >= 48 && event.charCode <= 57">
           </div>
           <div class="mb-2">
             <label for="artWidth" class="form-label">How wide is the art?</label>
-            <input type="number" min="1" step="1" class="form-control" id="artWidth" placeholder="Round down to the nearest inch" onkeypress="return (event.charCode == 8 || event.charCode == 0 || event.charCode == 13) ? null : event.charCode >= 48 && event.charCode <= 57">
+            <input type="number" min="1" step="1" class="form-control" id="artWidth" placeholder="Round down to the nearest inch or foot" onkeypress="return (event.charCode == 8 || event.charCode == 0 || event.charCode == 13) ? null : event.charCode >= 48 && event.charCode <= 57">
           </div>
-          <div>
+          <div class="mb-2">
             <label for="artCount" class="form-label">How many pieces of art?</label>
             <input type="number" min="1" step="1" class="form-control" id="artCount" placeholder="Any whole number" onkeypress="return (event.charCode == 8 || event.charCode == 0 || event.charCode == 13) ? null : event.charCode >= 48 && event.charCode <= 57">
+          </div>
+          <div>
+            <label for="artCount" class="form-label">Art spacing calculation</label>
+            <input type="text" class="form-control" id="artSpacing" placeholder="Approximately the spacing needed" readonly>
           </div>
         </div>
         <div class="mt-5" id="alignmentView">
@@ -61,19 +65,19 @@
             </tr>
             <tr class="text-center">
               <td class="py-5"></td>
-              <td class="py-5 bg-dark text-light" colspan="2">Art #1<br>02"</td>
+              <td class="py-5 bg-dark text-light" colspan="2">Art #1</td>
               <td class="py-5"></td>
               <td class="py-5"></td>
-              <td class="py-5 bg-dark text-light" colspan="2">Art #2<br>06"</td>
+              <td class="py-5 bg-dark text-light" colspan="2">Art #2"</td>
               <td class="py-5"></td>
               <td class="py-5"></td>
-              <td class="py-5 bg-dark text-light" colspan="2">Art #3<br>10"</td>
+              <td class="py-5 bg-dark text-light" colspan="2">Art #3</td>
               <td class="py-5"></td>
               <td class="py-5"></td>
-              <td class="py-5 bg-dark text-light" colspan="2">Art #4<br>14"</td>
+              <td class="py-5 bg-dark text-light" colspan="2">Art #4</td>
               <td class="py-5"></td>
               <td class="py-5"></td>
-              <td class="py-5 bg-dark text-light" colspan="2">Art #5<br>18"</td>
+              <td class="py-5 bg-dark text-light" colspan="2">Art #5</td>
               <td class="py-5"></td>
             </tr>
           </table>
