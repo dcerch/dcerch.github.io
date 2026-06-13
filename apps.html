@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Dominic Cerchio — a collection of full, standalone web applications.">
+  <title>dominiccerchio — apps</title>
+  <style>
+    :root {
+      --bg: #050a05;
+      --bg-2: #081208;
+      --phosphor: #3dff7a;
+      --phosphor-dim: #1f8f43;
+      --phosphor-glow: rgba(61, 255, 122, 0.55);
+      --amber: #ffcf6a;
+      --magenta: #f012be;
+      --rule: rgba(61, 255, 122, 0.25);
+      --ink: #bdf5cd;
+      --danger: #ff5f56;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(ellipse at center, var(--bg-2) 0%, var(--bg) 75%);
+      color: var(--phosphor);
+      font-family: "Courier New", "DejaVu Sans Mono", monospace;
+      font-size: 16px;
+      line-height: 1.6;
+      text-shadow: 0 0 4px var(--phosphor-glow);
+    }
+
+    /* CRT scanlines + flicker overlay */
+    body::before {
+      content: ""; position: fixed; inset: 0; pointer-events: none;
+      background: repeating-linear-gradient(to bottom,
+        rgba(0,0,0,0) 0px, rgba(0,0,0,0) 2px, rgba(0,0,0,0.28) 3px, rgba(0,0,0,0.28) 4px);
+      z-index: 9999; mix-blend-mode: multiply;
+    }
+    body::after {
+      content: ""; position: fixed; inset: 0; pointer-events: none;
+      background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.55) 100%);
+      z-index: 9998; animation: flicker 6s infinite;
+    }
+    @keyframes flicker {
+      0%, 100% { opacity: 0.92; } 48% { opacity: 0.96; } 50% { opacity: 0.82; } 52% { opacity: 0.97; }
+    }
+
+    main { position: relative; z-index: 1; min-height: 100vh; padding: 2rem 1.25rem; }
+
+    .window {
+      width: min(1080px, 100%); margin: 0 auto;
+      border: 1px solid var(--phosphor-dim); border-radius: 6px;
+      background: rgba(8, 18, 8, 0.6);
+      box-shadow: 0 0 22px rgba(61,255,122,0.18), inset 0 0 60px rgba(61,255,122,0.04);
+      overflow: hidden;
+    }
+    .titlebar {
+      display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem 0.85rem;
+      border-bottom: 1px solid var(--rule); background: rgba(61,255,122,0.06);
+      font-size: 0.8rem; letter-spacing: 0.05em;
+    }
+    .dot { width: 11px; height: 11px; border-radius: 50%; border: 1px solid var(--phosphor-dim); }
+    .dot.r { background: #ff5f56; } .dot.y { background: var(--amber); } .dot.g { background: var(--phosphor); }
+    .titlebar .path { margin-left: auto; color: var(--phosphor-dim); }
+    .titlebar a { color: var(--phosphor-dim); text-decoration: none; }
+    .titlebar a:hover { color: var(--phosphor); }
+
+    .screen { padding: 1.75rem 1.5rem 1.6rem; }
+
+    .prompt { color: var(--phosphor-dim); }
+    .prompt::before { content: "dominic@home:~$ "; color: var(--phosphor-dim); }
+
+    h1.page-title {
+      margin: 0.3rem 0 0.2rem; font-size: clamp(1.6rem, 6vw, 2.6rem); font-weight: 700; letter-spacing: 0.04em;
+    }
+    .lede { margin: 0 0 1.3rem; color: var(--amber); font-style: italic; text-shadow: 0 0 5px rgba(255,207,106,0.5); }
+
+    /* Filter chips */
+    .filters { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.4rem; }
+    .chip {
+      font: inherit; cursor: pointer; color: var(--phosphor); background: transparent;
+      border: 1px solid var(--phosphor-dim); border-radius: 999px; padding: 0.25rem 0.85rem;
+      font-size: 0.82rem; letter-spacing: 0.04em; transition: background 0.15s, box-shadow 0.15s;
+    }
+    .chip:hover { background: rgba(61,255,122,0.12); }
+    .chip[aria-pressed="true"] { background: var(--phosphor-dim); color: #04130a; font-weight: 700; box-shadow: 0 0 12px var(--phosphor-glow); }
+
+    /* Card grid */
+    .grid { display: grid; gap: 0.9rem; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+    .card {
+      text-align: left; font: inherit; color: var(--phosphor); cursor: pointer; text-decoration: none;
+      background: rgba(61,255,122,0.03); border: 1px solid var(--rule); border-radius: 6px;
+      padding: 1rem 1.05rem; transition: background 0.15s, box-shadow 0.15s, transform 0.1s, border-color 0.15s;
+      display: flex; flex-direction: column; gap: 0.35rem; min-height: 116px;
+    }
+    .card:hover { background: rgba(61,255,122,0.1); border-color: var(--phosphor-dim); box-shadow: 0 0 16px var(--phosphor-glow); transform: translateY(-2px); }
+    .card:active { transform: translateY(0); }
+    .card h3 { margin: 0; font-size: 1rem; letter-spacing: 0.02em; }
+    .card h3::before { content: "> "; color: var(--phosphor-dim); }
+    .card h3::after { content: " \2197"; color: var(--phosphor-dim); }
+    .card .desc { margin: 0; font-size: 0.82rem; color: var(--ink); flex: 1; }
+    .card .cat { font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--amber); }
+    .card.is-hidden { display: none; }
+    .count { color: var(--phosphor-dim); font-size: 0.8rem; margin: 1.1rem 0 0; }
+    .empty { color: var(--phosphor-dim); font-style: italic; margin: 1rem 0 0; }
+
+    @media (prefers-reduced-motion: reduce) { body::after { animation: none; } }
+    @media (max-width: 640px) { .screen { padding: 1.25rem 1rem; } }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="window">
+      <div class="titlebar">
+        <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+        <a href="index.html" title="Back home">&larr; home</a>
+        <span class="path">~/apps</span>
+      </div>
+      <div class="screen">
+        <div class="prompt">ls ./apps</div>
+        <h1 class="page-title">Apps</h1>
+        <p class="lede">Full, standalone applications &mdash; each one is its own self-contained page. Click a card to launch it.</p>
+
+        <div class="filters" id="filters"></div>
+        <div class="grid" id="grid"></div>
+        <p class="count" id="count"></p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+  "use strict";
+
+  function h(html) { var t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstChild; }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]; }); }
+
+  /* ============================ app registry ============================ */
+  /* Each entry is a full, standalone application. To add a new app, drop its
+     HTML file in the ../apps/ folder and register it here. */
+  var apps = [
+    {
+      id: "everybodyisjohn",
+      title: "Everybody is John",
+      cat: "Games",
+      desc: "A self-contained companion app for the simplest tabletop roleplaying game.",
+      url: "../apps/everybodyisjohn.html"
+    },
+    {
+      id: "kojima",
+      title: "Kojima Name Generator",
+      cat: "Games",
+      desc: "A Metal Gear Solid themed codec that forges your true Kojima codename from a few questions.",
+      url: "../apps/kojima.html"
+    },
+    {
+      id: "lostatsea",
+      title: "Lost at Sea",
+      cat: "Games",
+      desc: "A stranded-island survival game: rank 15 salvaged items before the clock runs out and see if the Coast Guard would have kept you alive.",
+      url: "../apps/lostatsea.html"
+    },
+    {
+      id: "rankedchoicevoting",
+      title: "Ranked Choice Voting",
+      cat: "Tools",
+      desc: "An official-style instant-runoff election simulator: create polls, rank choices by drag-and-drop, and watch the round-by-round tally. All data stays in your browser.",
+      url: "../apps/rankedchoicevoting.html"
+    },
+    {
+      id: "secretsanta",
+      title: "Secret Santa",
+      cat: "Tools",
+      desc: "A festive, pass-the-phone gift-exchange organizer: add names, draw matches so nobody gets themselves, and let each person privately reveal who they got. No accounts or server — everything stays in your browser.",
+      url: "../apps/secretsanta.html"
+    },
+    {
+      id: "archived",
+      title: "Archived",
+      cat: "Tools",
+      desc: "A museum of retired apps, documented and preserved: the Overwatch Workshop Repository, the Raspberry Pi Designer, and the Garage to Table materials calculator.",
+      url: "../apps/archived.html"
+    }
+  ];
+
+  /* ============================ render gallery ============================ */
+  var grid = document.getElementById("grid");
+  var filtersEl = document.getElementById("filters");
+  var countEl = document.getElementById("count");
+
+  apps.sort(function (a, z) { return a.title.localeCompare(z.title); });
+  apps.forEach(function (a) {
+    var card = h('<a class="card" href="' + esc(a.url) + '" data-cat="' + esc(a.cat) + '">' +
+      '<span class="cat">' + esc(a.cat) + '</span><h3>' + esc(a.title) + '</h3><p class="desc">' + esc(a.desc) + "</p></a>");
+    grid.appendChild(card);
+  });
+
+  // filter chips
+  var cats = ["All"].concat(apps.map(function (a) { return a.cat; }).filter(function (v, i, s) { return s.indexOf(v) === i; }).sort());
+  var active = "All";
+  cats.forEach(function (c) {
+    var chip = h('<button class="chip" aria-pressed="' + (c === "All") + '">' + esc(c) + "</button>");
+    chip.addEventListener("click", function () {
+      active = c;
+      filtersEl.querySelectorAll(".chip").forEach(function (x) { x.setAttribute("aria-pressed", x.textContent === c); });
+      applyFilter();
+    });
+    filtersEl.appendChild(chip);
+  });
+
+  function applyFilter() {
+    var shown = 0;
+    grid.querySelectorAll(".card").forEach(function (card) {
+      var ok = active === "All" || card.getAttribute("data-cat") === active;
+      card.classList.toggle("is-hidden", !ok); if (ok) shown++;
+    });
+    countEl.textContent = "// " + shown + " app" + (shown === 1 ? "" : "s");
+  }
+  applyFilter();
+  </script>
+</body>
+</html>

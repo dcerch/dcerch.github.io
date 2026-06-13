@@ -1,0 +1,1018 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta name="description" content="A Metal Gear Solid themed Kojima Name Generator. Single self-contained page, no dependencies." />
+  <title>KOJIMA NAME GENERATOR // CODEC 140.85</title>
+  <style>
+    /* =========================================================
+       METAL GEAR SOLID :: KOJIMA NAME GENERATOR
+       Single-file build. No external CSS/JS/fonts/images.
+       ========================================================= */
+
+    :root {
+      --codec-green: #9bf5c0;
+      --codec-green-dim: #4ea87a;
+      --codec-green-deep: #0c2a1c;
+      --amber: #ffb000;
+      --amber-deep: #b87500;
+      --bg: #03100a;
+      --bg-2: #061a11;
+      --panel: rgba(8, 30, 20, 0.78);
+      --panel-line: rgba(124, 252, 155, 0.28);
+      --danger: #ff4d4d;
+      --mono: "Lucida Console", "DejaVu Sans Mono", "Consolas", "Courier New", monospace;
+      --glow: 0 0 6px rgba(124, 252, 155, 0.55);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { height: 100%; }
+
+    body {
+      margin: 0;
+      font-family: var(--mono);
+      color: var(--codec-green);
+      background:
+        radial-gradient(ellipse at 50% 0%, #0a2417 0%, var(--bg) 60%, #020a07 100%);
+      letter-spacing: 0.04em;
+      line-height: 1.5;
+      min-height: 100%;
+      overflow-x: hidden;
+    }
+
+    /* ---- CRT overlays ---- */
+    .crt-scanlines,
+    .crt-vignette {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9000;
+    }
+    .crt-scanlines {
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0) 0px,
+        rgba(0, 0, 0, 0) 2px,
+        rgba(0, 0, 0, 0.28) 3px,
+        rgba(0, 0, 0, 0.28) 4px
+      );
+      mix-blend-mode: multiply;
+      animation: scan-drift 8s linear infinite;
+    }
+    .crt-vignette {
+      background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.7) 100%);
+      box-shadow: inset 0 0 120px rgba(0, 0, 0, 0.9);
+    }
+    .crt-flicker {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9001;
+      background: rgba(124, 252, 155, 0.03);
+      animation: flicker 5s steps(60) infinite;
+    }
+
+    @keyframes scan-drift { from { background-position: 0 0; } to { background-position: 0 4px; } }
+    @keyframes flicker {
+      0%, 96%, 100% { opacity: 0.15; }
+      97% { opacity: 0.32; }
+      98% { opacity: 0.05; }
+      99% { opacity: 0.28; }
+    }
+
+    /* ---- layout ---- */
+    .wrap {
+      position: relative;
+      z-index: 10;
+      max-width: 940px;
+      margin: 0 auto;
+      padding: 18px 16px 80px;
+    }
+
+    /* ---- top codec status bar ---- */
+    .codec-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border: 1px solid var(--panel-line);
+      background: linear-gradient(180deg, rgba(12,42,28,0.9), rgba(4,16,11,0.9));
+      padding: 8px 14px;
+      font-size: 12px;
+      text-transform: uppercase;
+      box-shadow: var(--glow);
+    }
+    .codec-bar .freq {
+      font-size: 20px;
+      color: #fff;
+      text-shadow: 0 0 8px var(--codec-green);
+      letter-spacing: 0.12em;
+    }
+    .codec-bar .freq b { color: var(--codec-green); }
+    .rec { display: inline-flex; align-items: center; gap: 6px; color: var(--danger); }
+    .rec .dot {
+      width: 9px; height: 9px; border-radius: 50%;
+      background: var(--danger);
+      box-shadow: 0 0 8px var(--danger);
+      animation: blink 1.1s steps(2) infinite;
+    }
+    @keyframes blink { 50% { opacity: 0.15; } }
+
+    .bar-tools { display: flex; align-items: center; gap: 10px; }
+    .icon-btn {
+      font-family: var(--mono);
+      background: transparent;
+      color: var(--codec-green);
+      border: 1px solid var(--panel-line);
+      padding: 4px 9px;
+      cursor: pointer;
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      transition: background 0.12s, color 0.12s;
+    }
+    .icon-btn:hover, .icon-btn:focus-visible { background: var(--codec-green); color: #03100a; outline: none; }
+
+    /* ---- hero title ---- */
+    .hero { text-align: center; margin: 34px 0 26px; }
+    .hero .kicker {
+      font-size: 12px;
+      letter-spacing: 0.45em;
+      color: var(--codec-green-dim);
+      text-transform: uppercase;
+    }
+    .hero h1 {
+      margin: 8px 0 6px;
+      font-size: clamp(28px, 7vw, 62px);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #eafff2;
+      text-shadow: 0 0 12px rgba(124, 252, 155, 0.7), 0 0 2px #fff;
+      position: relative;
+    }
+    .hero h1.glitch::before,
+    .hero h1.glitch::after {
+      content: attr(data-text);
+      position: absolute;
+      left: 0; top: 0; width: 100%;
+    }
+    .hero h1.glitch::before { color: #00fff0; transform: translate(-2px, 0); mix-blend-mode: screen; animation: glitch-x 3.4s infinite; }
+    .hero h1.glitch::after { color: #ff00a0; transform: translate(2px, 0); mix-blend-mode: screen; animation: glitch-x 2.6s infinite reverse; }
+    @keyframes glitch-x {
+      0%, 92%, 100% { clip-path: inset(0 0 100% 0); }
+      93% { clip-path: inset(10% 0 60% 0); transform: translate(-3px, 0); }
+      96% { clip-path: inset(50% 0 20% 0); transform: translate(3px, 0); }
+    }
+    .hero .sub { color: var(--codec-green-dim); font-size: 13px; letter-spacing: 0.2em; text-transform: uppercase; }
+
+    /* ---- panels ---- */
+    .panel {
+      border: 1px solid var(--panel-line);
+      background: var(--panel);
+      margin-bottom: 20px;
+      box-shadow: var(--glow), inset 0 0 40px rgba(0,0,0,0.5);
+      position: relative;
+    }
+    .panel::before {
+      /* corner brackets */
+      content: "";
+      position: absolute; inset: 4px;
+      border: 1px solid rgba(124,252,155,0.12);
+      pointer-events: none;
+    }
+    .panel-head {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 10px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--panel-line);
+      background: linear-gradient(180deg, rgba(124,252,155,0.10), transparent);
+    }
+    .panel-head h2, .panel-head h3 {
+      margin: 0;
+      font-size: 15px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #eafff2;
+    }
+    .panel-head .tag {
+      font-size: 10px; color: var(--codec-green-dim);
+      letter-spacing: 0.2em; text-transform: uppercase;
+    }
+    .panel-body { padding: 16px 18px; }
+
+    .briefing h3 { color: #eafff2; letter-spacing: 0.18em; text-transform: uppercase; font-size: 14px; margin: 18px 0 6px; }
+    .briefing p { color: var(--codec-green); font-size: 14px; margin: 0 0 12px; }
+    .briefing a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted var(--amber); }
+    .briefing a:hover { color: #fff; }
+    .hr { height: 1px; background: var(--panel-line); border: 0; margin: 18px 0; }
+
+    /* ---- codec call frame (form toggles) ---- */
+    .codec-frame {
+      display: grid;
+      grid-template-columns: 92px 1fr 92px;
+      gap: 12px;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+      padding: 6px 4px;
+    }
+    .portrait {
+      height: 92px; width: 100%;
+      border: 1px solid var(--panel-line);
+      background:
+        repeating-linear-gradient(to bottom, rgba(124,252,155,0.06) 0 2px, transparent 2px 4px),
+        radial-gradient(circle at 50% 38%, rgba(124,252,155,0.5) 0 16%, transparent 17%),
+        radial-gradient(ellipse at 50% 105%, rgba(124,252,155,0.45) 0 42%, transparent 43%),
+        var(--codec-green-deep);
+      box-shadow: inset 0 0 22px rgba(0,0,0,0.7);
+      filter: contrast(1.1);
+    }
+    .codec-meta h3 { margin: 0 0 4px; }
+    .codec-meta p { margin: 0; font-size: 12px; color: var(--codec-green-dim); }
+    .codec-state {
+      font-size: 11px; color: var(--amber);
+      letter-spacing: 0.2em; text-transform: uppercase;
+      margin-top: 6px;
+    }
+
+    .form-region {
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height 0.4s ease;
+      border-top: 1px solid transparent;
+    }
+    .form-region.open { max-height: 4000px; border-top: 1px solid var(--panel-line); margin-top: 12px; padding-top: 4px; }
+
+    /* ---- form fields ---- */
+    .field { margin: 0 0 16px; }
+    .field label {
+      display: block;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #d6ffe8;
+      margin-bottom: 6px;
+    }
+    .field label .num { color: var(--codec-green-dim); margin-right: 8px; }
+    .field input {
+      width: 100%;
+      font-family: var(--mono);
+      font-size: 14px;
+      color: #eafff2;
+      background: rgba(0,0,0,0.45);
+      border: 1px solid var(--panel-line);
+      padding: 9px 11px;
+      letter-spacing: 0.05em;
+      transition: border-color 0.12s, box-shadow 0.12s;
+    }
+    .field input::placeholder { color: rgba(124,252,155,0.32); }
+    .field input:focus {
+      outline: none;
+      border-color: var(--codec-green);
+      box-shadow: 0 0 0 1px var(--codec-green), 0 0 12px rgba(124,252,155,0.4);
+      background: rgba(124,252,155,0.06);
+    }
+    .field input.invalid { border-color: var(--danger); box-shadow: 0 0 8px rgba(255,77,77,0.5); }
+    .field .hint { font-size: 11px; color: var(--codec-green-dim); margin-top: 5px; }
+    .field .hint a { color: var(--amber); text-decoration: none; border-bottom: 1px dotted var(--amber); }
+
+    @media (min-width: 680px) {
+      .field { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 22px; align-items: start; }
+      .field label { margin-top: 9px; }
+      .field .hint { grid-column: 2; }
+    }
+
+    /* ---- progress / actions ---- */
+    .progress-wrap { margin: 4px 0 14px; }
+    .progress-label {
+      display: flex; justify-content: space-between;
+      font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--codec-green-dim); margin-bottom: 6px;
+    }
+    .progress-track { height: 8px; background: rgba(0,0,0,0.5); border: 1px solid var(--panel-line); }
+    .progress-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, var(--codec-green-dim), var(--codec-green));
+      box-shadow: 0 0 10px var(--codec-green);
+      transition: width 0.3s ease;
+    }
+
+    .btn {
+      font-family: var(--mono);
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      font-size: 14px;
+      padding: 13px 18px;
+      width: 100%;
+      cursor: pointer;
+      border: 1px solid var(--codec-green);
+      background: transparent;
+      color: var(--codec-green);
+      transition: background 0.12s, color 0.12s, box-shadow 0.12s;
+      margin-bottom: 10px;
+    }
+    .btn:hover, .btn:focus-visible { background: var(--codec-green); color: #03100a; box-shadow: var(--glow); outline: none; }
+    .btn-primary {
+      border-color: var(--amber); color: var(--amber);
+      font-weight: 700; font-size: 16px;
+    }
+    .btn-primary:hover, .btn-primary:focus-visible { background: var(--amber); color: #1a0f00; box-shadow: 0 0 16px var(--amber); }
+    .btn-ghost { border-color: var(--panel-line); color: var(--codec-green-dim); }
+    .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    @media (max-width: 540px) { .btn-row { grid-template-columns: 1fr; } }
+
+    .credit { font-size: 11px; color: var(--codec-green-dim); text-align: center; margin-top: 6px; }
+
+    /* ---- alert "!" ---- */
+    .alert-flash {
+      position: fixed; inset: 0; z-index: 9500;
+      display: none;
+      align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.55);
+      pointer-events: none;
+    }
+    .alert-flash.show { display: flex; }
+    .alert-mark {
+      font-size: clamp(120px, 30vw, 280px);
+      font-weight: 900;
+      color: var(--amber);
+      text-shadow: 0 0 30px var(--amber), 0 0 6px #fff;
+      animation: alert-pop 0.6s ease;
+    }
+    @keyframes alert-pop {
+      0% { transform: scale(0.2); opacity: 0; }
+      40% { transform: scale(1.15); opacity: 1; }
+      60% { transform: scale(0.95); }
+      100% { transform: scale(1); }
+    }
+
+    /* ---- results ---- */
+    #sectionResults { display: none; }
+    .result-name {
+      text-align: center;
+      padding: 14px 0 6px;
+    }
+    .result-name .label {
+      font-size: 13px; letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--amber); font-style: italic;
+    }
+    .result-name .true-name {
+      font-size: clamp(30px, 8vw, 70px);
+      font-weight: 700;
+      color: #eafff2;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin: 10px 0 4px;
+      word-break: break-word;
+      text-shadow: 0 0 16px rgba(124,252,155,0.7), 0 0 3px #fff;
+      min-height: 1.1em;
+    }
+    .true-name .caret { color: var(--codec-green); animation: blink 0.8s steps(2) infinite; }
+    .alt-label { font-size: 13px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--amber); font-style: italic; text-align: center; margin-top: 18px; }
+    .alt-list { text-align: center; color: var(--codec-green); font-size: 15px; margin: 8px 0 0; line-height: 1.9; }
+    .alt-list span { display: inline-block; padding: 2px 8px; border: 1px solid var(--panel-line); margin: 3px; }
+
+    .explain h3 { color:#eafff2; letter-spacing: 0.18em; text-transform: uppercase; font-size: 14px; margin: 18px 0 6px; }
+    .explain p { font-size: 14px; }
+    .explain b { color: var(--amber); }
+
+    .toast {
+      position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%) translateY(20px);
+      background: var(--codec-green); color: #03100a;
+      padding: 10px 18px; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase;
+      box-shadow: 0 0 18px rgba(124,252,155,0.7);
+      opacity: 0; pointer-events: none; transition: opacity 0.25s, transform 0.25s; z-index: 9600;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    .foot { text-align: center; font-size: 10px; color: var(--codec-green-dim); letter-spacing: 0.24em; text-transform: uppercase; margin-top: 26px; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .crt-scanlines, .crt-flicker, .rec .dot, .hero h1.glitch::before, .hero h1.glitch::after,
+      .alert-mark, .true-name .caret { animation: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="crt-scanlines" aria-hidden="true"></div>
+  <div class="crt-flicker" aria-hidden="true"></div>
+  <div class="crt-vignette" aria-hidden="true"></div>
+
+  <div class="alert-flash" id="alertFlash" aria-hidden="true"><div class="alert-mark">!</div></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <div class="wrap">
+    <!-- Codec status bar -->
+    <div class="codec-bar">
+      <div class="freq"><b>140</b>.85</div>
+      <div class="rec"><span class="dot"></span> REC</div>
+      <div class="bar-tools">
+        <button class="icon-btn" id="soundToggle" type="button" aria-pressed="false" title="Toggle codec audio">SND: OFF</button>
+      </div>
+    </div>
+
+    <!-- Hero -->
+    <header class="hero">
+      <div class="kicker">// CODEC TRANSMISSION INCOMING</div>
+      <h1 class="glitch" data-text="KOJIMA NAME GENERATOR">KOJIMA NAME GENERATOR</h1>
+      <div class="sub">Tactical Identity &bull; Codename Protocol</div>
+    </header>
+
+    <!-- ===================== BRIEFING / INPUT ===================== -->
+    <section id="sectionInformation">
+      <div class="panel briefing">
+        <div class="panel-head">
+          <h2>Mission Briefing</h2>
+          <span class="tag">FREQ 140.85</span>
+        </div>
+        <div class="panel-body">
+          <h3>Overview</h3>
+          <p>This name generator is an adaptation of Brian David Gilbert's Kojima Name Generator. The original 11-page worksheet used to create a Kojima name is now a single tactical app &mdash; slightly modified to automate the process. You do not need to figure out name alternatives, conditions, or categories. Just fill out the Personal and Kojima information; the codec handles the rest.</p>
+          <h3>Instructions</h3>
+          <p>Complete both transmissions below &mdash; <b>PERSONAL INTEL</b> and <b>KOJIMA INTEL</b> &mdash; then transmit <b>GENERATE CODENAME</b> to receive your designation instantly. Your intel is stored locally on this device only.</p>
+        </div>
+      </div>
+
+      <!-- Personal Intel -->
+      <div class="panel">
+        <div class="panel-head">
+          <h3>Transmission 01 // Personal Intel</h3>
+          <span class="tag" id="personalCount">0 / 15</span>
+        </div>
+        <div class="panel-body">
+          <div class="codec-frame" data-toggle="personalForm" role="button" tabindex="0" aria-expanded="false" aria-controls="personalForm">
+            <div class="portrait" aria-hidden="true"></div>
+            <div class="codec-meta">
+              <h3>You</h3>
+              <p>Kojima's characters have names directly tied to their own traits. This intel ensures your codename fits your personality.</p>
+              <div class="codec-state" data-state="personalForm">&#9654; OPEN CHANNEL</div>
+            </div>
+            <div class="portrait" aria-hidden="true"></div>
+          </div>
+          <div class="form-region" id="personalForm"></div>
+        </div>
+      </div>
+
+      <!-- Kojima Intel -->
+      <div class="panel">
+        <div class="panel-head">
+          <h3>Transmission 02 // Kojima Intel</h3>
+          <span class="tag" id="kojimaCount">0 / 6</span>
+        </div>
+        <div class="panel-body">
+          <div class="codec-frame" data-toggle="kojimaForm" role="button" tabindex="0" aria-expanded="false" aria-controls="kojimaForm">
+            <div class="portrait" aria-hidden="true"></div>
+            <div class="codec-meta">
+              <h3>Kojima</h3>
+              <p>Kojima character names reflect his own idiosyncrasies. He can't help himself.</p>
+              <div class="codec-state" data-state="kojimaForm">&#9654; OPEN CHANNEL</div>
+            </div>
+            <div class="portrait" aria-hidden="true"></div>
+          </div>
+          <div class="form-region" id="kojimaForm"></div>
+        </div>
+      </div>
+
+      <!-- Progress + Generate -->
+      <div class="panel">
+        <div class="panel-body">
+          <div class="progress-wrap">
+            <div class="progress-label"><span>Intel Compiled</span><span id="progressText">0 / 21</span></div>
+            <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+          </div>
+          <button class="btn btn-primary" id="generate" type="button">&#9888; Generate Codename</button>
+          <p class="credit">All credit to <a href="https://www.twitter.com/briamgilbert" target="_blank" rel="noopener">Brian David Gilbert</a> at <a href="https://www.polygon.com/" target="_blank" rel="noopener">Polygon</a> for <a href="https://www.polygon.com/videos/2019/11/11/20959269/unraveled-kojima-name-generator-death-stranding" target="_blank" rel="noopener">this amazing worksheet</a>.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== RESULTS ===================== -->
+    <section id="sectionResults">
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Codename Confirmed</h2>
+          <span class="tag">CLASSIFIED</span>
+        </div>
+        <div class="panel-body">
+          <div class="result-name" id="resultsName"></div>
+          <hr class="hr" />
+          <div class="explain">
+            <h3>Explaining Your Name</h3>
+            <p>Kojima's characters know their names are meaningful, and they will tell you completely unprompted. You, too, must explain your name to any potential friends, foes, or shadowy government institutions. Use the following to start your monologue and explain your Kojima name to the best of your ability. Feel free to draw from personal experience.</p>
+            <p>Hi, I'm <b id="resultsExplanation"></b>, and if you're wondering how I got this name, well, let me tell you...</p>
+          </div>
+          <hr class="hr" />
+          <div class="btn-row">
+            <button class="btn" id="reroll" type="button">&#8635; Re-Roll Dice</button>
+            <button class="btn" id="copyName" type="button">&#9112; Copy Codename</button>
+          </div>
+          <button class="btn btn-ghost" id="backToBriefing" type="button">&#9664; Return To Briefing</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="foot">Metal Gear Solid is a trademark of Konami &bull; Fan tribute &bull; No affiliation</div>
+  </div>
+
+  <script>
+  (function () {
+    "use strict";
+
+    /* =====================================================
+       FIELD CONFIG (ported from original modal forms)
+       ===================================================== */
+    var PERSONAL_FIELDS = [
+      { id: "formPersonalName", label: "What is your full name?", ph: "Hideo Kojima" },
+      { id: "formPersonalOccupation", label: "What do you do at your occupation?", ph: "Farmer", hint: "Condense the verb in your answer into a single \"-er\" noun." },
+      { id: "formPersonalPet", label: "What was your first pet's specific species/breed?", ph: "Cat", hint: "If you never had a pet, answer with an animal you wish you owned." },
+      { id: "formPersonalChildhood", label: "What's your most embarrassing childhood memory?", ph: "Missing Pantaloons", hint: "Condense this story into two words." },
+      { id: "formPersonalStab", label: "What is the object you'd least like to be stabbed by?", ph: "Spoon" },
+      { id: "formPersonalGood", label: "What is something you are good at?", ph: "Eating", hint: "Condense the verb in your answer into a single \"-ing\" word." },
+      { id: "formPersonalCarrots", label: "How many full-sized carrots could you eat in one sitting?", ph: "3", type: "number", min: "0", optional: true },
+      { id: "formPersonalIntangible", label: "What is your greatest intangible fear?", ph: "Loneliness" },
+      { id: "formPersonalTangible", label: "What is your greatest tangible fear?", ph: "Horses" },
+      { id: "formPersonalWorksheet", label: "What is the last thing you did before starting this worksheet?", ph: "Slept", hint: "Condense the verb into a single, past-tense word." },
+      { id: "formPersonalCondition", label: "What condition is your body currently in?", ph: "Exhausted", hint: "Condense into a single, past-tense word." },
+      { id: "formPersonalMatter", label: "Favorite state of matter?", ph: "Liquid" },
+      { id: "formPersonalSound", label: "What word does your name kind of sound like?", ph: "Brain (for Brian)" },
+      { id: "formPersonalZodiac", label: "What is your Zodiac sign?", ph: "Leo" },
+      { id: "formPersonalPersonality", label: "If you had to define your personality in one word, what would it be?", ph: "Sarcastic" }
+    ];
+
+    var KOJIMA_FIELDS = [
+      { id: "formKojimaKurt", label: "Who is your favorite film character played by Kurt Russell?", ph: "Ego", hint: "See <a href=\"https://www.imdb.com/name/nm0000621/#actor\" target=\"_blank\" rel=\"noopener\">Kurt Russell's IMDB page</a>. Don't like Kurt? Pick a character from any actor/actress." },
+      { id: "formKojimaKubrick", label: "What is the last word of the title of your favorite Kubrick film?", ph: "Odyssey", hint: "See <a href=\"https://www.imdb.com/name/nm0000040/#filmography\" target=\"_blank\" rel=\"noopener\">Stanley Kubrick's IMDB page</a>. Don't like Kubrick? Pick any film." },
+      { id: "formKojimaJoy", label: "What is the first word in the title of your favorite Joy Division album?", ph: "YMCA", hint: "See <a href=\"https://www.discogs.com/artist/3898-Joy-Division\" target=\"_blank\" rel=\"noopener\">Joy Division's discography</a>. Don't like them? Pick any album." },
+      { id: "formKojimaNPR", label: "What is a scientific term you picked up from listening to NPR once?", ph: "Umbra", hint: "Don't listen to NPR? Pick any <a href=\"http://www.english-for-students.com/Science-Words.html\" target=\"_blank\" rel=\"noopener\">scientific word</a> you fancy." },
+      { id: "formKojimaWar", label: "What military hardware looks cool even though war is bad?", ph: "FGM-148 Javelin", hint: "See <a href=\"https://www.military.com/equipment\" target=\"_blank\" rel=\"noopener\">military equipment</a> for inspiration." },
+      { id: "formKojimaMads", label: "What is something you'd enjoy watching Mads Mikkelsen do?", ph: "Stare", hint: "One word. See <a href=\"https://www.imdb.com/name/nm0586568/\" target=\"_blank\" rel=\"noopener\">Mads Mikkelsen's IMDB page</a>." }
+    ];
+
+    var STORAGE_KEY = "kojima_name_generator_intel_v1";
+
+    /* =====================================================
+       RENDER FORMS
+       ===================================================== */
+    function renderFields(container, fields, startIndex) {
+      var html = "";
+      fields.forEach(function (f, i) {
+        var n = String(startIndex + i + 1).padStart(2, "0");
+        var type = f.type || "text";
+        var extra = f.min != null ? ' min="' + f.min + '"' : "";
+        html += '<div class="field">';
+        html += '<label for="' + f.id + '"><span class="num">' + n + '</span>' + f.label + "</label>";
+        html += '<input id="' + f.id + '" type="' + type + '" placeholder="' + f.ph + '"' + extra +
+                ' autocomplete="off" data-required="' + (f.optional ? "0" : "1") + '">';
+        if (f.hint) { html += '<div class="hint">' + f.hint + "</div>"; }
+        html += "</div>";
+      });
+      container.innerHTML = html;
+    }
+
+    renderFields(document.getElementById("personalForm"), PERSONAL_FIELDS, 0);
+    renderFields(document.getElementById("kojimaForm"), KOJIMA_FIELDS, PERSONAL_FIELDS.length);
+
+    var ALL_FIELDS = PERSONAL_FIELDS.concat(KOJIMA_FIELDS);
+
+    /* =====================================================
+       PERSISTENCE (localStorage)
+       ===================================================== */
+    function saveIntel() {
+      var data = {};
+      ALL_FIELDS.forEach(function (f) {
+        var el = document.getElementById(f.id);
+        if (el) { data[f.id] = el.value; }
+      });
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) {}
+    }
+
+    function loadIntel() {
+      var data;
+      try { data = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); } catch (e) { data = {}; }
+      ALL_FIELDS.forEach(function (f) {
+        var el = document.getElementById(f.id);
+        if (el && typeof data[f.id] === "string") { el.value = data[f.id]; }
+      });
+    }
+    loadIntel();
+
+    /* =====================================================
+       PROGRESS + VALIDATION
+       ===================================================== */
+    function val(id) {
+      var el = document.getElementById(id);
+      return el ? el.value.trim() : "";
+    }
+
+    function requiredFields() { return ALL_FIELDS.filter(function (f) { return !f.optional; }); }
+
+    function updateProgress() {
+      var req = requiredFields();
+      var filled = req.filter(function (f) { return val(f.id) !== ""; }).length;
+      var total = req.length;
+      document.getElementById("progressText").textContent = filled + " / " + total;
+      document.getElementById("progressFill").style.width = (filled / total * 100) + "%";
+
+      var pReq = PERSONAL_FIELDS.filter(function (f) { return !f.optional; });
+      var pFilled = pReq.filter(function (f) { return val(f.id) !== ""; }).length;
+      document.getElementById("personalCount").textContent = pFilled + " / " + pReq.length;
+
+      var kFilled = KOJIMA_FIELDS.filter(function (f) { return val(f.id) !== ""; }).length;
+      document.getElementById("kojimaCount").textContent = kFilled + " / " + KOJIMA_FIELDS.length;
+    }
+
+    document.querySelectorAll(".form-region input").forEach(function (el) {
+      el.addEventListener("input", function () {
+        el.classList.remove("invalid");
+        updateProgress();
+        saveIntel();
+      });
+    });
+    updateProgress();
+
+    function firstMissingField() {
+      var missing = requiredFields().filter(function (f) { return val(f.id) === ""; });
+      missing.forEach(function (f) { document.getElementById(f.id).classList.add("invalid"); });
+      return missing.length ? missing[0] : null;
+    }
+
+    /* =====================================================
+       TOGGLE CODEC CHANNELS
+       ===================================================== */
+    function toggleChannel(id) {
+      var region = document.getElementById(id);
+      var open = region.classList.toggle("open");
+      var frame = document.querySelector('[data-toggle="' + id + '"]');
+      var state = document.querySelector('[data-state="' + id + '"]');
+      if (frame) { frame.setAttribute("aria-expanded", String(open)); }
+      if (state) { state.innerHTML = open ? "&#9660; CLOSE CHANNEL" : "&#9654; OPEN CHANNEL"; }
+      if (open) { beep(660, 0.06); } else { beep(440, 0.05); }
+    }
+
+    document.querySelectorAll("[data-toggle]").forEach(function (frame) {
+      var id = frame.getAttribute("data-toggle");
+      frame.addEventListener("click", function () { toggleChannel(id); });
+      frame.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleChannel(id); }
+      });
+    });
+
+    /* =====================================================
+       DICE + NAME LOGIC  (ported verbatim from originals)
+       ===================================================== */
+    function dice(sides) { return Math.floor(Math.random() * sides) + 1; }
+
+    var s1a = dice(6);
+    var s2a = 1, s2b = 1, s2c = 1, s2d = 1;
+    var s3a = 1, s3c = 1, s3d = 1, s3e = 1, s3f = 1, s3g = 1;
+
+    function rollDice() {
+      s2a = dice(4);   // -man condition
+      s2b = dice(8);   // condition condition
+      s2c = dice(12);  // clone condition
+      s2d = dice(100); // Kojima condition
+      s3a = dice(20);  // category
+      s3c = dice(4);   // occupational
+      s3d = dice(4);   // horny
+      s3e = dice(4);   // the
+      s3f = dice(6);   // cool
+      s3g = dice(4);   // violent
+    }
+
+    var input = {};
+    var kojima_name = [];
+
+    function captureInput() {
+      input = {
+        name: val("formPersonalName"),
+        occupation: val("formPersonalOccupation"),
+        pet: val("formPersonalPet"),
+        childhood: val("formPersonalChildhood"),
+        stab: val("formPersonalStab"),
+        good: val("formPersonalGood"),
+        intangible: val("formPersonalIntangible"),
+        tangible: val("formPersonalTangible"),
+        worksheet: val("formPersonalWorksheet"),
+        condition: val("formPersonalCondition"),
+        matter: val("formPersonalMatter"),
+        sound: val("formPersonalSound"),
+        zodiac: val("formPersonalZodiac"),
+        personality: val("formPersonalPersonality"),
+        kurt: val("formKojimaKurt"),
+        kubrick: val("formKojimaKubrick"),
+        joy: val("formKojimaJoy"),
+        npr: val("formKojimaNPR"),
+        war: val("formKojimaWar"),
+        mads: val("formKojimaMads")
+      };
+    }
+
+    function buildNames() {
+      kojima_name = [];
+      var name_count = (s1a === 6) ? 7 : 1;
+
+      for (var i = 0; i < name_count; i++) {
+        rollDice();
+        var w = "";
+
+        // Normal
+        if (s3a === 1) { w = input.name; }
+
+        // Occupational
+        if (s3a >= 2 && s3a <= 6) {
+          switch (s3c) {
+            case 1: w = input.personality; break;
+            case 2: w = input.good; break;
+            case 3: w = input.sound; break;
+            case 4: w = input.kurt; break;
+          }
+          w = w + " " + input.occupation;
+        }
+
+        // Horny
+        if (s3a >= 7 && s3a <= 10) {
+          switch (s3d) {
+            case 1: w = input.matter; break;
+            case 2: w = "Naked"; break;
+            case 3: w = input.good; break;
+            case 4: w = input.zodiac; break;
+          }
+          if (s3d % 2 !== 0) { w = w + " Lickable"; }
+          w = w + " " + input.pet;
+        }
+
+        // The
+        if (s3a >= 11 && s3a <= 13) {
+          w = "The";
+          switch (s3e) {
+            case 1: w = w + " " + input.intangible; break;
+            case 2: w = w + " " + input.tangible; break;
+            case 3: w = w + " " + input.childhood; break;
+            case 4: w = w + " " + input.war; break;
+          }
+        }
+
+        // Cool
+        if (s3a >= 14 && s3a <= 17) {
+          w = input.mads;
+          switch (s3f) {
+            case 1: w = w + " " + input.kubrick; break;
+            case 2: w = w + " " + input.joy; break;
+            case 3: w = w + " " + input.npr; break;
+            case 4: w = w + " " + input.good; break;
+            case 5: w = w + " " + input.intangible; break;
+            case 6: w = w + " " + input.sound; break;
+          }
+        }
+
+        // Violent
+        if (s3a >= 18 && s3a <= 19) {
+          switch (s3g) {
+            case 1: w = input.npr; break;
+            case 2: w = input.matter; break;
+            case 3: w = input.war; break;
+            case 4: w = input.tangible; break;
+          }
+          w = w + " " + input.stab;
+        }
+
+        // Subtext
+        if (s3a === 20) { w = input.worksheet; }
+
+        // Conditions ----------------------------------------
+        var isThe = (s3a >= 11 && s3a <= 13);
+
+        if (s2a === 4) { w = w + "-man"; }
+
+        if (s2b === 6) { w = isThe ? (w.slice(0, 3) + " Big " + w.slice(3)) : ("Big " + w); }
+        if (s2b === 7) { w = isThe ? (w.slice(0, 3) + " Old " + w.slice(3)) : ("Old " + w); }
+        if (s2b === 8) { w = isThe ? (w.slice(0, 3) + " " + input.condition + " " + w.slice(3)) : (input.condition + " " + w); }
+
+        if (s2c === 6) { w = "Clone of " + w; }
+
+        if (s2d === 69) { w = "Hideo Kojima"; }
+
+        kojima_name.push(w);
+      }
+    }
+
+    /* =====================================================
+       RESULTS RENDER + TYPEWRITER
+       ===================================================== */
+    var typeTimer = null;
+    function typewriter(el, text) {
+      if (typeTimer) { clearInterval(typeTimer); }
+      var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (reduce) { el.textContent = text; return; }
+      el.innerHTML = '<span class="caret">_</span>';
+      var i = 0;
+      typeTimer = setInterval(function () {
+        i++;
+        if (i > text.length) {
+          clearInterval(typeTimer);
+          el.textContent = text;
+          return;
+        }
+        el.innerHTML = escapeHtml(text.slice(0, i)) + '<span class="caret">_</span>';
+        if (i % 2 === 0) { beep(720 + Math.random() * 120, 0.015, 0.04); }
+      }, 55);
+    }
+
+    function showResults() {
+      var trueName = kojima_name[0] || "Unknown";
+      var html = '<div class="label">// Your True Kojima Name Is //</div>';
+      html += '<div class="true-name" id="trueName"></div>';
+      if (kojima_name.length > 1) {
+        html += '<div class="alt-label">with alternate designations such as</div>';
+        html += '<div class="alt-list">';
+        for (var i = 1; i < kojima_name.length; i++) {
+          html += "<span>" + escapeHtml(kojima_name[i]) + "</span>";
+        }
+        html += "</div>";
+      }
+      document.getElementById("resultsName").innerHTML = html;
+      document.getElementById("resultsExplanation").textContent = trueName;
+
+      document.getElementById("sectionInformation").style.display = "none";
+      document.getElementById("sectionResults").style.display = "block";
+
+      typewriter(document.getElementById("trueName"), trueName);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, function (c) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+      });
+    }
+
+    /* =====================================================
+       ALERT "!" FLASH
+       ===================================================== */
+    function alertFlash(cb) {
+      var el = document.getElementById("alertFlash");
+      el.classList.add("show");
+      alertSound();
+      setTimeout(function () {
+        el.classList.remove("show");
+        if (cb) { cb(); }
+      }, 650);
+    }
+
+    /* =====================================================
+       GENERATE / RE-ROLL
+       ===================================================== */
+    function runGeneration() {
+      captureInput();
+      s1a = dice(6);
+      buildNames();
+      showResults();
+    }
+
+    document.getElementById("generate").addEventListener("click", function () {
+      var missing = firstMissingField();
+      if (missing) {
+        var el = document.getElementById(missing);
+        // open whichever channel contains the missing field
+        var region = el.closest(".form-region");
+        if (region && !region.classList.contains("open")) { toggleChannel(region.id); }
+        alertFlash(function () {
+          el.focus();
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
+        });
+        toast("! Incomplete intel \u2014 fill all required fields");
+        return;
+      }
+      saveIntel();
+      alertFlash(runGeneration);
+    });
+
+    document.getElementById("reroll").addEventListener("click", function () {
+      alertFlash(runGeneration);
+    });
+
+    document.getElementById("backToBriefing").addEventListener("click", function () {
+      document.getElementById("sectionResults").style.display = "none";
+      document.getElementById("sectionInformation").style.display = "block";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    document.getElementById("copyName").addEventListener("click", function () {
+      var trueName = kojima_name[0] || "";
+      var alts = kojima_name.length > 1 ? "\nAlternates: " + kojima_name.slice(1).join(", ") : "";
+      var text = "My Kojima codename is " + trueName + "." + alts;
+      copyToClipboard(text);
+    });
+
+    function copyToClipboard(text) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { toast("Codename copied to clipboard"); },
+          function () { fallbackCopy(text); });
+      } else { fallbackCopy(text); }
+    }
+    function fallbackCopy(text) {
+      var ta = document.createElement("textarea");
+      ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      try { document.execCommand("copy"); toast("Codename copied to clipboard"); }
+      catch (e) { toast("Copy failed \u2014 select manually"); }
+      document.body.removeChild(ta);
+    }
+
+    /* =====================================================
+       TOAST
+       ===================================================== */
+    var toastTimer = null;
+    function toast(msg) {
+      var el = document.getElementById("toast");
+      el.textContent = msg;
+      el.classList.add("show");
+      if (toastTimer) { clearTimeout(toastTimer); }
+      toastTimer = setTimeout(function () { el.classList.remove("show"); }, 2400);
+    }
+
+    /* =====================================================
+       WEB AUDIO (codec beeps) + mute toggle
+       ===================================================== */
+    var audioOn = false;
+    var actx = null;
+
+    function ensureCtx() {
+      if (!actx) {
+        try { actx = new (window.AudioContext || window.webkitAudioContext)(); }
+        catch (e) { actx = null; }
+      }
+      if (actx && actx.state === "suspended") { actx.resume(); }
+      return actx;
+    }
+
+    function beep(freq, dur, gain) {
+      if (!audioOn) { return; }
+      var ctx = ensureCtx();
+      if (!ctx) { return; }
+      var osc = ctx.createOscillator();
+      var g = ctx.createGain();
+      osc.type = "square";
+      osc.frequency.value = freq;
+      g.gain.value = gain || 0.08;
+      osc.connect(g); g.connect(ctx.destination);
+      var t = ctx.currentTime;
+      osc.start(t);
+      g.gain.setValueAtTime(g.gain.value, t);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + (dur || 0.08));
+      osc.stop(t + (dur || 0.08) + 0.02);
+    }
+
+    function alertSound() {
+      if (!audioOn) { return; }
+      beep(880, 0.09, 0.12);
+      setTimeout(function () { beep(880, 0.12, 0.12); }, 130);
+    }
+
+    var soundBtn = document.getElementById("soundToggle");
+    soundBtn.addEventListener("click", function () {
+      audioOn = !audioOn;
+      soundBtn.textContent = "SND: " + (audioOn ? "ON" : "OFF");
+      soundBtn.setAttribute("aria-pressed", String(audioOn));
+      if (audioOn) { ensureCtx(); beep(660, 0.08); }
+    });
+
+    /* =====================================================
+       KONAMI CODE EASTER EGG :: autofill demo intel
+       ===================================================== */
+    var KONAMI = ["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"];
+    var konamiPos = 0;
+    var DEMO = {
+      formPersonalName: "John Doe", formPersonalOccupation: "Farmer", formPersonalPet: "Cat",
+      formPersonalChildhood: "Missing Pantaloons", formPersonalStab: "Spoon", formPersonalGood: "Eating",
+      formPersonalCarrots: "3", formPersonalIntangible: "Loneliness", formPersonalTangible: "Horses",
+      formPersonalWorksheet: "Slept", formPersonalCondition: "Exhausted", formPersonalMatter: "Liquid",
+      formPersonalSound: "Brain", formPersonalZodiac: "Leo", formPersonalPersonality: "Sarcastic",
+      formKojimaKurt: "Ego", formKojimaKubrick: "Odyssey", formKojimaJoy: "YMCA",
+      formKojimaNPR: "Umbra", formKojimaWar: "Javelin", formKojimaMads: "Stare"
+    };
+    document.addEventListener("keydown", function (e) {
+      var key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+      if (key === KONAMI[konamiPos]) {
+        konamiPos++;
+        if (konamiPos === KONAMI.length) {
+          konamiPos = 0;
+          Object.keys(DEMO).forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el) { el.value = DEMO[id]; el.classList.remove("invalid"); }
+          });
+          updateProgress(); saveIntel();
+          alertFlash(function () { toast("\u26A0 Demo intel injected (codec override)"); });
+        }
+      } else {
+        konamiPos = (key === KONAMI[0]) ? 1 : 0;
+      }
+    });
+
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="description" content="Everybody is John: the simplest roleplaying game. A self-contained, dependency-free companion app.">
+<meta name="author" content="Dominic Cerchio">
+<title>EVERYBODY IS JOHN!</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%97%A3%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<style>
+/* ============================================================
+   EVERYBODY IS JOHN — single-file comic-book app
+   Zero external dependencies. Inline CSS + JS only.
+   ============================================================ */
+
+:root{
+  --ink:#16161d;
+  --paper:#fdf3df;
+  --pow:#ffd23f;
+  --pow2:#ff6f3c;
+  --burst:#ff3b6b;
+  --sky:#3aa0ff;
+  --good:#2ecc71;
+  --bad:#ff3b6b;
+  --halftone: radial-gradient(var(--dotcolor,rgba(0,0,0,.14)) 18%, transparent 19%);
+  --dotsize:14px;
+  --comic:"Comic Sans MS","Chalkboard SE","Segoe UI",Impact,system-ui,sans-serif;
+  --display: Impact, "Anton", "Arial Black", "Haettenschweiler", system-ui, sans-serif;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--comic);
+  color:var(--ink);
+  background:
+    var(--halftone) 0 0/var(--dotsize) var(--dotsize),
+    linear-gradient(135deg,#ffe27a,#ff9e6d 45%,#ff6f8e 80%,#9b6bff);
+  background-attachment:fixed;
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- shared comic primitives ---------- */
+.panel{
+  background:var(--paper);
+  border:4px solid var(--ink);
+  border-radius:14px;
+  box-shadow:8px 8px 0 var(--ink);
+  position:relative;
+}
+.bolt-title{
+  font-family:var(--display);
+  text-transform:uppercase;
+  letter-spacing:1px;
+  line-height:.92;
+  margin:0;
+  color:var(--paper);
+  text-shadow:3px 3px 0 var(--burst);
+  -webkit-text-stroke:2px var(--ink);
+  paint-order:stroke fill;
+}
+button{font-family:var(--comic);cursor:pointer}
+.btn{
+  font-family:var(--display);
+  letter-spacing:1px;
+  text-transform:uppercase;
+  border:3px solid var(--ink);
+  border-radius:10px;
+  padding:.55em 1em;
+  background:var(--pow);
+  color:var(--ink);
+  box-shadow:4px 4px 0 var(--ink);
+  transition:transform .06s ease, box-shadow .06s ease, background .15s;
+  font-size:1rem;
+}
+.btn:hover{transform:translate(-1px,-1px);box-shadow:6px 6px 0 var(--ink)}
+.btn:active{transform:translate(4px,4px);box-shadow:0 0 0 var(--ink)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:4px 4px 0 var(--ink)}
+.btn.alt{background:var(--sky);color:#fff}
+.btn.go{background:var(--good);color:#04340f}
+.btn.danger{background:var(--burst);color:#fff}
+.btn.ghost{background:#fff}
+.btn.sm{font-size:.8rem;padding:.4em .7em;box-shadow:3px 3px 0 var(--ink);-webkit-text-stroke:0}
+
+input[type=text],input[type=number],select{
+  font-family:var(--comic);
+  border:3px solid var(--ink);
+  border-radius:8px;
+  padding:.45em .6em;
+  font-size:1rem;
+  background:#fff;
+  width:100%;
+}
+input:focus,select:focus{outline:3px solid var(--pow2);outline-offset:1px}
+label{font-weight:bold}
+
+.wrap{max-width:1100px;margin:0 auto;padding:18px}
+.hidden{display:none !important}
+.center{text-align:center}
+.row{display:flex;gap:14px;flex-wrap:wrap}
+.spread{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+
+/* ---------- masthead ---------- */
+.masthead{
+  text-align:center;
+  padding:22px 14px 10px;
+}
+.masthead h1{
+  font-size:clamp(2.4rem,8vw,5rem);
+}
+.masthead .sub{
+  display:inline-block;
+  margin-top:10px;
+  background:var(--ink);
+  color:var(--pow);
+  font-family:var(--display);
+  letter-spacing:2px;
+  text-transform:uppercase;
+  padding:.3em .9em;
+  border-radius:8px;
+  transform:rotate(-2deg);
+  font-size:clamp(.7rem,2.2vw,1rem);
+}
+
+/* ---------- collapsible rules ---------- */
+.rules summary{
+  list-style:none;
+  font-family:var(--display);
+  text-transform:uppercase;
+  letter-spacing:1px;
+  font-size:1.2rem;
+  padding:12px 16px;
+  cursor:pointer;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.rules summary::-webkit-details-marker{display:none}
+.rules summary::after{content:"▾";transition:transform .2s}
+.rules[open] summary::after{transform:rotate(180deg)}
+.rules .body{padding:0 18px 16px;font-size:.96rem;line-height:1.45}
+.rules .body h4{margin:.8em 0 .2em;font-family:var(--display);letter-spacing:1px}
+.tag{
+  display:inline-block;background:var(--ink);color:#fff;border-radius:6px;
+  padding:.05em .5em;font-size:.78rem;margin:0 .15em;
+}
+
+/* ---------- lobby voice cards ---------- */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:18px;
+}
+.voice-card{
+  --voice-color:#888;
+  padding:0;overflow:hidden;
+}
+.voice-card .cap{
+  background:var(--voice-color);
+  color:#fff;
+  padding:10px 14px;
+  font-family:var(--display);
+  letter-spacing:1px;
+  text-transform:uppercase;
+  display:flex;justify-content:space-between;align-items:center;
+  -webkit-text-stroke:1.5px var(--ink);
+  paint-order:stroke fill;
+  border-bottom:4px solid var(--ink);
+}
+.voice-card .cap .num{
+  background:#fff;color:var(--ink);border-radius:50%;
+  -webkit-text-stroke:0;
+  width:30px;height:30px;display:grid;place-items:center;border:3px solid var(--ink);
+}
+.voice-card .form{padding:14px;display:flex;flex-direction:column;gap:9px}
+.voice-card .skills{display:flex;gap:8px}
+.toggle{display:flex;align-items:center;gap:8px;font-size:.9rem}
+.toggle input{width:auto}
+.joined-badge{
+  text-align:center;padding:26px 14px;
+  font-family:var(--display);text-transform:uppercase;letter-spacing:1px;font-size:1.4rem;
+}
+
+/* color swatch picker */
+.swatches{display:flex;gap:6px;flex-wrap:wrap}
+.swatch{
+  width:24px;height:24px;border-radius:50%;border:3px solid var(--ink);cursor:pointer;
+  box-shadow:2px 2px 0 var(--ink);
+}
+.swatch.sel{outline:3px solid var(--ink);outline-offset:2px;transform:scale(1.1)}
+
+/* ---------- game board ---------- */
+.john-panel{
+  padding:16px;margin-bottom:18px;
+  --dotcolor:rgba(0,0,0,.08);
+  background:
+    var(--halftone) 0 0/12px 12px,
+    var(--paper);
+}
+.john-head{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.john-face{
+  font-size:2.6rem;width:74px;height:74px;border:4px solid var(--ink);border-radius:50%;
+  display:grid;place-items:center;background:#fff;box-shadow:4px 4px 0 var(--ink);
+}
+.status-pill{
+  font-family:var(--display);letter-spacing:1px;text-transform:uppercase;
+  border:3px solid var(--ink);border-radius:20px;padding:.2em .8em;background:#fff;
+}
+.status-awake{background:var(--good);color:#04340f}
+.status-asleep{background:var(--sky);color:#fff}
+.status-hurt{background:var(--pow2);color:#fff}
+.status-dead{background:var(--ink);color:var(--burst)}
+
+.gm-bar{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+
+.board-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;
+  margin-bottom:18px;
+}
+.pcard{
+  --voice-color:#888;padding:0;overflow:hidden;
+  transition:transform .12s;
+}
+.pcard.active{transform:translateY(-4px) rotate(-1deg);box-shadow:10px 12px 0 var(--ink)}
+.pcard .cap{
+  background:var(--voice-color);color:#fff;padding:8px 12px;
+  font-family:var(--display);letter-spacing:1px;text-transform:uppercase;
+  border-bottom:4px solid var(--ink);
+  -webkit-text-stroke:1.5px var(--ink);paint-order:stroke fill;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.pcard .cap .active-flag{font-size:.7rem;background:#fff;color:var(--ink);border-radius:6px;padding:.1em .4em;-webkit-text-stroke:0}
+.pcard .body{padding:12px;display:flex;flex-direction:column;gap:6px;font-size:.9rem}
+.stat{display:flex;justify-content:space-between;align-items:center}
+.stat b{font-family:var(--display);letter-spacing:1px}
+.wp-num{font-family:var(--display);font-size:1.6rem;color:var(--pow2);-webkit-text-stroke:1px var(--ink)}
+.score-num{font-family:var(--display);font-size:1.6rem;color:var(--good);-webkit-text-stroke:1px var(--ink)}
+.skill-chip{display:inline-block;background:var(--ink);color:#fff;border-radius:6px;padding:.05em .5em;font-size:.75rem;margin:.1em}
+.obs{font-style:italic}
+.diff-dots{color:var(--burst);font-size:1.1rem;letter-spacing:2px}
+
+/* action area */
+.action-panel{padding:16px;margin-bottom:18px}
+.action-panel h3{font-family:var(--display);letter-spacing:1px;text-transform:uppercase;margin:.2em 0 .6em}
+.action-row{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end}
+.field{display:flex;flex-direction:column;gap:4px}
+.field small{font-weight:bold}
+.die{
+  width:90px;height:90px;border:4px solid var(--ink);border-radius:16px;background:#fff;
+  display:grid;place-items:center;font-family:var(--display);font-size:3rem;
+  box-shadow:5px 5px 0 var(--ink);
+}
+.die.rolling{animation:tumble .6s ease}
+@keyframes tumble{
+  0%{transform:rotate(0) scale(1)}
+  25%{transform:rotate(90deg) scale(1.15)}
+  50%{transform:rotate(200deg) scale(.9)}
+  75%{transform:rotate(300deg) scale(1.1)}
+  100%{transform:rotate(360deg) scale(1)}
+}
+.result-burst{
+  font-family:var(--display);text-transform:uppercase;letter-spacing:1px;font-size:1.6rem;
+  padding:.2em .7em;border:3px solid var(--ink);border-radius:10px;display:inline-block;
+  animation:pop .3s ease;
+}
+@keyframes pop{0%{transform:scale(0)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+.result-good{background:var(--good);color:#04340f}
+.result-bad{background:var(--bad);color:#fff}
+
+/* ---------- event log ---------- */
+.log-panel{padding:14px 16px;margin-bottom:18px;max-height:280px;overflow:auto}
+.log-panel h3{font-family:var(--display);letter-spacing:1px;text-transform:uppercase;margin:.1em 0 .5em}
+.bubble{
+  position:relative;background:#fff;border:3px solid var(--ink);border-radius:14px;
+  padding:8px 12px;margin:0 0 14px 14px;font-size:.9rem;box-shadow:3px 3px 0 rgba(0,0,0,.15);
+}
+.bubble::before{
+  content:"";position:absolute;left:-12px;top:14px;width:0;height:0;
+  border:8px solid transparent;border-right-color:var(--ink);
+}
+.bubble .who{font-family:var(--display);letter-spacing:1px;text-transform:uppercase;
+  color:var(--voice-color,var(--ink));-webkit-text-stroke:.4px var(--ink);}
+
+/* ---------- modal ---------- */
+.scrim{
+  position:fixed;inset:0;background:rgba(0,0,0,.6);display:grid;place-items:center;
+  z-index:50;padding:18px;
+}
+.modal{max-width:480px;width:100%;padding:22px}
+.modal h2{font-family:var(--display);text-transform:uppercase;letter-spacing:1px;margin:.1em 0 .5em}
+.bid-secret{
+  font-family:var(--display);font-size:2.4rem;text-align:center;letter-spacing:2px;
+  border:4px dashed var(--ink);border-radius:12px;padding:.3em;margin:10px 0;background:#fff;
+}
+.bid-list{display:flex;flex-direction:column;gap:8px;margin:10px 0}
+.bid-row{display:flex;justify-content:space-between;align-items:center;border:3px solid var(--ink);
+  border-radius:8px;padding:6px 10px;background:#fff}
+.bid-row .dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--ink);display:inline-block;margin-right:6px;vertical-align:middle}
+
+/* ---------- results ---------- */
+.podium{display:flex;flex-direction:column;gap:12px;margin:18px 0}
+.rank-row{
+  --voice-color:#888;display:flex;align-items:center;gap:14px;padding:12px 16px;
+  border:4px solid var(--ink);border-radius:12px;background:#fff;box-shadow:5px 5px 0 var(--ink);
+}
+.rank-row .medal{font-size:2rem;width:50px;text-align:center}
+.rank-row .nm{font-family:var(--display);font-size:1.4rem;letter-spacing:1px;flex:1;
+  color:var(--voice-color);-webkit-text-stroke:.5px var(--ink)}
+.rank-row .pts{font-family:var(--display);font-size:1.8rem;color:var(--good);-webkit-text-stroke:1px var(--ink)}
+.winner-banner{
+  text-align:center;font-family:var(--display);text-transform:uppercase;letter-spacing:2px;
+  font-size:clamp(1.6rem,6vw,3rem);
+  background:var(--pow);border:4px solid var(--ink);border-radius:14px;
+  padding:.3em;box-shadow:8px 8px 0 var(--ink);transform:rotate(-1.5deg);margin:10px 0 20px;
+}
+
+footer{text-align:center;padding:30px 14px;color:#3a2a1a;font-size:.85rem}
+.foot-tag{background:var(--ink);color:#fff;border-radius:6px;padding:.2em .6em}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ============ MASTHEAD ============ -->
+  <header class="masthead">
+    <h1 class="bolt-title">Everybody&nbsp;is&nbsp;John!</h1>
+    <div class="sub">A competitive game of voices &amp; willpower</div>
+  </header>
+
+  <!-- ============ RULES ============ -->
+  <details class="rules panel" style="margin-bottom:18px">
+    <summary>How to Play</summary>
+    <div class="body">
+      <h4>The Pitch</h4>
+      <p>Everyone but the Game Master plays a <b>Voice</b> in the head of <b>John</b> — a hapless man who can barely tie his shoes. Each Voice is <b>obsessed</b> with making John do one specific thing, and spends a limited pool of <b>willpower</b> to seize control and pull it off.</p>
+
+      <h4>Setup</h4>
+      <p>Each Voice starts with <b>10 willpower</b> and <b>2 skills</b>. You may spend <b>3 willpower up front</b> (starting at 7 instead) to gain a <b>3rd skill</b>. Pick an <b>obsession</b> and rate how hard it is: <span class="tag">1 ★ easy</span> <span class="tag">2 ★★ risky</span> <span class="tag">3 ★★★ near-impossible</span> — that's how many points it scores.</p>
+
+      <h4>Taking Control</h4>
+      <p>When John wakes, gets hurt, the active Voice <i>fails a roll</i>, or a Voice <i>completes its obsession</i>, a <b>control test</b> happens. Every interested Voice secretly bids willpower. <b>Highest bid wins</b> and pays it; ties roll off. Everyone else keeps their willpower.</p>
+
+      <h4>Doing Things</h4>
+      <p>When John attempts something risky, the active Voice rolls <b>1d6</b>. With a matching <b>skill</b> you need <b>3+</b>; without one you need a <b>6</b>. Before rolling you may spend willpower for <b>+1 each</b> — enough makes it automatic. <b>Fail</b> and control is up for grabs again.</p>
+
+      <h4>Scoring &amp; The End</h4>
+      <p>Complete your obsession to score its point value, then a new control test begins. If John naps (GM's call), every Voice gains <b>+1 willpower</b>. The game ends when <b>John dies</b> or <b>all Voices run out of willpower</b> — highest score wins.</p>
+    </div>
+  </details>
+
+  <!-- ============ SCREEN: LOBBY ============ -->
+  <section id="screen-lobby">
+    <div class="panel" style="padding:14px 16px;margin-bottom:18px">
+      <div class="spread">
+        <h2 class="bolt-title" style="font-size:1.6rem;text-shadow:3px 3px 0 var(--sky)">Assemble the Voices</h2>
+        <div class="row">
+          <button class="btn alt" id="addVoiceBtn">+ Add Voice</button>
+          <button class="btn go" id="startBtn">▶ Start Game</button>
+          <button class="btn danger" id="resetBtn">↺ Reset</button>
+        </div>
+      </div>
+      <p style="margin:.6em 0 0">Add <b>3 to 6</b> Voices, then start. <span id="lobbyCount"></span></p>
+    </div>
+    <div class="grid" id="lobbyGrid"></div>
+  </section>
+
+  <!-- ============ SCREEN: BOARD ============ -->
+  <section id="screen-board" class="hidden">
+
+    <div class="panel john-panel">
+      <div class="john-head">
+        <div class="john-face" id="johnFace">🙂</div>
+        <div>
+          <h2 class="bolt-title" style="font-size:1.6rem">John</h2>
+          <span class="status-pill" id="johnStatus">Awake</span>
+        </div>
+        <div style="margin-left:auto" class="center">
+          <div style="font-family:var(--display);letter-spacing:1px">Active Voice</div>
+          <div id="activeName" style="font-family:var(--display);font-size:1.4rem">—</div>
+        </div>
+      </div>
+      <div class="gm-bar">
+        <button class="btn sm" id="gmControlTest">⚖ Control Test</button>
+        <button class="btn sm" id="gmHurt">💥 John Hurt</button>
+        <button class="btn sm alt" id="gmSleep">😴 John Naps (+1 all)</button>
+        <button class="btn sm ghost" id="gmWake">☀ John Wakes</button>
+        <button class="btn sm danger" id="gmDie">💀 John Dies</button>
+        <button class="btn sm danger" id="gmEnd">🏁 End &amp; Tally</button>
+      </div>
+    </div>
+
+    <div class="board-grid" id="boardGrid"></div>
+
+    <div class="panel action-panel" id="actionPanel">
+      <h3>Active Voice — Take an Action</h3>
+      <div id="noActive" class="center" style="padding:10px">
+        <p>No Voice is in control. Run a <b>Control Test</b> to decide who acts.</p>
+        <button class="btn alt" id="actionControlTest">⚖ Run Control Test</button>
+      </div>
+      <div id="activeAction" class="hidden">
+        <div class="action-row">
+          <div class="field">
+            <small>Challenge uses skill?</small>
+            <select id="challengeSkill"></select>
+          </div>
+          <div class="field">
+            <small>Spend willpower (+1 each)</small>
+            <input type="number" id="spendWp" min="0" value="0">
+          </div>
+          <div class="field">
+            <small>&nbsp;</small>
+            <button class="btn go" id="rollBtn">🎲 Roll d6</button>
+          </div>
+          <div class="die" id="dieFace">?</div>
+          <div id="rollOutcome"></div>
+        </div>
+        <div class="action-row" style="margin-top:14px">
+          <button class="btn" id="completeObsBtn">🏆 Complete Obsession</button>
+          <span style="font-style:italic">…score your points &amp; trigger a control test.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel log-panel">
+      <h3>📣 The Voices</h3>
+      <div id="logList"></div>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN: RESULTS ============ -->
+  <section id="screen-results" class="hidden">
+    <div class="winner-banner" id="winnerBanner">—</div>
+    <div class="panel" style="padding:16px">
+      <h2 class="bolt-title" style="font-size:1.6rem">Final Tally</h2>
+      <div class="podium" id="podium"></div>
+      <div class="center">
+        <button class="btn go" id="playAgainBtn">🔁 Play Again (keep Voices)</button>
+        <button class="btn danger" id="resultsReset">↺ Full Reset</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span class="foot-tag">Everybody is John</span> — based on the tabletop game by Michael Sullivan &amp; Mai Hannan. Companion app by Dominic Cerchio.
+  </footer>
+</div>
+
+<!-- ============ MODAL ROOT ============ -->
+<div id="modalRoot"></div>
+
+<script>
+/* ============================================================
+   STATE
+   ============================================================ */
+"use strict";
+const STORAGE_KEY = "eij.state.v2";
+const PALETTE = ["#ff3b6b","#3aa0ff","#f7b500","#2ecc71","#9b6bff","#ff6f3c","#00bcd4","#e91e63","#8bc34a","#795548"];
+
+let state = loadState() || freshState();
+
+function freshState(){
+  return {
+    screen:"lobby",
+    voices:[],          // {id,name,obsession,difficulty,skills:[],thirdSkill,willpower,score,color}
+    activeId:null,
+    john:{status:"awake"}, // awake|asleep|hurt|dead
+    log:[]
+  };
+}
+function loadState(){
+  try{ const raw=localStorage.getItem(STORAGE_KEY); return raw?JSON.parse(raw):null; }
+  catch(e){ return null; }
+}
+function save(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+}
+function uid(){ return "v"+Math.random().toString(36).slice(2,9); }
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+const $ = (s,r=document)=>r.querySelector(s);
+const $$ = (s,r=document)=>[...r.querySelectorAll(s)];
+function el(tag,props={},...kids){
+  const e=document.createElement(tag);
+  for(const[k,v] of Object.entries(props)){
+    if(k==="class")e.className=v;
+    else if(k==="html")e.innerHTML=v;
+    else if(k.startsWith("on")&&typeof v==="function")e.addEventListener(k.slice(2),v);
+    else if(v!==null&&v!==undefined)e.setAttribute(k,v);
+  }
+  for(const k of kids){ if(k==null)continue; e.append(k.nodeType?k:document.createTextNode(k)); }
+  return e;
+}
+function voiceById(id){ return state.voices.find(v=>v.id===id); }
+function activeVoice(){ return voiceById(state.activeId); }
+function diffStars(n){ return "★".repeat(n); }
+function log(text, voiceId=null){
+  state.log.unshift({text, voiceId});
+  if(state.log.length>60) state.log.pop();
+}
+
+/* ============================================================
+   ROUTING / RENDER
+   ============================================================ */
+function show(screen){
+  state.screen=screen;
+  $("#screen-lobby").classList.toggle("hidden",screen!=="lobby");
+  $("#screen-board").classList.toggle("hidden",screen!=="board");
+  $("#screen-results").classList.toggle("hidden",screen!=="results");
+}
+function render(){
+  show(state.screen);
+  if(state.screen==="lobby") renderLobby();
+  if(state.screen==="board") renderBoard();
+  if(state.screen==="results") renderResults();
+  save();
+}
+
+/* ============================================================
+   LOBBY
+   ============================================================ */
+function pickColor(){
+  const used = new Set(state.voices.map(v=>v.color));
+  return PALETTE.find(c=>!used.has(c)) || PALETTE[state.voices.length%PALETTE.length];
+}
+function addVoice(){
+  if(state.voices.length>=6) return;
+  state.voices.push({
+    id:uid(), name:"", obsession:"", difficulty:1,
+    skills:["",""], thirdSkill:false,
+    willpower:10, score:0, color:pickColor()
+  });
+  render();
+}
+function removeVoice(id){
+  state.voices = state.voices.filter(v=>v.id!==id);
+  render();
+}
+function renderLobby(){
+  const grid=$("#lobbyGrid"); grid.innerHTML="";
+  state.voices.forEach((v,i)=>grid.append(lobbyCard(v,i)));
+  const n=state.voices.length;
+  $("#lobbyCount").textContent = n+" voice"+(n===1?"":"s")+" added"+(n<3?" — need at least 3.":" — ready!");
+  $("#addVoiceBtn").disabled = n>=6;
+  $("#startBtn").disabled = n<3;
+}
+function lobbyCard(v,i){
+  const card=el("div",{class:"panel voice-card"});
+  card.style.setProperty("--voice-color",v.color);
+
+  const cap=el("div",{class:"cap"},
+    el("span",{class:"num"},String(i+1)),
+    el("span",{},"Voice "+(i+1)),
+    el("button",{class:"btn sm danger",title:"Remove",onclick:()=>removeVoice(v.id)},"✕")
+  );
+
+  const form=el("div",{class:"form"});
+
+  const name=el("input",{type:"text",placeholder:"Name of the Voice",value:v.name});
+  name.addEventListener("input",e=>{v.name=e.target.value;save();});
+
+  const obs=el("input",{type:"text",placeholder:"Obsession (what John must do)",value:v.obsession});
+  obs.addEventListener("input",e=>{v.obsession=e.target.value;save();});
+
+  const diffWrap=el("div",{},el("small",{},el("b",{},"Difficulty: ")));
+  const diff=el("select");
+  [[1,"★ — 1 pt (easy)"],[2,"★★ — 2 pts (risky)"],[3,"★★★ — 3 pts (near-impossible)"]]
+    .forEach(([val,lbl])=>{ const o=el("option",{value:val},lbl); if(v.difficulty===val)o.selected=true; diff.append(o); });
+  diff.addEventListener("change",e=>{v.difficulty=+e.target.value;save();});
+  diffWrap.append(diff);
+
+  const skills=el("div",{class:"skills"});
+  const s1=el("input",{type:"text",placeholder:"Skill 1",value:v.skills[0]||""});
+  s1.addEventListener("input",e=>{v.skills[0]=e.target.value;save();});
+  const s2=el("input",{type:"text",placeholder:"Skill 2",value:v.skills[1]||""});
+  s2.addEventListener("input",e=>{v.skills[1]=e.target.value;save();});
+  skills.append(s1,s2);
+
+  const s3wrap=el("div",{class:"skills"});
+  const s3=el("input",{type:"text",placeholder:"Skill 3",value:v.skills[2]||""});
+  s3.addEventListener("input",e=>{v.skills[2]=e.target.value;save();});
+  s3wrap.append(s3);
+  s3wrap.classList.toggle("hidden",!v.thirdSkill);
+
+  const tog=el("label",{class:"toggle"});
+  const cb=el("input",{type:"checkbox"});
+  cb.checked=v.thirdSkill;
+  cb.addEventListener("change",e=>{
+    v.thirdSkill=e.target.checked;
+    v.willpower = e.target.checked?7:10;
+    if(!e.target.checked) v.skills[2]="";
+    s3wrap.classList.toggle("hidden",!e.target.checked);
+    wpNote.textContent = "Starts with "+v.willpower+" willpower";
+    save();
+  });
+  tog.append(cb, document.createTextNode(" Spend 3 willpower for a 3rd skill"));
+
+  const wpNote=el("small",{},"Starts with "+v.willpower+" willpower");
+
+  // color swatches
+  const sw=el("div",{class:"swatches"});
+  PALETTE.forEach(c=>{
+    const used=state.voices.some(o=>o!==v && o.color===c);
+    const dot=el("div",{class:"swatch"+(v.color===c?" sel":""),title:used?"in use":c});
+    dot.style.background=c; dot.style.opacity=used?.35:1;
+    if(!used) dot.addEventListener("click",()=>{v.color=c;render();});
+    sw.append(dot);
+  });
+
+  form.append(name,obs,diffWrap,skills,tog,s3wrap,wpNote,el("div",{},el("small",{},el("b",{},"Color: ")),sw));
+  card.append(cap,form);
+  return card;
+}
+
+function validateAndStart(){
+  if(state.voices.length<3){ alert("At least 3 Voices are required."); return; }
+  for(const v of state.voices){
+    if(!v.name.trim()){ alert("Every Voice needs a name."); return; }
+    if(!v.obsession.trim()){ alert((v.name||"A Voice")+" needs an obsession."); return; }
+    const sk=v.skills.filter(s=>s&&s.trim());
+    const need=v.thirdSkill?3:2;
+    if(sk.length<need){ alert((v.name||"A Voice")+" needs "+need+" skills filled in."); return; }
+  }
+  // normalize skills
+  state.voices.forEach(v=>{ v.skills=v.skills.filter(s=>s&&s.trim()); });
+  state.john={status:"awake"};
+  state.activeId=null;
+  state.log=[];
+  log("The Voices stir. John wakes up… and the struggle for his mind begins.");
+  state.screen="board";
+  render();
+  openControlTest();
+}
+
+/* ============================================================
+   GAME BOARD
+   ============================================================ */
+const FACES={awake:"🙂",asleep:"😴",hurt:"🤕",dead:"💀"};
+function renderBoard(){
+  const j=state.john;
+  $("#johnFace").textContent = FACES[j.status]||"🙂";
+  const pill=$("#johnStatus");
+  pill.textContent = j.status[0].toUpperCase()+j.status.slice(1);
+  pill.className="status-pill status-"+j.status;
+
+  const a=activeVoice();
+  $("#activeName").textContent = a?a.name:"—";
+  $("#activeName").style.color = a?a.color:"inherit";
+
+  // voice cards
+  const grid=$("#boardGrid"); grid.innerHTML="";
+  state.voices.forEach(v=>grid.append(boardCard(v)));
+
+  // action panel
+  const hasActive=!!a;
+  $("#noActive").classList.toggle("hidden",hasActive);
+  $("#activeAction").classList.toggle("hidden",!hasActive);
+  if(hasActive) buildActionControls(a);
+
+  // log
+  renderLog();
+
+  // disable GM wake unless asleep/hurt
+  $("#gmWake").disabled = j.status==="awake" || j.status==="dead";
+  $("#gmDie").disabled = j.status==="dead";
+}
+
+function renderLog(){
+  const ll=$("#logList"); ll.innerHTML="";
+  if(state.log.length===0){ ll.append(el("p",{style:"font-style:italic"},"No chatter yet…")); return; }
+  state.log.forEach(entry=>{
+    const v=entry.voiceId?voiceById(entry.voiceId):null;
+    const b=el("div",{class:"bubble"});
+    if(v) b.style.setProperty("--voice-color",v.color);
+    if(v) b.append(el("span",{class:"who"},v.name+": "));
+    b.append(document.createTextNode(entry.text));
+    ll.append(b);
+  });
+}
+
+function boardCard(v){
+  const card=el("div",{class:"panel pcard"+(v.id===state.activeId?" active":"")});
+  card.style.setProperty("--voice-color",v.color);
+  const cap=el("div",{class:"cap"},
+    el("span",{},v.name),
+    v.id===state.activeId?el("span",{class:"active-flag"},"IN CONTROL"):null
+  );
+  const body=el("div",{class:"body"});
+  body.append(
+    el("div",{class:"stat"}, el("b",{},"Willpower"), el("span",{class:"wp-num"},String(v.willpower))),
+    el("div",{class:"stat"}, el("b",{},"Score"), el("span",{class:"score-num"},String(v.score))),
+    el("div",{class:"obs"}, "“"+v.obsession+"” ", el("span",{class:"diff-dots"},diffStars(v.difficulty))),
+    el("div",{}, ...v.skills.map(s=>el("span",{class:"skill-chip"},s)))
+  );
+  card.append(cap,body);
+  return card;
+}
+
+function buildActionControls(a){
+  const sel=$("#challengeSkill"); sel.innerHTML="";
+  sel.append(el("option",{value:"__none"},"No matching skill (need 6)"));
+  a.skills.forEach(s=>sel.append(el("option",{value:s},s+" (need 3+)")));
+  const spend=$("#spendWp");
+  spend.max=String(a.willpower);
+  spend.value="0";
+  $("#dieFace").textContent="?";
+  $("#dieFace").className="die";
+  $("#rollOutcome").innerHTML="";
+}
+
+/* ---------- dice roll ---------- */
+function doRoll(){
+  const a=activeVoice(); if(!a) return;
+  const sel=$("#challengeSkill");
+  const usingSkill = sel.value!=="__none";
+  let spend = Math.max(0, Math.min(a.willpower, parseInt($("#spendWp").value||"0",10)||0));
+  const target = usingSkill?3:6;
+
+  // spend willpower up front
+  a.willpower -= spend;
+  const die=$("#dieFace");
+  die.classList.remove("rolling"); void die.offsetWidth; die.classList.add("rolling");
+  $("#rollBtn").disabled=true;
+  const roll = 1+Math.floor(Math.random()*6);
+  setTimeout(()=>{
+    die.textContent = ["⚀","⚁","⚂","⚃","⚄","⚅"][roll-1];
+    const total = roll+spend;
+    const success = total>=target;
+    const out=$("#rollOutcome");
+    out.innerHTML="";
+    out.append(el("span",{class:"result-burst "+(success?"result-good":"result-bad")},
+      success?"SUCCESS!":"FAILURE!"));
+    const detail = "rolled "+roll+(spend?(" +"+spend+" WP = "+total):"")+" vs "+target+(usingSkill?(" ("+sel.value+")"):" (no skill)");
+    log((success?"succeeds — ":"fails — ")+detail+".", a.id);
+    save(); refreshNumbers();
+    $("#rollBtn").disabled=false;
+    if(!success){
+      log("Failure! Control of John is up for grabs.");
+      setTimeout(()=>{ render(); openControlTest(); }, 700);
+    }
+  }, 600);
+}
+// update only the live numbers + log without rebuilding the action selects mid-action
+function refreshNumbers(){
+  const a=activeVoice();
+  $$("#boardGrid .pcard").forEach((card,idx)=>{
+    const v=state.voices[idx]; if(!v)return;
+    const nums=card.querySelectorAll(".wp-num,.score-num");
+    if(nums[0])nums[0].textContent=String(v.willpower);
+    if(nums[1])nums[1].textContent=String(v.score);
+  });
+  renderLog();
+  if($("#spendWp")) $("#spendWp").max=String(a?a.willpower:0);
+}
+
+/* ---------- complete obsession ---------- */
+function completeObsession(){
+  const a=activeVoice(); if(!a) return;
+  a.score += a.difficulty;
+  log("completes the obsession “"+a.obsession+"” and scores "+a.difficulty+" point"+(a.difficulty>1?"s":"")+"!", a.id);
+  save();
+  if(checkGameEnd()) return;
+  log("Obsession fulfilled — a new control test begins.");
+  render();
+  openControlTest();
+}
+
+/* ============================================================
+   CONTROL TEST (sequential hidden bidding)
+   ============================================================ */
+function openControlTest(){
+  const eligible = state.voices.filter(v=>v.willpower>0);
+  if(eligible.length===0){
+    log("No Voice has any willpower left. The game is over.");
+    endGame(); return;
+  }
+  runBiddingSequence(eligible);
+}
+function runBiddingSequence(eligible){
+  const bids={}; // id -> amount
+  let idx=0;
+  const root=$("#modalRoot");
+
+  function showSecretEntry(){
+    const v=eligible[idx];
+    root.innerHTML="";
+    const scrim=el("div",{class:"scrim"});
+    const modal=el("div",{class:"panel modal"});
+    modal.style.setProperty("--voice-color",v.color);
+    const inp=el("input",{type:"number",min:"0",max:String(v.willpower),value:"0",id:"bidInput"});
+    inp.addEventListener("keydown",ev=>{ if(ev.key==="Enter")submitBid(); });
+    modal.append(
+      el("h2",{},"Control Test — Secret Bid"),
+      el("p",{},"Pass the device to ", el("b",{style:"color:"+v.color},v.name||"this Voice"), ". Others, look away!"),
+      el("p",{},"Available willpower: ", el("b",{},String(v.willpower))),
+      inp,
+      el("p",{style:"font-size:.85rem;font-style:italic"},"Bid 0 to pass / bluff. Highest bidder takes control and pays their bid."),
+      el("div",{class:"row",style:"margin-top:10px"},
+        el("button",{class:"btn go",onclick:submitBid},"🔒 Lock In Bid")
+      )
+    );
+    scrim.append(modal); root.append(scrim);
+    setTimeout(()=>{ const bi=$("#bidInput"); if(bi){bi.focus();bi.select();} },50);
+  }
+  function submitBid(){
+    const v=eligible[idx];
+    let amt=parseInt($("#bidInput").value||"0",10);
+    amt=Math.max(0,Math.min(v.willpower, isNaN(amt)?0:amt));
+    bids[v.id]=amt;
+    idx++;
+    if(idx<eligible.length) showSecretEntry();
+    else resolveBids(eligible,bids);
+  }
+  showSecretEntry();
+}
+function resolveBids(eligible,bids){
+  const root=$("#modalRoot");
+  let max=-1;
+  eligible.forEach(v=>{ if(bids[v.id]>max)max=bids[v.id]; });
+  let winners = eligible.filter(v=>bids[v.id]===max);
+
+  const reveal=el("div",{class:"panel modal"});
+  reveal.append(el("h2",{},"Bids Revealed!"));
+  const list=el("div",{class:"bid-list"});
+  eligible.slice().sort((a,b)=>bids[b.id]-bids[a.id]).forEach(v=>{
+    const row=el("div",{class:"bid-row"});
+    const dot=el("span",{class:"dot"}); dot.style.background=v.color;
+    row.append(el("span",{},dot," ",v.name), el("b",{style:"font-family:var(--display);font-size:1.3rem"},String(bids[v.id])));
+    list.append(row);
+  });
+  reveal.append(list);
+
+  function finalize(winner){
+    if(winner){
+      winner.willpower -= bids[winner.id];
+      state.activeId = winner.id;
+      log("wins the control test, bidding "+bids[winner.id]+" willpower. John is theirs!", winner.id);
+    }else{
+      state.activeId = null;
+      log("Everyone bid 0 — nobody seizes control. John mills about aimlessly.");
+    }
+    $("#modalRoot").innerHTML="";
+    save(); render();
+    if(winner) checkGameEnd();
+  }
+
+  function mount(node){ root.innerHTML=""; const sc=el("div",{class:"scrim"}); sc.append(node); root.append(sc); }
+
+  if(max<=0){
+    reveal.append(el("p",{},"Nobody bid any willpower — control is left undecided."),
+      el("div",{class:"center"},el("button",{class:"btn",onclick:()=>finalize(null)},"Continue")));
+    mount(reveal); return;
+  }
+  if(winners.length===1){
+    reveal.append(el("p",{},el("b",{style:"color:"+winners[0].color},winners[0].name)," takes control with a bid of ",el("b",{},String(max)),"!"),
+      el("div",{class:"center"},el("button",{class:"btn go",onclick:()=>finalize(winners[0])},"Seize Control")));
+    mount(reveal); return;
+  }
+  // tie -> roll off
+  reveal.append(el("p",{},"Tie at ",el("b",{},String(max)),"! ",winners.map(w=>w.name).join(" & ")," roll off…"));
+  const resultBox=el("div",{class:"center",style:"margin-top:10px"});
+  const btn=el("button",{class:"btn alt"},"🎲 Roll Off");
+  btn.addEventListener("click",()=>{
+    let best=-1;
+    const rolls=winners.map(w=>{ const r=1+Math.floor(Math.random()*6); if(r>best)best=r; return {w,r}; });
+    const tieAgain=rolls.filter(o=>o.r===best).map(o=>o.w);
+    resultBox.innerHTML="";
+    rolls.forEach(o=>resultBox.append(el("div",{},o.w.name+" rolled "+o.r)));
+    if(tieAgain.length===1){
+      const champ=tieAgain[0];
+      resultBox.append(el("p",{},el("b",{style:"color:"+champ.color},champ.name)," wins the roll-off!"));
+      resultBox.append(el("button",{class:"btn go",onclick:()=>finalize(champ)},"Seize Control"));
+      btn.disabled=true;
+    }else{
+      winners=tieAgain;
+      resultBox.append(el("p",{},"Still tied — roll again!"));
+    }
+  });
+  reveal.append(el("div",{class:"center"},btn),resultBox);
+  mount(reveal);
+}
+
+/* ============================================================
+   GM ACTIONS
+   ============================================================ */
+function johnHurt(){
+  if(state.john.status==="dead")return;
+  state.john.status="hurt";
+  log("💥 John takes a beating! A control test is triggered.");
+  render(); openControlTest();
+}
+function johnSleep(){
+  if(state.john.status==="dead")return;
+  state.john.status="asleep";
+  state.voices.forEach(v=>v.willpower+=1);
+  log("😴 John dozes off. Every Voice gains +1 willpower.");
+  render();
+}
+function johnWake(){
+  if(state.john.status==="dead")return;
+  state.john.status="awake";
+  log("☀ John jolts awake. The Voices scramble for control.");
+  render(); openControlTest();
+}
+function johnDie(){
+  if(state.john.status==="dead")return;
+  if(!confirm("John dies and the game ends. Tally the scores?"))return;
+  state.john.status="dead";
+  log("💀 John has perished. The game is over.");
+  endGame();
+}
+function checkGameEnd(){
+  const anyWp = state.voices.some(v=>v.willpower>0);
+  if(!anyWp){
+    log("All Voices are out of willpower — the game ends!");
+    endGame(); return true;
+  }
+  return false;
+}
+function endGame(){
+  $("#modalRoot").innerHTML="";
+  state.screen="results";
+  render();
+}
+
+/* ============================================================
+   RESULTS
+   ============================================================ */
+function renderResults(){
+  const ranked=[...state.voices].sort((a,b)=>b.score-a.score);
+  const top=ranked.length?ranked[0].score:0;
+  const winners=ranked.filter(v=>v.score===top&&top>0);
+  const banner=$("#winnerBanner");
+  if(top===0) banner.textContent="Nobody scored… John wins?!";
+  else if(winners.length===1) banner.textContent="🏆 "+winners[0].name+" wins!";
+  else banner.textContent="🏆 Tie: "+winners.map(w=>w.name).join(" & ")+"!";
+
+  const medals=["🥇","🥈","🥉"];
+  const podium=$("#podium"); podium.innerHTML="";
+  ranked.forEach((v,i)=>{
+    const row=el("div",{class:"rank-row"});
+    row.style.setProperty("--voice-color",v.color);
+    row.append(
+      el("div",{class:"medal"}, medals[i]||("#"+(i+1))),
+      el("div",{class:"nm"}, v.name, el("div",{style:"font-size:.7rem;font-family:var(--comic);color:#333;-webkit-text-stroke:0"},"“"+v.obsession+"”")),
+      el("div",{class:"pts"}, v.score+" pt"+(v.score===1?"":"s"))
+    );
+    podium.append(row);
+  });
+}
+
+/* ============================================================
+   RESET / PLAY AGAIN
+   ============================================================ */
+function fullReset(){
+  if(!confirm("Reset everything? All Voices and progress will be erased."))return;
+  localStorage.removeItem(STORAGE_KEY);
+  state=freshState();
+  $("#modalRoot").innerHTML="";
+  addVoice(); addVoice(); addVoice();
+}
+function playAgain(){
+  state.voices.forEach(v=>{ v.score=0; v.willpower=v.thirdSkill?7:10; });
+  state.activeId=null;
+  state.john={status:"awake"};
+  state.log=[];
+  log("A new descent into John's mind begins…");
+  state.screen="board";
+  render(); openControlTest();
+}
+
+/* ============================================================
+   WIRE-UP
+   ============================================================ */
+$("#addVoiceBtn").addEventListener("click",addVoice);
+$("#startBtn").addEventListener("click",validateAndStart);
+$("#resetBtn").addEventListener("click",fullReset);
+
+$("#gmControlTest").addEventListener("click",()=>openControlTest());
+$("#actionControlTest").addEventListener("click",()=>openControlTest());
+$("#gmHurt").addEventListener("click",johnHurt);
+$("#gmSleep").addEventListener("click",johnSleep);
+$("#gmWake").addEventListener("click",johnWake);
+$("#gmDie").addEventListener("click",johnDie);
+$("#gmEnd").addEventListener("click",()=>{ if(confirm("End the game now and tally scores?")) endGame(); });
+
+$("#rollBtn").addEventListener("click",doRoll);
+$("#completeObsBtn").addEventListener("click",completeObsession);
+
+$("#playAgainBtn").addEventListener("click",playAgain);
+$("#resultsReset").addEventListener("click",fullReset);
+
+/* first paint */
+if(state.voices.length===0 && state.screen==="lobby"){ addVoice(); addVoice(); addVoice(); }
+else render();
+</script>
+</body>
+</html>

@@ -1,0 +1,862 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="description" content="Lost at Sea — a stranded-island survival ranking game. Rank 15 salvaged items before the clock runs out and see if the US Coast Guard would have kept you alive. Self-contained, dependency-free.">
+<meta name="author" content="Dominic Cerchio">
+<title>Lost at Sea ⛵</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9B%B5%3C/text%3E%3C/svg%3E">
+<style>
+/* ============================================================
+   LOST AT SEA — single-file stranded-island survival game
+   Zero external dependencies. Inline CSS + JS only.
+   ============================================================ */
+
+:root{
+  --ink:#27201a;
+  --driftwood:#3a2f25;
+  --parchment:#f6e9cf;
+  --parchment-2:#efdcb6;
+  --sand:#e8d2a3;
+  --sand-deep:#d8b97e;
+  --sea:#1c87a6;
+  --sea-deep:#0d5e78;
+  --sea-light:#46b6c9;
+  --sky:#bfe9ef;
+  --sky-2:#7fcfd6;
+  --sun:#ffd255;
+  --sun-glow:#ffe9a8;
+  --palm:#3f7d3a;
+  --palm-dark:#2c5a29;
+  --good:#2f9e5c;
+  --bad:#c8482f;
+  --warn:#d98f2b;
+  --rope:#caa874;
+  --display:"Trebuchet MS","Gill Sans","Segoe UI",Optima,system-ui,sans-serif;
+  --body:"Segoe UI",Candara,Optima,"Trebuchet MS",system-ui,sans-serif;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--body);
+  color:var(--ink);
+  min-height:100vh;
+  position:relative;
+  overflow-x:hidden;
+  background:linear-gradient(180deg,#9fe0e6 0%,#7fcfd6 26%,#46b6c9 48%,#1c87a6 70%,#0d5e78 100%);
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- animated ocean / island ambiance ---------- */
+.scene{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+
+.sun{
+  position:absolute;top:7vh;right:9vw;width:120px;height:120px;border-radius:50%;
+  background:radial-gradient(circle at 50% 50%,var(--sun-glow),var(--sun) 55%,#ffba3b 100%);
+  box-shadow:0 0 70px 26px rgba(255,210,85,.55);
+  animation:sunPulse 7s ease-in-out infinite;
+}
+@keyframes sunPulse{0%,100%{transform:scale(1);opacity:.95}50%{transform:scale(1.06);opacity:1}}
+
+.cloud{position:absolute;top:0;left:-260px;opacity:.85;filter:drop-shadow(0 6px 6px rgba(0,0,0,.05))}
+.cloud.c1{top:9vh;animation:drift 48s linear infinite}
+.cloud.c2{top:18vh;transform:scale(.7);animation:drift 70s linear infinite;animation-delay:-20s;opacity:.7}
+.cloud.c3{top:5vh;transform:scale(.5);animation:drift 90s linear infinite;animation-delay:-55s;opacity:.6}
+@keyframes drift{from{transform:translateX(0)}to{transform:translateX(115vw)}}
+
+/* layered waves at the bottom */
+.waves{position:absolute;left:0;right:0;bottom:0;height:38vh}
+.wave{position:absolute;left:0;width:200%;bottom:0;height:100%;
+  background-repeat:repeat-x;background-position:0 bottom;}
+.wave.w1{background-image:radial-gradient(circle at 50px 60px,transparent 48px,rgba(255,255,255,.18) 49px,transparent 53px);
+  background-size:100px 80px;opacity:.5;animation:waveMove 9s linear infinite}
+.wave.w2{height:60%;background:linear-gradient(180deg,rgba(13,94,120,0) 0,rgba(13,94,120,.55) 100%)}
+.wave.w3{height:30%;background:linear-gradient(180deg,rgba(8,66,86,0) 0,rgba(8,66,86,.8) 100%)}
+@keyframes waveMove{from{transform:translateX(0)}to{transform:translateX(-100px)}}
+
+/* drifting life raft */
+.raft{position:absolute;bottom:11vh;left:-90px;font-size:46px;filter:drop-shadow(0 4px 3px rgba(0,0,0,.25));
+  animation:raftDrift 40s linear infinite, bob 4.5s ease-in-out infinite}
+@keyframes raftDrift{from{left:-90px}to{left:108vw}}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-10px) rotate(3deg)}}
+
+/* palm + island in a corner */
+.island{position:absolute;bottom:7vh;left:-10px;font-size:84px;transform-origin:bottom center;
+  animation:sway 6s ease-in-out infinite;filter:drop-shadow(0 6px 4px rgba(0,0,0,.2))}
+@keyframes sway{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
+
+.gull{position:absolute;font-size:20px;top:14vh;left:40vw;opacity:.7;animation:gullFly 26s linear infinite}
+.gull.g2{top:11vh;left:60vw;font-size:15px;animation-duration:34s;animation-delay:-12s}
+@keyframes gullFly{0%{transform:translate(0,0)}50%{transform:translate(-30vw,6vh)}100%{transform:translate(-60vw,0)}}
+
+/* ---------- layout ---------- */
+.wrap{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:1.5rem 1rem 8rem}
+
+header.masthead{text-align:center;margin:.5rem 0 1.4rem}
+.title{
+  font-family:var(--display);font-weight:800;letter-spacing:.5px;line-height:1;
+  font-size:clamp(2.2rem,8vw,4rem);margin:0;color:var(--parchment);
+  text-shadow:0 2px 0 var(--sea-deep),0 4px 14px rgba(0,0,0,.35);
+}
+.subtitle{margin:.5rem 0 0;color:var(--sea-deep);font-style:italic;
+  text-shadow:0 1px 4px rgba(255,255,255,.45);font-size:clamp(.9rem,3vw,1.1rem)}
+
+/* parchment panel, pinned like a castaway's note */
+.panel{
+  background:
+    radial-gradient(120% 120% at 0 0,rgba(255,255,255,.35),transparent 40%),
+    linear-gradient(180deg,var(--parchment),var(--parchment-2));
+  border:2px solid #c9ac76;
+  border-radius:14px;
+  box-shadow:0 14px 30px rgba(0,0,0,.28),inset 0 0 60px rgba(180,140,80,.18);
+  padding:1.4rem 1.4rem 1.6rem;
+  position:relative;
+}
+.panel::before{/* tape */
+  content:"";position:absolute;top:-12px;left:50%;transform:translateX(-50%) rotate(-2deg);
+  width:120px;height:24px;background:var(--sand-deep);
+  border:1px dashed rgba(120,90,50,.5);border-radius:3px;box-shadow:0 2px 4px rgba(0,0,0,.15)}
+
+h2.section{font-family:var(--display);margin:.2rem 0 .8rem;font-size:1.4rem;color:var(--driftwood)}
+h3.section{font-family:var(--display);margin:1.2rem 0 .5rem;font-size:1.15rem;color:var(--driftwood)}
+.panel p{line-height:1.6;margin:.6rem 0}
+.panel strong{color:var(--sea-deep)}
+
+.note{
+  border-left:5px solid var(--warn);background:rgba(217,143,43,.14);
+  border-radius:8px;padding:.85rem 1rem;margin:1rem 0;font-size:.95rem;line-height:1.55;
+}
+
+/* ---------- buttons ---------- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:.5rem;
+  font-family:var(--display);font-weight:700;letter-spacing:.4px;font-size:1.05rem;
+  border:2px solid var(--driftwood);border-radius:11px;padding:.7em 1.2em;cursor:pointer;
+  background:linear-gradient(180deg,#f0c97a,var(--sand-deep));color:var(--driftwood);
+  box-shadow:0 5px 0 #a07b3f,0 8px 14px rgba(0,0,0,.25);
+  transition:transform .07s ease,box-shadow .07s ease,filter .15s;
+}
+.btn:hover{filter:brightness(1.05)}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #a07b3f,0 3px 8px rgba(0,0,0,.25)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:0 5px 0 #a07b3f}
+.btn.block{display:flex;width:100%}
+.btn.go{background:linear-gradient(180deg,#56c47e,var(--good));color:#06351c;border-color:#1d6a3c;box-shadow:0 5px 0 #16542f,0 8px 14px rgba(0,0,0,.25)}
+.btn.go:active{box-shadow:0 1px 0 #16542f,0 3px 8px rgba(0,0,0,.25)}
+.btn.sea{background:linear-gradient(180deg,#4fc0d4,var(--sea));color:#04313d;border-color:#0d5e78;box-shadow:0 5px 0 #0a4a5f,0 8px 14px rgba(0,0,0,.25)}
+.btn.sea:active{box-shadow:0 1px 0 #0a4a5f,0 3px 8px rgba(0,0,0,.25)}
+.btn.small{font-size:.9rem;padding:.5em .9em;box-shadow:0 4px 0 #a07b3f}
+.btn-row{display:flex;gap:.7rem;flex-wrap:wrap;justify-content:center;margin-top:1rem}
+
+/* ---------- timer ---------- */
+.timer-bar{display:flex;align-items:center;justify-content:center;gap:.8rem;margin:.2rem 0 1rem;flex-wrap:wrap}
+.timer{
+  font-family:var(--display);font-weight:800;font-variant-numeric:tabular-nums;
+  font-size:clamp(2rem,9vw,3.2rem);line-height:1;color:var(--sea-deep);
+  padding:.1em .4em;border-radius:10px;background:rgba(255,255,255,.45);
+  border:2px solid #c9ac76;min-width:3.4em;text-align:center;
+}
+.timer.low{color:var(--bad);animation:throb 1s ease-in-out infinite}
+@keyframes throb{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+
+.rank-cap{display:flex;align-items:center;gap:.6rem;font-size:.85rem;color:var(--driftwood);margin:.3rem 0}
+.rank-cap.top{color:var(--good)}
+.rank-cap.bot{color:var(--bad)}
+.rank-cap .line{flex:1;height:0;border-top:2px dashed currentColor;opacity:.6}
+
+/* ---------- the ranking list ---------- */
+ol.items{list-style:none;margin:.2rem 0;padding:0;counter-reset:rank}
+li.item{
+  counter-increment:rank;
+  display:flex;align-items:center;gap:.7rem;
+  background:linear-gradient(180deg,#fff7e6,#f1dfb8);
+  border:2px solid #cbae79;border-radius:10px;
+  padding:.6rem .7rem;margin:.45rem 0;
+  box-shadow:0 3px 7px rgba(0,0,0,.12);
+  touch-action:none;
+  will-change:transform;
+}
+li.item.locked{touch-action:auto}
+li.item::before{
+  content:counter(rank);
+  flex:0 0 auto;width:1.9rem;height:1.9rem;border-radius:50%;
+  display:grid;place-items:center;font-weight:800;font-family:var(--display);
+  background:var(--sea);color:#fff;font-size:.95rem;box-shadow:inset 0 0 0 2px rgba(255,255,255,.4)}
+li.item{cursor:grab}
+li.item.lifted,li.item.locked{cursor:default}
+li.item .grip{color:#a07b3f;font-size:1.1rem;user-select:none}
+li.item .emoji{font-size:1.4rem;flex:0 0 auto}
+li.item .label{flex:1;font-size:.98rem;line-height:1.2}
+li.item .arrows{display:flex;flex-direction:column;gap:2px;flex:0 0 auto}
+li.item .arrows button{
+  font-family:var(--display);font-weight:800;line-height:1;cursor:pointer;
+  width:1.9rem;height:1.25rem;border:1.5px solid var(--driftwood);border-radius:6px;
+  background:linear-gradient(180deg,#f0c97a,var(--sand-deep));color:var(--driftwood);
+  display:grid;place-items:center;font-size:.7rem;padding:0;
+}
+li.item .arrows button:hover{filter:brightness(1.06)}
+li.item .arrows button:active{transform:translateY(1px)}
+li.item .arrows button:disabled{opacity:.35;cursor:not-allowed}
+
+/* FLIP transition for rows sliding into new positions */
+li.item.flip{transition:transform .2s cubic-bezier(.2,.7,.3,1)}
+
+/* the lifted card that follows the pointer */
+li.item.lifted{
+  position:fixed;left:0;top:0;margin:0;z-index:50;
+  counter-increment:none;
+  box-shadow:0 14px 28px rgba(0,0,0,.32),0 0 0 2px var(--sea-light);
+  cursor:grabbing;pointer-events:none;transition:none;
+  background:linear-gradient(180deg,#fffaee,#f3e2bd);
+}
+li.item.lifted .grip{cursor:grabbing}
+
+/* the gap left behind / drop target */
+li.item.placeholder{
+  background:repeating-linear-gradient(135deg,rgba(70,182,201,.16),rgba(70,182,201,.16) 10px,rgba(70,182,201,.06) 10px,rgba(70,182,201,.06) 20px);
+  border:2px dashed var(--sea-light);box-shadow:none;
+}
+li.item.placeholder>*{visibility:hidden}
+
+li.item.locked{background:linear-gradient(180deg,#e9e1d2,#ddd2bd);color:#6c655a}
+li.item.locked .grip{cursor:default;color:#b3a991}
+ol.items.locked li.item::before{background:#8a8475}
+
+/* ---------- results ---------- */
+.verdict{border-radius:12px;padding:1.1rem 1rem;text-align:center;margin:.2rem 0 1.2rem;border:2px solid}
+.verdict.win{background:rgba(47,158,92,.16);border-color:var(--good)}
+.verdict.lose{background:rgba(200,72,47,.16);border-color:var(--bad)}
+.verdict h2{font-family:var(--display);margin:.1rem 0;font-size:clamp(1.6rem,6vw,2.3rem)}
+.verdict.win h2{color:var(--good)}
+.verdict.lose h2{color:var(--bad)}
+.verdict .lead{margin:.3rem 0 0;font-size:1.05rem}
+.gauge{height:16px;border-radius:9px;background:rgba(0,0,0,.12);overflow:hidden;margin:.9rem auto 0;max-width:420px;border:1px solid rgba(0,0,0,.15)}
+.gauge > i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,#56c47e,#2f9e5c)}
+.verdict.lose .gauge > i{background:linear-gradient(90deg,#e08a6f,#c8482f)}
+
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:10px;border:1px solid #cbae79}
+table{width:100%;border-collapse:collapse;font-size:.92rem;min-width:560px;background:rgba(255,255,255,.35)}
+th,td{padding:.55rem .7rem;text-align:left;vertical-align:top;border-bottom:1px solid #d8c298}
+thead th{background:rgba(28,135,166,.16);font-family:var(--display);color:var(--sea-deep);position:sticky;top:0}
+tbody tr:nth-child(even){background:rgba(255,255,255,.25)}
+td.pri{font-weight:800;text-align:center;color:var(--sea-deep);font-family:var(--display)}
+td.match{color:var(--good);font-weight:700}
+td.miss{color:var(--bad)}
+.delta{font-size:.78rem;color:#7a6f5e}
+
+/* sound toggle (top-right) */
+.sound-toggle{
+  position:fixed;top:.8rem;right:.8rem;z-index:5;
+  font-family:var(--display);font-weight:700;font-size:.85rem;cursor:pointer;
+  border:2px solid var(--driftwood);border-radius:999px;padding:.4em .8em;
+  background:rgba(246,233,207,.92);color:var(--driftwood);box-shadow:0 3px 8px rgba(0,0,0,.25);
+}
+.sound-toggle:hover{filter:brightness(1.04)}
+
+.copied-toast{
+  position:fixed;left:50%;bottom:1.5rem;transform:translateX(-50%) translateY(20px);
+  background:var(--driftwood);color:var(--parchment);padding:.6em 1.1em;border-radius:10px;
+  font-weight:700;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:20;
+  box-shadow:0 6px 16px rgba(0,0,0,.35);
+}
+.copied-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.hidden{display:none !important}
+
+.summary-box{white-space:pre-wrap;font-family:"Consolas","Courier New",monospace;font-size:.82rem;
+  background:rgba(255,255,255,.45);border:1px solid #cbae79;border-radius:8px;padding:.8rem;margin-top:.8rem;
+  max-height:220px;overflow:auto}
+
+footer.tide{position:relative;z-index:1;text-align:center;color:var(--parchment-2);
+  font-size:.8rem;padding:1.4rem 1rem 2rem;text-shadow:0 1px 3px rgba(0,0,0,.4)}
+footer.tide a{color:var(--parchment);text-decoration:underline}
+
+@media (max-width:560px){
+  .panel{padding:1.1rem 1rem 1.3rem}
+  .sun{width:84px;height:84px;top:5vh}
+}
+@media (prefers-reduced-motion:reduce){
+  .sun,.cloud,.wave.w1,.raft,.island,.gull,.timer.low{animation:none !important}
+  li.item.flip{transition:none}
+  li.item.lifted{transform:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ambiance -->
+<div class="scene" aria-hidden="true">
+  <div class="sun"></div>
+  <svg class="cloud c1" width="220" height="80" viewBox="0 0 220 80"><g fill="#ffffff"><ellipse cx="70" cy="50" rx="55" ry="28"/><ellipse cx="120" cy="42" rx="45" ry="34"/><ellipse cx="160" cy="52" rx="42" ry="24"/></g></svg>
+  <svg class="cloud c2" width="220" height="80" viewBox="0 0 220 80"><g fill="#ffffff"><ellipse cx="70" cy="50" rx="55" ry="28"/><ellipse cx="120" cy="42" rx="45" ry="34"/><ellipse cx="160" cy="52" rx="42" ry="24"/></g></svg>
+  <svg class="cloud c3" width="220" height="80" viewBox="0 0 220 80"><g fill="#ffffff"><ellipse cx="70" cy="50" rx="55" ry="28"/><ellipse cx="120" cy="42" rx="45" ry="34"/><ellipse cx="160" cy="52" rx="42" ry="24"/></g></svg>
+  <span class="gull">🕊️</span>
+  <span class="gull g2">🕊️</span>
+  <span class="raft">⛵</span>
+  <span class="island">🌴</span>
+  <div class="waves">
+    <div class="wave w2"></div>
+    <div class="wave w3"></div>
+    <div class="wave w1"></div>
+  </div>
+</div>
+
+<button class="sound-toggle" id="soundToggle" aria-pressed="false" title="Toggle sound">🔇 Sound: Off</button>
+
+<div class="wrap">
+  <header class="masthead">
+    <h1 class="title">Lost at Sea ⛵</h1>
+    <p class="subtitle">Castaway in the mid-Atlantic — rank what keeps you alive.</p>
+  </header>
+
+  <!-- ===================== INTRO ===================== -->
+  <section class="panel" id="screenIntro">
+    <h2 class="section">🏝️ Situation Report</h2>
+    <p>You chartered a yacht with three friends for the trip of a lifetime across the Atlantic Ocean. Since none of you had sailing experience, you hired an experienced skipper and a two-person crew. About halfway through your journey, a fierce fire breaks out in the ship's galley. The skipper and crew are lost fighting the blaze. Much of the yacht is destroyed and slowly sinking. Your location is unclear — the navigational and radio equipment were damaged in the fire. Your best estimate is that you are <strong>many hundreds of miles from land</strong>.</p>
+    <p>You and your friends managed to save 15 items, undamaged after the fire. <strong>In addition, you salvaged a four-man rubber life raft and a box of matches.</strong> Your task is to rank the 15 items by their importance to your survival as you wait to be rescued.</p>
+
+    <div class="note">
+      ⏳ When you press <strong>Set Sail</strong>, a <strong>4-minute</strong> timer begins. Drag items — or use the ▲▼ buttons — to order them from most to least important. Lock in any time with <strong>Finish Early</strong>, or the list finalizes automatically when time runs out. Then see whether you'd survive, your odds of rescue, and how you stack up against the US Coast Guard.
+    </div>
+
+    <button type="button" class="btn go block" id="btnStart">⚓ Set Sail</button>
+  </section>
+
+  <!-- ===================== GAME ===================== -->
+  <section class="panel hidden" id="screenGame">
+    <div class="timer-bar">
+      <span style="font-size:1.4rem">⏳</span>
+      <div class="timer" id="timer">04:00</div>
+      <button type="button" class="btn sea small" id="btnFinish">Finish Early →</button>
+    </div>
+
+    <div class="rank-cap top"><strong>▲ Most important</strong><span class="line"></span></div>
+    <ol class="items" id="itemList"></ol>
+    <div class="rank-cap bot"><span class="line"></span><strong>Least important ▼</strong></div>
+
+    <p style="text-align:center;color:var(--driftwood);font-size:.85rem;margin:.8rem 0 0">Drag the rows or tap the ▲▼ arrows to reorder.</p>
+  </section>
+
+  <!-- ===================== RESULTS ===================== -->
+  <section class="panel hidden" id="screenResults">
+    <div id="verdict"></div>
+
+    <h3 class="section">📜 Quick Explanation</h3>
+    <p>According to the US Coast Guard, the basic supplies needed when stranded mid-ocean are articles to <strong>attract attention</strong> and <strong>aid survival</strong> until rescue arrives. A transatlantic trip takes roughly 20 days — significantly less with good winds, far more without them.</p>
+    <p>Articles for navigation are of little importance: even if a small raft could reach land, it would be impossible to store enough food and water to last that long. Without signaling devices, there is almost no chance of being spotted and rescued.</p>
+
+    <h3 class="section">🧭 You vs. the Coast Guard</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Your Choice</th>
+            <th>Coast Guard Choice</th>
+            <th>Coast Guard Justification</th>
+          </tr>
+        </thead>
+        <tbody id="resultTable"></tbody>
+      </table>
+    </div>
+
+    <div class="btn-row">
+      <button type="button" class="btn sea small" id="btnCopy">📋 Copy Summary</button>
+      <button type="button" class="btn go small" id="btnReplay">🔁 Play Again</button>
+    </div>
+    <pre class="summary-box hidden" id="summaryBox"></pre>
+  </section>
+</div>
+
+<footer class="tide">
+  Survival exercise adapted from the classic “Lost at Sea” consensus game. ·
+  <a href="../website/apps.html">← back to apps</a>
+</footer>
+
+<div class="copied-toast" id="toast">Copied to clipboard ✓</div>
+
+<script>
+"use strict";
+
+/* ============================ data ============================ */
+/* official priority 1 = most important. */
+var ITEMS = [
+  { pri:1,  label:"A shaving mirror",                         emoji:"🔲",
+    just:"Of all the items, the mirror is absolutely critical. It is the most powerful tool you have for communicating your presence. In sunlight, a simple mirror can generate five to seven million candlepower of light. The reflected sunbeam can even be seen beyond the horizon." },
+  { pri:2,  label:"A 10 litre can of oil/petrol mixture",     emoji:"🛢️",
+    just:"The second most critical item for signaling. The mixture will float on water and can be ignited using the matches." },
+  { pri:3,  label:"A 25 litre container of water",            emoji:"🌊",
+    just:"Vital to restore fluids lost through perspiration. 25 litres will supply water rations for your group for several days." },
+  { pri:4,  label:"A case of army rations",                   emoji:"🥫",
+    just:"This is your basic food intake." },
+  { pri:5,  label:"20 square feet of opaque plastic sheeting",emoji:"⬜",
+    just:"Can be used to collect rain water and shelter from the wind and waves." },
+  { pri:6,  label:"2 boxes of chocolate bars",                emoji:"🍫",
+    just:"Your reserve food supply." },
+  { pri:7,  label:"An ocean fishing kit & pole",              emoji:"🎣",
+    just:"Ranked lower than the chocolate as there is no guarantee you will catch any fish. The pole might be used as a tent pole." },
+  { pri:8,  label:"15 feet of nylon rope",                    emoji:"🪢",
+    just:"Could be used to lash people or equipment together to prevent being washed overboard. There are a variety of other uses, but none high on the list for survival." },
+  { pri:9,  label:"A floating seat cushion",                  emoji:"💺",
+    just:"Useful as a life preserver if someone fell overboard." },
+  { pri:10, label:"A can of shark repellent",                 emoji:"🦈",
+    just:"To repel sharks, of course!" },
+  { pri:11, label:"One bottle of 160 proof rum",              emoji:"🥃",
+    just:"Contains 80% alcohol — enough to be used as an antiseptic for injuries, but otherwise of little value. Very dangerous if drunk, as it would dehydrate the body, the opposite of what you need to survive." },
+  { pri:12, label:"A small transistor radio",                 emoji:"📻",
+    just:"You would be out of range of any radio station." },
+  { pri:13, label:"Maps of the Atlantic Ocean",              emoji:"🗺️",
+    just:"Worthless without navigation equipment." },
+  { pri:14, label:"A quantity of mosquito netting",           emoji:"🦟",
+    just:"There are NO mosquitoes in the middle of the Atlantic Ocean and the netting is useless for anything else." },
+  { pri:15, label:"An octant",                                emoji:"🧭",
+    just:"Useless without the relevant tables and a chronometer." }
+];
+
+var TOTAL = ITEMS.length;            // 15
+var START_SECONDS = 240;             // 4 minutes
+var SCORE_MAX = 112;                 // worst-case total displacement
+var RESCUE_THRESHOLD = 0.6;          // >= 60% => survive
+
+/* ============================ elements ============================ */
+var el = function(id){ return document.getElementById(id); };
+var screenIntro   = el("screenIntro");
+var screenGame    = el("screenGame");
+var screenResults = el("screenResults");
+var listEl        = el("itemList");
+var timerEl       = el("timer");
+var toastEl       = el("toast");
+
+var timerId = null;
+var finished = false;
+
+/* ============================ sound (WebAudio, synthesized) ============================ */
+var Sound = (function(){
+  var ctx = null, on = false, waveNode = null, waveGain = null;
+  function ac(){ if(!ctx){ var AC = window.AudioContext || window.webkitAudioContext; if(AC) ctx = new AC(); } return ctx; }
+  function blip(freq, dur, type, vol){
+    if(!on) return; var c = ac(); if(!c) return;
+    var o = c.createOscillator(), g = c.createGain();
+    o.type = type || "sine"; o.frequency.value = freq;
+    g.gain.setValueAtTime(0.0001, c.currentTime);
+    g.gain.exponentialRampToValueAtTime(vol || 0.18, c.currentTime + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + (dur || 0.15));
+    o.connect(g); g.connect(c.destination);
+    o.start(); o.stop(c.currentTime + (dur || 0.15) + 0.02);
+  }
+  function startWaves(){
+    if(!on) return; var c = ac(); if(!c || waveNode) return;
+    var buf = c.createBuffer(1, c.sampleRate*2, c.sampleRate);
+    var d = buf.getChannelData(0);
+    for(var i=0;i<d.length;i++){ d[i] = (Math.random()*2-1)*0.4; }
+    var src = c.createBufferSource(); src.buffer = buf; src.loop = true;
+    var lp = c.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=550;
+    var lfo = c.createOscillator(); lfo.frequency.value=0.18;
+    var lfoGain = c.createGain(); lfoGain.gain.value=0.05;
+    waveGain = c.createGain(); waveGain.gain.value=0.05;
+    lfo.connect(lfoGain); lfoGain.connect(waveGain.gain);
+    src.connect(lp); lp.connect(waveGain); waveGain.connect(c.destination);
+    src.start(); lfo.start();
+    waveNode = src;
+  }
+  function stopWaves(){ if(waveNode){ try{ waveNode.stop(); }catch(e){} waveNode=null; } }
+  return {
+    set:function(v){ on=v; var c=ac(); if(c && c.state==="suspended") c.resume();
+      if(on) startWaves(); else stopWaves(); },
+    isOn:function(){ return on; },
+    click:function(){ blip(420,0.08,"triangle",0.14); },
+    move:function(){ blip(300,0.06,"square",0.10); },
+    win:function(){ blip(523,0.12,"sine",0.2); setTimeout(function(){blip(659,0.12,"sine",0.2);},120); setTimeout(function(){blip(784,0.22,"sine",0.22);},250); },
+    lose:function(){ blip(330,0.18,"sawtooth",0.18); setTimeout(function(){blip(247,0.28,"sawtooth",0.18);},170); },
+    tick:function(){ blip(880,0.05,"square",0.08); }
+  };
+})();
+
+var soundBtn = el("soundToggle");
+soundBtn.addEventListener("click", function(){
+  var next = !Sound.isOn();
+  Sound.set(next);
+  soundBtn.setAttribute("aria-pressed", String(next));
+  soundBtn.textContent = next ? "🔊 Sound: On" : "🔇 Sound: Off";
+});
+
+/* ============================ helpers ============================ */
+function show(node){ node.classList.remove("hidden"); }
+function hide(node){ node.classList.add("hidden"); }
+
+function shuffle(arr){
+  var a = arr.slice();
+  for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; }
+  return a;
+}
+
+function fmtTime(total){
+  var m = Math.floor(total/60), s = total % 60;
+  return (m<10?"0":"")+m+":"+(s<10?"0":"")+s;
+}
+
+/* ============================ build list ============================ */
+function buildList(){
+  listEl.innerHTML = "";
+  listEl.classList.remove("locked");
+  var order = shuffle(ITEMS);
+  order.forEach(function(item){
+    var li = document.createElement("li");
+    li.className = "item";
+    li.dataset.pri = item.pri;
+    li.dataset.label = item.label;
+    li.dataset.emoji = item.emoji;
+    li.innerHTML =
+      '<span class="grip" aria-hidden="true">⋮⋮</span>' +
+      '<span class="emoji" aria-hidden="true">'+item.emoji+'</span>' +
+      '<span class="label">'+item.label+'</span>' +
+      '<span class="arrows">' +
+        '<button type="button" class="up" title="Move up" aria-label="Move '+item.label+' up">▲</button>' +
+        '<button type="button" class="down" title="Move down" aria-label="Move '+item.label+' down">▼</button>' +
+      '</span>';
+    listEl.appendChild(li);
+  });
+  refreshArrowState();
+}
+
+/* ---------- arrow reordering (with FLIP) ---------- */
+function attachArrows(){
+  listEl.addEventListener("click", function(e){
+    if(finished) return;
+    var btn = e.target.closest("button");
+    if(!btn) return;
+    var li = btn.closest("li.item");
+    if(!li) return;
+    if(btn.classList.contains("up") && li.previousElementSibling){
+      flipMove(function(){ listEl.insertBefore(li, li.previousElementSibling); });
+      Sound.move();
+    } else if(btn.classList.contains("down") && li.nextElementSibling){
+      flipMove(function(){ listEl.insertBefore(li.nextElementSibling, li); });
+      Sound.move();
+    }
+    refreshArrowState();
+  });
+}
+
+function refreshArrowState(){
+  var rows = listEl.querySelectorAll("li.item");
+  rows.forEach(function(li, idx){
+    var up = li.querySelector(".up"), down = li.querySelector(".down");
+    if(up) up.disabled = (idx === 0) || finished;
+    if(down) down.disabled = (idx === rows.length-1) || finished;
+  });
+}
+
+/* ---------- FLIP: animate rows sliding into their new spots ---------- */
+function flipMove(mutate){
+  var rows = Array.prototype.slice.call(listEl.querySelectorAll("li.item"));
+  var firstTop = rows.map(function(li){ return li.getBoundingClientRect().top; });
+  mutate();
+  rows.forEach(function(li, i){
+    if(li.classList.contains("lifted")) return;
+    var dy = firstTop[i] - li.getBoundingClientRect().top;
+    if(!dy) return;
+    li.classList.remove("flip");
+    li.style.transform = "translateY(" + dy + "px)";
+    requestAnimationFrame(function(){
+      li.classList.add("flip");
+      li.style.transform = "";
+    });
+  });
+}
+
+/* ---------- Pointer-based drag (mouse + touch + pen) ---------- */
+var drag = null;
+
+function attachDrag(){
+  listEl.addEventListener("pointerdown", onPointerDown);
+  listEl.addEventListener("pointermove", onPointerMove);
+  listEl.addEventListener("pointerup", onPointerUp);
+  listEl.addEventListener("pointercancel", onPointerUp);
+}
+
+function onPointerDown(e){
+  if(finished) return;
+  if(e.button != null && e.button > 0) return;          // left button / touch / pen only
+  if(e.target.closest(".arrows")) return;               // let the ▲▼ buttons work normally
+  var li = e.target.closest("li.item");
+  if(!li) return;                                        // drag from anywhere on the row
+  e.preventDefault();
+  var rect = li.getBoundingClientRect();
+  drag = {
+    li: li, pointerId: e.pointerId, active: false,
+    startX: e.clientX, startY: e.clientY,
+    offsetX: e.clientX - rect.left, offsetY: e.clientY - rect.top,
+    width: rect.width, curLeft: rect.left, curTop: rect.top
+  };
+  try { li.setPointerCapture(e.pointerId); } catch(err){}
+}
+
+function beginLift(){
+  var li = drag.li;
+  var rect = li.getBoundingClientRect();
+  var ph = document.createElement("li");
+  ph.className = "item placeholder";
+  ph.style.height = rect.height + "px";
+  listEl.insertBefore(ph, li);
+  drag.placeholder = ph;
+  li.classList.add("lifted");
+  li.style.width = drag.width + "px";
+  drag.active = true;
+  Sound.move();
+  refreshArrowState();
+}
+
+function positionLifted(x, y){
+  var left = x - drag.offsetX, top = y - drag.offsetY;
+  drag.curLeft = left; drag.curTop = top;
+  drag.li.style.transform = "translate(" + left + "px," + top + "px) scale(1.03) rotate(-.6deg)";
+}
+
+function refRowFor(y){
+  var rows = listEl.querySelectorAll("li.item:not(.lifted):not(.placeholder)");
+  for(var i=0;i<rows.length;i++){
+    var r = rows[i].getBoundingClientRect();
+    if(y < r.top + r.height/2) return rows[i];
+  }
+  return null;
+}
+
+function onPointerMove(e){
+  if(!drag || e.pointerId !== drag.pointerId) return;
+  if(!drag.active){
+    if(Math.abs(e.clientX - drag.startX) < 5 && Math.abs(e.clientY - drag.startY) < 5) return;
+    beginLift();
+  }
+  e.preventDefault();
+  positionLifted(e.clientX, e.clientY);
+
+  var ph = drag.placeholder;
+  var ref = refRowFor(e.clientY);
+  if(ref !== ph && ref !== ph.nextElementSibling){
+    flipMove(function(){ listEl.insertBefore(ph, ref); });
+    Sound.move();
+  }
+}
+
+function onPointerUp(e){
+  if(!drag || e.pointerId !== drag.pointerId) return;
+  var li = drag.li;
+  try { li.releasePointerCapture(drag.pointerId); } catch(err){}
+
+  if(drag.active){
+    var ph = drag.placeholder;
+    li.classList.remove("lifted");
+    li.style.width = "";
+    listEl.insertBefore(li, ph);
+    listEl.removeChild(ph);
+
+    // glide the card from its floating spot into the resting slot
+    var rect = li.getBoundingClientRect();
+    var dx = drag.curLeft - rect.left, dy = drag.curTop - rect.top;
+    li.classList.remove("flip");
+    li.style.transform = "translate(" + dx + "px," + dy + "px) scale(1.03) rotate(-.6deg)";
+    requestAnimationFrame(function(){
+      li.classList.add("flip");
+      li.style.transform = "";
+    });
+    li.addEventListener("transitionend", function te(){
+      li.classList.remove("flip"); li.style.transform = "";
+      li.removeEventListener("transitionend", te);
+    });
+    Sound.move();
+  }
+  drag = null;
+  refreshArrowState();
+}
+
+/* ============================ timer ============================ */
+function startTimer(){
+  var remaining = START_SECONDS;
+  timerEl.textContent = fmtTime(remaining);
+  timerEl.classList.remove("low");
+  if(timerId) clearInterval(timerId);
+  timerId = setInterval(function(){
+    remaining--;
+    timerEl.textContent = fmtTime(remaining);
+    if(remaining <= 10){ timerEl.classList.add("low"); if(remaining > 0) Sound.tick(); }
+    if(remaining <= 0){
+      clearInterval(timerId); timerId = null;
+      finishGame();
+    }
+  }, 1000);
+}
+
+/* ============================ scoring & results ============================ */
+function finishGame(){
+  if(finished) return;
+  finished = true;
+  if(timerId){ clearInterval(timerId); timerId = null; }
+
+  // cancel any in-progress drag so the list locks cleanly
+  if(drag){
+    if(drag.placeholder && drag.placeholder.parentNode) drag.placeholder.parentNode.removeChild(drag.placeholder);
+    drag.li.classList.remove("lifted","flip");
+    drag.li.style.width = ""; drag.li.style.transform = "";
+    drag = null;
+  }
+
+  // lock the list
+  listEl.classList.add("locked");
+  listEl.querySelectorAll("li.item").forEach(function(li){
+    li.classList.add("locked");
+  });
+  refreshArrowState();
+
+  var result = computeScore();
+  renderResults(result);
+
+  hide(screenGame);
+  show(screenResults);
+  window.scrollTo({ top:0, behavior:"smooth" });
+
+  if(result.survived) Sound.win(); else Sound.lose();
+}
+
+function computeScore(){
+  var rows = listEl.querySelectorAll("li.item");
+  var score = 0;
+  var player = [];
+  rows.forEach(function(li, idx){
+    var officialPri = Number(li.dataset.pri);
+    var playerRank = idx + 1;
+    score += Math.abs(officialPri - playerRank);
+    player.push({
+      rank: playerRank,
+      label: li.dataset.label,
+      emoji: li.dataset.emoji,
+      officialPri: officialPri
+    });
+  });
+  var percent = Math.abs((score / SCORE_MAX) - 1);   // 1 = perfect
+  var pct = Math.round(percent * 100);
+  return {
+    score: score,
+    percent: percent,
+    pct: pct,
+    survived: percent >= RESCUE_THRESHOLD,
+    player: player
+  };
+}
+
+function renderResults(r){
+  // verdict banner
+  var v = el("verdict");
+  v.className = "verdict " + (r.survived ? "win" : "lose");
+  v.innerHTML =
+    '<h2>'+(r.survived ? "🏝️ You survived!" : "🌊 You did not survive.")+'</h2>' +
+    '<p class="lead">You have about a <strong>'+r.pct+'%</strong> chance of being rescued.</p>' +
+    '<div class="gauge"><i style="width:'+r.pct+'%"></i></div>';
+
+  // comparison table — row N shows the player's Nth pick vs the official Nth item
+  var byPriority = ITEMS.slice().sort(function(a,b){ return a.pri - b.pri; });
+  var tbody = el("resultTable");
+  tbody.innerHTML = "";
+  for(var i=0;i<TOTAL;i++){
+    var p = r.player[i];
+    var official = byPriority[i];
+    var perfect = (p.officialPri === (i+1));
+    var delta = p.officialPri - (i+1);
+    var deltaTxt = delta === 0 ? "spot on" : (Math.abs(delta) + " off");
+    var tr = document.createElement("tr");
+    tr.innerHTML =
+      '<td class="pri">'+(i+1)+'</td>' +
+      '<td class="'+(perfect?"match":"miss")+'">'+p.emoji+' '+escapeHtml(p.label)+
+        '<div class="delta">('+deltaTxt+')</div></td>' +
+      '<td>'+official.emoji+' '+escapeHtml(official.label)+'</td>' +
+      '<td>'+escapeHtml(official.just)+'</td>';
+    tbody.appendChild(tr);
+  }
+
+  // share summary
+  buildSummary(r);
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, function(c){
+    return ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" })[c];
+  });
+}
+
+/* ============================ share summary ============================ */
+var lastSummary = "";
+function buildSummary(r){
+  var lines = [];
+  lines.push("⛵ Lost at Sea — survival result");
+  lines.push(r.survived ? "🏝️ SURVIVED — "+r.pct+"% chance of rescue"
+                        : "🌊 DID NOT SURVIVE — "+r.pct+"% chance of rescue");
+  lines.push("");
+  lines.push("My ranking (vs Coast Guard rank):");
+  r.player.forEach(function(p){
+    lines.push("  "+p.rank+". "+p.emoji+" "+p.label+"  [CG #"+p.officialPri+"]");
+  });
+  lines.push("");
+  lines.push("Can you do better? "+location.href);
+  lastSummary = lines.join("\n");
+  el("summaryBox").textContent = lastSummary;
+}
+
+function copySummary(){
+  el("summaryBox").classList.remove("hidden");
+  var done = function(){ Sound.click(); showToast(); };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(lastSummary).then(done, fallbackCopy);
+  } else {
+    fallbackCopy();
+  }
+  function fallbackCopy(){
+    var box = el("summaryBox");
+    var range = document.createRange();
+    range.selectNodeContents(box);
+    var sel = window.getSelection();
+    sel.removeAllRanges(); sel.addRange(range);
+    try{ document.execCommand("copy"); done(); }catch(e){}
+    sel.removeAllRanges();
+  }
+}
+
+var toastTimer = null;
+function showToast(){
+  toastEl.classList.add("show");
+  if(toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ toastEl.classList.remove("show"); }, 1600);
+}
+
+/* ============================ flow control ============================ */
+function startGame(){
+  finished = false;
+  buildList();
+  hide(screenIntro);
+  hide(screenResults);
+  show(screenGame);
+  el("summaryBox").classList.add("hidden");
+  startTimer();
+  Sound.click();
+  window.scrollTo({ top:0, behavior:"smooth" });
+}
+
+function replay(){
+  hide(screenResults);
+  show(screenIntro);
+  finished = false;
+  if(timerId){ clearInterval(timerId); timerId = null; }
+  window.scrollTo({ top:0, behavior:"smooth" });
+  Sound.click();
+}
+
+/* ============================ wire up ============================ */
+attachDrag();
+attachArrows();
+el("btnStart").addEventListener("click", startGame);
+el("btnFinish").addEventListener("click", function(){ Sound.click(); finishGame(); });
+el("btnReplay").addEventListener("click", replay);
+el("btnCopy").addEventListener("click", copySummary);
+</script>
+</body>
+</html>

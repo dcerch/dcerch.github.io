@@ -1,0 +1,892 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Ranked Choice Voting</title>
+<style>
+/* ============================ theme ============================ */
+:root{
+  --navy:#0a2342;        /* deep official blue   */
+  --blue:#15317a;        /* primary blue         */
+  --blue-light:#3457b2;
+  --red:#b22234;         /* old glory red        */
+  --red-dark:#8b1a2b;
+  --gold:#c9a227;        /* seal / accent gold   */
+  --paper:#f4f6fb;
+  --card:#ffffff;
+  --ink:#16203a;
+  --muted:#5a6378;
+  --line:#d3dae8;
+  --good:#1d7a46;
+  --display:Georgia,"Times New Roman","Cambria",serif;
+  --body:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--body);color:var(--ink);background:var(--paper);
+  line-height:1.5;-webkit-font-smoothing:antialiased;
+}
+a{color:var(--blue)}
+
+/* ---------- top banner ---------- */
+header.banner{
+  background:linear-gradient(180deg,var(--navy),var(--blue));
+  color:#fff;border-bottom:5px solid var(--red);position:relative;
+}
+header.banner .stripe{
+  height:6px;
+  background:repeating-linear-gradient(90deg,var(--red) 0,var(--red) 34px,#fff 34px,#fff 68px);
+  opacity:.9;
+}
+header.banner .inner{max-width:1040px;margin:0 auto;padding:1.4rem 1.2rem 1.1rem;text-align:center}
+header.banner .seal{font-size:2.6rem;line-height:1;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
+header.banner h1{
+  font-family:var(--display);font-weight:800;letter-spacing:.5px;
+  margin:.3rem 0 .15rem;font-size:clamp(1.7rem,5vw,2.6rem);text-transform:uppercase;
+}
+header.banner h1 .accent{color:var(--gold)}
+header.banner p.tag{margin:0;color:#cdd6ea;font-size:.98rem;font-style:italic}
+
+/* ---------- nav tabs ---------- */
+nav.tabs{
+  background:var(--navy);display:flex;justify-content:center;flex-wrap:wrap;
+  border-bottom:1px solid rgba(255,255,255,.12);position:sticky;top:0;z-index:20;
+}
+nav.tabs button{
+  background:none;border:none;color:#c5cee4;font-family:var(--display);
+  font-weight:700;font-size:.95rem;letter-spacing:.4px;padding:.85rem 1.3rem;
+  cursor:pointer;border-bottom:3px solid transparent;transition:color .15s,border-color .15s,background .15s;
+}
+nav.tabs button:hover{color:#fff;background:rgba(255,255,255,.06)}
+nav.tabs button.active{color:#fff;border-bottom-color:var(--gold)}
+
+/* ---------- layout ---------- */
+main{max-width:1040px;margin:0 auto;padding:1.6rem 1.1rem 3rem}
+.view{display:none;animation:fade .25s ease}
+.view.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+h2.section{
+  font-family:var(--display);font-size:1.55rem;margin:.2rem 0 1rem;color:var(--navy);
+  border-bottom:2px solid var(--line);padding-bottom:.5rem;
+}
+h2.section .tail{color:var(--red)}
+p.lead{color:var(--muted);margin-top:-.4rem}
+
+/* ---------- cards ---------- */
+.card{
+  background:var(--card);border:1px solid var(--line);border-radius:12px;
+  box-shadow:0 1px 2px rgba(16,32,64,.05),0 8px 24px rgba(16,32,64,.06);
+  padding:1.2rem;margin-bottom:1.1rem;
+}
+.card.accent-blue{border-top:4px solid var(--blue)}
+.card.accent-red{border-top:4px solid var(--red)}
+
+/* ---------- forms ---------- */
+label.fld{display:block;font-weight:700;color:var(--navy);margin:.2rem 0 .35rem;font-size:.95rem}
+input[type=text]{
+  width:100%;padding:.65rem .8rem;border:1.5px solid var(--line);border-radius:8px;
+  font-size:1rem;font-family:var(--body);background:#fff;color:var(--ink);
+}
+input[type=text]:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(21,49,122,.15)}
+.choice-row{display:flex;gap:.5rem;margin-bottom:.55rem;align-items:center}
+.choice-row .num{
+  flex:0 0 auto;width:1.9rem;height:1.9rem;border-radius:50%;display:grid;place-items:center;
+  background:var(--blue);color:#fff;font-weight:800;font-family:var(--display);font-size:.9rem;
+}
+.choice-row input{flex:1}
+
+/* ---------- buttons ---------- */
+.btn{
+  font-family:var(--body);font-weight:700;font-size:.95rem;cursor:pointer;
+  border:1.5px solid transparent;border-radius:8px;padding:.62rem 1.1rem;
+  display:inline-flex;align-items:center;gap:.4rem;transition:filter .15s,transform .05s,background .15s;
+}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-primary:hover{filter:brightness(1.1)}
+.btn-red{background:var(--red);color:#fff}
+.btn-red:hover{filter:brightness(1.08)}
+.btn-gold{background:var(--gold);color:#3a2e05}
+.btn-gold:hover{filter:brightness(1.05)}
+.btn-ghost{background:#fff;color:var(--blue);border-color:var(--blue)}
+.btn-ghost:hover{background:rgba(21,49,122,.06)}
+.btn-ghost-red{background:#fff;color:var(--red);border-color:var(--red)}
+.btn-ghost-red:hover{background:rgba(178,34,52,.07)}
+.btn-sm{padding:.4rem .7rem;font-size:.85rem}
+.btn-block{display:flex;width:100%;justify-content:center}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn-bar{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.4rem}
+.icon-btn{
+  background:none;border:1.5px solid var(--line);border-radius:8px;cursor:pointer;
+  width:2rem;height:2rem;display:grid;place-items:center;color:var(--red);font-size:1.1rem;font-weight:800;
+}
+.icon-btn:hover{background:rgba(178,34,52,.07);border-color:var(--red)}
+
+/* ---------- badges / chips ---------- */
+.badge{
+  display:inline-block;font-family:var(--display);font-weight:700;font-size:.78rem;
+  letter-spacing:.5px;padding:.18rem .55rem;border-radius:6px;background:var(--navy);color:#fff;
+}
+.badge.id{background:#eef1f8;color:var(--blue);border:1px solid var(--line);font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:1px}
+.chip{display:inline-block;font-size:.82rem;color:var(--muted);background:#eef1f8;border:1px solid var(--line);border-radius:20px;padding:.12rem .6rem;margin:.1rem .15rem}
+
+/* ---------- poll list ---------- */
+.poll-grid{display:grid;gap:1rem;grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
+.poll-item{display:flex;flex-direction:column;gap:.6rem}
+.poll-item h3{font-family:var(--display);margin:.1rem 0;color:var(--navy);font-size:1.2rem}
+.poll-meta{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center}
+.poll-actions{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:auto}
+.empty-state{text-align:center;color:var(--muted);padding:2.4rem 1rem;border:2px dashed var(--line);border-radius:12px}
+.empty-state .seal{font-size:2.4rem}
+
+/* ---------- ranking ballot list ---------- */
+.ballot-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.6rem;margin-bottom:.4rem}
+ol.items{list-style:none;margin:.4rem 0 0;padding:0;counter-reset:rank;position:relative}
+li.item{
+  counter-increment:rank;display:flex;align-items:center;gap:.7rem;
+  background:#fff;border:1.5px solid var(--line);border-left:5px solid var(--blue);
+  border-radius:10px;padding:.6rem .75rem;margin-bottom:.55rem;
+  box-shadow:0 1px 2px rgba(16,32,64,.05);touch-action:none;cursor:grab;
+}
+li.item.lifted,li.item.placeholder{cursor:default}
+li.item::before{
+  content:counter(rank);flex:0 0 auto;width:1.9rem;height:1.9rem;border-radius:50%;
+  display:grid;place-items:center;font-weight:800;font-family:var(--display);
+  background:var(--blue);color:#fff;font-size:.95rem;box-shadow:inset 0 0 0 2px rgba(255,255,255,.35);
+}
+li.item .grip{color:#9aa3b8;font-size:1.1rem;user-select:none}
+li.item .label{flex:1;font-size:1rem;line-height:1.25}
+li.item .arrows{display:flex;flex-direction:column;gap:3px;flex:0 0 auto}
+li.item .arrows button{
+  font-family:var(--display);font-weight:800;line-height:1;cursor:pointer;
+  width:1.9rem;height:1.2rem;border:1.5px solid var(--line);border-radius:6px;
+  background:#f3f5fb;color:var(--blue);display:grid;place-items:center;font-size:.65rem;padding:0;
+}
+li.item .arrows button:hover{filter:brightness(.97);border-color:var(--blue)}
+li.item .arrows button:active{transform:translateY(1px)}
+li.item .arrows button:disabled{opacity:.35;cursor:not-allowed}
+li.item.flip{transition:transform .2s cubic-bezier(.2,.7,.3,1)}
+li.item.lifted{
+  position:fixed;left:0;top:0;margin:0;z-index:50;counter-increment:none;
+  box-shadow:0 14px 28px rgba(10,35,66,.32),0 0 0 2px var(--blue-light);
+  cursor:grabbing;pointer-events:none;transition:none;background:#fff;
+}
+li.item.placeholder{
+  background:repeating-linear-gradient(135deg,rgba(21,49,122,.12),rgba(21,49,122,.12) 10px,rgba(21,49,122,.04) 10px,rgba(21,49,122,.04) 20px);
+  border:2px dashed var(--blue-light);border-left:5px dashed var(--blue-light);box-shadow:none;
+}
+li.item.placeholder>*{visibility:hidden}
+
+/* ---------- results ---------- */
+.winner-banner{
+  text-align:center;border-radius:14px;padding:1.3rem 1rem;margin:.4rem 0 1.4rem;
+  background:linear-gradient(180deg,#eef3ff,#e3ebff);border:2px solid var(--blue);
+}
+.winner-banner.tie{background:linear-gradient(180deg,#fdeef0,#fbe2e6);border-color:var(--red)}
+.winner-banner .seal{font-size:2rem}
+.winner-banner .who{font-family:var(--display);font-size:clamp(1.5rem,5vw,2.2rem);font-weight:800;color:var(--navy);margin:.2rem 0}
+.winner-banner.tie .who{color:var(--red-dark)}
+.winner-banner .sub{color:var(--muted);margin:0}
+
+.round{margin-bottom:1.1rem}
+.round h4{font-family:var(--display);color:var(--navy);margin:.2rem 0 .5rem;font-size:1.1rem;display:flex;align-items:center;gap:.5rem}
+.round h4 .pill{font-size:.72rem;background:var(--blue);color:#fff;padding:.12rem .5rem;border-radius:20px;font-family:var(--body);font-weight:700}
+.tally-row{display:flex;align-items:center;gap:.7rem;margin-bottom:.4rem}
+.tally-row .name{flex:0 0 38%;max-width:38%;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tally-row.elim .name{color:var(--red-dark);text-decoration:line-through}
+.tally-row.win .name{color:var(--good);font-weight:800}
+.bar-wrap{flex:1;height:18px;background:#eef1f8;border-radius:9px;overflow:hidden;border:1px solid var(--line)}
+.bar-wrap > i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,var(--blue-light),var(--blue))}
+.tally-row.elim .bar-wrap > i{background:linear-gradient(90deg,#d98a93,var(--red))}
+.tally-row.win .bar-wrap > i{background:linear-gradient(90deg,#4cae74,var(--good))}
+.tally-row .cnt{flex:0 0 auto;font-variant-numeric:tabular-nums;font-weight:700;min-width:3.6rem;text-align:right;font-size:.9rem}
+.round .note{font-size:.86rem;color:var(--muted);margin:.45rem 0 0}
+.maj-line{font-size:.85rem;color:var(--muted);margin:.1rem 0 .6rem}
+
+/* ---------- selectors ---------- */
+.poll-picker{display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:1rem}
+select{
+  padding:.6rem .7rem;border:1.5px solid var(--line);border-radius:8px;font-size:1rem;
+  background:#fff;color:var(--ink);font-family:var(--body);min-width:220px;
+}
+select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(21,49,122,.15)}
+
+/* ---------- toast ---------- */
+#toast{
+  position:fixed;left:50%;bottom:1.4rem;transform:translateX(-50%);
+  background:var(--navy);color:#fff;padding:.7rem 1.1rem;border-radius:10px;
+  box-shadow:0 10px 30px rgba(10,35,66,.35);font-weight:600;font-size:.92rem;
+  opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:80;border-left:4px solid var(--gold);
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
+
+/* ---------- explainer ---------- */
+.steps{counter-reset:step;list-style:none;padding:0;margin:.5rem 0}
+.steps li{counter-increment:step;position:relative;padding:.6rem 0 .6rem 2.6rem;border-bottom:1px solid var(--line)}
+.steps li:last-child{border-bottom:none}
+.steps li::before{
+  content:counter(step);position:absolute;left:0;top:.55rem;width:1.9rem;height:1.9rem;border-radius:50%;
+  background:var(--red);color:#fff;display:grid;place-items:center;font-weight:800;font-family:var(--display);
+}
+.two-col{display:grid;gap:1rem;grid-template-columns:1fr}
+@media(min-width:760px){.two-col{grid-template-columns:1fr 1fr}}
+
+footer.site{
+  text-align:center;color:var(--muted);font-size:.85rem;padding:1.4rem 1rem 2.2rem;border-top:1px solid var(--line);
+}
+.hr{height:1px;background:var(--line);border:none;margin:1.1rem 0}
+.danger-zone{border:1.5px solid var(--red);border-radius:12px;padding:1rem;background:rgba(178,34,52,.04)}
+.danger-zone h3{color:var(--red-dark);font-family:var(--display);margin:.1rem 0 .5rem}
+</style>
+</head>
+<body>
+
+<header class="banner">
+  <div class="inner">
+    <div class="seal">&#128499;&#65039;</div>
+    <h1>Ranked&nbsp;Choice <span class="accent">Voting</span></h1>
+    <p class="tag">An official-style instant-runoff election simulator &mdash; all data stays in your browser</p>
+  </div>
+  <div class="stripe"></div>
+</header>
+
+<nav class="tabs" id="tabs">
+  <button data-view="polls" class="active">Polls</button>
+  <button data-view="create">Create</button>
+  <button data-view="vote">Vote</button>
+  <button data-view="results">Results</button>
+  <button data-view="about">How It Works</button>
+</nav>
+
+<main>
+
+  <!-- ============================ POLLS ============================ -->
+  <section class="view active" id="view-polls">
+    <h2 class="section">Registered <span class="tail">Polls</span></h2>
+    <p class="lead">Every poll you create is stored locally. Pick one to cast ballots or certify results.</p>
+    <div class="btn-bar" style="margin-bottom:1.2rem">
+      <button class="btn btn-primary" onclick="go('create')">&#65291; New Poll</button>
+      <button class="btn btn-ghost" onclick="addSampleData()">Load Sample Poll</button>
+    </div>
+    <div id="pollList"></div>
+
+    <hr class="hr">
+    <div class="two-col">
+      <div class="card">
+        <h3 style="font-family:var(--display);color:var(--navy);margin:.1rem 0 .6rem">Data Portability</h3>
+        <p style="color:var(--muted);font-size:.9rem;margin-top:0">Back up every poll &amp; ballot, or restore from a file.</p>
+        <div class="btn-bar">
+          <button class="btn btn-ghost btn-sm" onclick="exportData()">&#11020; Export JSON</button>
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('importFile').click()">&#11021; Import JSON</button>
+          <input type="file" id="importFile" accept="application/json,.json" style="display:none" onchange="importData(event)">
+        </div>
+      </div>
+      <div class="danger-zone">
+        <h3>Danger Zone</h3>
+        <p style="color:var(--muted);font-size:.9rem;margin-top:0">Permanently erase all polls and ballots from this browser.</p>
+        <button class="btn btn-red btn-sm" onclick="resetAll()">Clear All Data</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ CREATE ============================ -->
+  <section class="view" id="view-create">
+    <h2 class="section">Charter a <span class="tail">New Poll</span></h2>
+    <div class="card accent-blue">
+      <label class="fld" for="pollName">Name of Poll / Ballot Measure</label>
+      <input type="text" id="pollName" placeholder="e.g. City Council Election 2026" autocomplete="off">
+      <hr class="hr">
+      <label class="fld">Candidates / Choices to Rank</label>
+      <p style="color:var(--muted);font-size:.85rem;margin-top:-.2rem">At least two are required.</p>
+      <div id="choiceList"></div>
+      <div class="btn-bar">
+        <button class="btn btn-ghost btn-sm" onclick="addChoiceInput()">&#65291; Add Choice</button>
+      </div>
+      <hr class="hr">
+      <div class="btn-bar">
+        <button class="btn btn-primary" onclick="createPoll()">Certify &amp; Create Poll</button>
+        <button class="btn btn-ghost" onclick="go('polls')">Cancel</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ VOTE ============================ -->
+  <section class="view" id="view-vote">
+    <h2 class="section">Cast a <span class="tail">Ballot</span></h2>
+    <div class="poll-picker">
+      <div>
+        <label class="fld" for="votePoll">Select Poll</label>
+        <select id="votePoll" onchange="renderBallot()"></select>
+      </div>
+    </div>
+    <div id="voteBody"></div>
+  </section>
+
+  <!-- ============================ RESULTS ============================ -->
+  <section class="view" id="view-results">
+    <h2 class="section">Certified <span class="tail">Results</span></h2>
+    <div class="poll-picker">
+      <div>
+        <label class="fld" for="resultsPoll">Select Poll</label>
+        <select id="resultsPoll" onchange="renderResults()"></select>
+      </div>
+    </div>
+    <div id="resultsBody"></div>
+  </section>
+
+  <!-- ============================ ABOUT ============================ -->
+  <section class="view" id="view-about">
+    <h2 class="section">How Ranked Choice <span class="tail">Voting</span> Works</h2>
+    <div class="card accent-red">
+      <p>Ranked choice voting (also called <strong>instant-runoff voting</strong>) lets voters rank candidates in order of preference instead of choosing only one. Votes are then counted in rounds:</p>
+      <ol class="steps">
+        <li>If a candidate wins an outright majority of first-preference votes (50% + 1), they are declared the winner.</li>
+        <li>If no candidate has a majority, the candidate with the fewest first-preference votes is eliminated.</li>
+        <li>Ballots for the eliminated candidate transfer to each voter's next-ranked surviving choice.</li>
+        <li>A new tally is conducted to check whether any candidate now holds a majority.</li>
+        <li>The process repeats, round by round, until a candidate secures a majority of the remaining votes.</li>
+      </ol>
+      <p class="maj-line">A ballot that runs out of ranked surviving choices is set aside as <em>exhausted</em> and no longer counts toward the majority threshold.</p>
+    </div>
+  </section>
+
+</main>
+
+<div id="toast"></div>
+
+<footer class="site">
+  Ranked Choice Voting &mdash; client-side instant-runoff simulator. No servers, no tracking; all polls live in your browser's local storage.
+</footer>
+
+<script>
+"use strict";
+/* ============================ storage ============================ */
+var STORE_KEY = "rcv.polls.v1";
+
+function loadPolls(){
+  try{ var d = JSON.parse(localStorage.getItem(STORE_KEY)); return Array.isArray(d) ? d : []; }
+  catch(e){ return []; }
+}
+function savePolls(polls){ localStorage.setItem(STORE_KEY, JSON.stringify(polls)); }
+function getPoll(id){ return loadPolls().filter(function(p){return p.id===id;})[0] || null; }
+function upsertPoll(poll){
+  var polls = loadPolls();
+  var i = polls.map(function(p){return p.id;}).indexOf(poll.id);
+  if(i>=0) polls[i] = poll; else polls.push(poll);
+  savePolls(polls);
+}
+function genId(){
+  var existing = loadPolls().map(function(p){return p.id;});
+  var id;
+  do{
+    id = "";
+    for(var i=0;i<6;i++) id += "ABCDEFGHJKLMNPQRSTUVWXYZ23456789".charAt(Math.floor(Math.random()*32));
+  } while(existing.indexOf(id)>=0);
+  return id;
+}
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g,function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+  });
+}
+
+/* ============================ navigation ============================ */
+var currentView = "polls";
+function go(view){
+  currentView = view;
+  var views = document.querySelectorAll(".view");
+  for(var i=0;i<views.length;i++) views[i].classList.toggle("active", views[i].id === "view-"+view);
+  var btns = document.querySelectorAll("#tabs button");
+  for(var j=0;j<btns.length;j++) btns[j].classList.toggle("active", btns[j].getAttribute("data-view")===view);
+  if(view==="polls")   renderPollList();
+  if(view==="vote")    { populatePollSelect("votePoll"); renderBallot(); }
+  if(view==="results") { populatePollSelect("resultsPoll"); renderResults(); }
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+document.getElementById("tabs").addEventListener("click", function(e){
+  var b = e.target.closest("button[data-view]");
+  if(b) go(b.getAttribute("data-view"));
+});
+
+function toast(msg){
+  var t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(toast._t);
+  toast._t = setTimeout(function(){ t.classList.remove("show"); }, 2200);
+}
+
+/* ============================ polls list ============================ */
+function renderPollList(){
+  var polls = loadPolls();
+  var host = document.getElementById("pollList");
+  if(!polls.length){
+    host.innerHTML =
+      '<div class="empty-state"><div class="seal">&#128499;&#65039;</div>'+
+      '<p>No polls on record yet.<br>Create one or load a sample to begin.</p></div>';
+    return;
+  }
+  // newest first
+  polls = polls.slice().sort(function(a,b){ return (b.created||0)-(a.created||0); });
+  var html = '<div class="poll-grid">';
+  polls.forEach(function(p){
+    html +=
+      '<div class="card poll-item accent-blue">'+
+        '<div class="poll-meta">'+
+          '<span class="badge id">'+escapeHtml(p.id)+'</span>'+
+          '<span class="chip">'+p.choices.length+' choices</span>'+
+          '<span class="chip">'+p.ballots.length+' ballot'+(p.ballots.length===1?'':'s')+'</span>'+
+        '</div>'+
+        '<h3>'+escapeHtml(p.name)+'</h3>'+
+        '<div class="poll-actions">'+
+          '<button class="btn btn-primary btn-sm" onclick="openVote(\''+p.id+'\')">Vote</button>'+
+          '<button class="btn btn-gold btn-sm" onclick="openResults(\''+p.id+'\')">Results</button>'+
+          '<button class="btn btn-ghost-red btn-sm" onclick="deletePoll(\''+p.id+'\')">Delete</button>'+
+        '</div>'+
+      '</div>';
+  });
+  html += '</div>';
+  host.innerHTML = html;
+}
+
+function deletePoll(id){
+  var p = getPoll(id);
+  if(!p) return;
+  if(!confirm('Delete the poll "'+p.name+'" and all its ballots? This cannot be undone.')) return;
+  savePolls(loadPolls().filter(function(x){return x.id!==id;}));
+  renderPollList();
+  toast("Poll deleted");
+}
+
+function openVote(id){ go("vote"); document.getElementById("votePoll").value = id; renderBallot(); }
+function openResults(id){ go("results"); document.getElementById("resultsPoll").value = id; renderResults(); }
+
+/* ============================ create ============================ */
+function addChoiceInput(value){
+  var list = document.getElementById("choiceList");
+  var row = document.createElement("div");
+  row.className = "choice-row";
+  row.innerHTML =
+    '<span class="num"></span>'+
+    '<input type="text" placeholder="Candidate or choice name" autocomplete="off">'+
+    '<button class="icon-btn" title="Remove" type="button">&times;</button>';
+  row.querySelector(".icon-btn").addEventListener("click", function(){
+    row.remove(); renumberChoices();
+  });
+  if(value) row.querySelector("input").value = value;
+  list.appendChild(row);
+  renumberChoices();
+}
+function renumberChoices(){
+  var rows = document.querySelectorAll("#choiceList .choice-row");
+  rows.forEach(function(r,i){ r.querySelector(".num").textContent = i+1; });
+}
+function resetCreateForm(){
+  document.getElementById("pollName").value = "";
+  document.getElementById("choiceList").innerHTML = "";
+  addChoiceInput(); addChoiceInput(); addChoiceInput();
+}
+function createPoll(){
+  var name = document.getElementById("pollName").value.trim();
+  if(!name){ toast("Please name the poll"); return; }
+  var choices = [];
+  document.querySelectorAll("#choiceList input").forEach(function(inp){
+    var v = inp.value.trim();
+    if(v) choices.push(v);
+  });
+  if(choices.length < 2){ toast("Add at least two choices"); return; }
+  var poll = { id:genId(), name:name, choices:choices, ballots:[], created:Date.now() };
+  upsertPoll(poll);
+  toast('Poll created \u2014 ID '+poll.id);
+  resetCreateForm();
+  openVote(poll.id);
+}
+
+/* ============================ poll selects ============================ */
+function populatePollSelect(selId){
+  var sel = document.getElementById(selId);
+  var prev = sel.value;
+  var polls = loadPolls().slice().sort(function(a,b){ return (b.created||0)-(a.created||0); });
+  sel.innerHTML = "";
+  if(!polls.length){
+    var o = document.createElement("option");
+    o.value=""; o.textContent="\u2014 no polls yet \u2014"; sel.appendChild(o);
+    return;
+  }
+  polls.forEach(function(p){
+    var o = document.createElement("option");
+    o.value = p.id; o.textContent = p.name + "  ["+p.id+"]";
+    sel.appendChild(o);
+  });
+  if(prev && polls.some(function(p){return p.id===prev;})) sel.value = prev;
+}
+
+/* ============================ ballot (drag to rank) ============================ */
+var listEl = null; // active ballot <ol>
+
+function shuffled(arr){
+  var a = arr.slice();
+  for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i];a[i]=a[j];a[j]=t; }
+  return a;
+}
+
+function renderBallot(){
+  var host = document.getElementById("voteBody");
+  var id = document.getElementById("votePoll").value;
+  var poll = getPoll(id);
+  if(!poll){
+    host.innerHTML = '<div class="empty-state"><div class="seal">&#128203;</div><p>No poll selected. '+
+      '<a href="#" onclick="go(\'create\');return false;">Create one</a> first.</p></div>';
+    return;
+  }
+  var order = shuffled(poll.choices.map(function(_,i){return i;}));
+  var rows = order.map(function(idx){
+    return '<li class="item" data-idx="'+idx+'">'+
+      '<span class="grip">\u22ee\u22ee</span>'+
+      '<span class="label">'+escapeHtml(poll.choices[idx])+'</span>'+
+      '<span class="arrows">'+
+        '<button type="button" class="up" title="Move up">\u25b2</button>'+
+        '<button type="button" class="down" title="Move down">\u25bc</button>'+
+      '</span></li>';
+  }).join("");
+  host.innerHTML =
+    '<div class="card accent-blue">'+
+      '<div class="ballot-head">'+
+        '<div><strong style="font-family:var(--display);color:var(--navy);font-size:1.1rem">'+escapeHtml(poll.name)+'</strong>'+
+          '<div style="color:var(--muted);font-size:.85rem">Drag rows or use \u25b2\u25bc to rank from most (1) to least preferred.</div></div>'+
+        '<span class="badge id">'+escapeHtml(poll.id)+'</span>'+
+      '</div>'+
+      '<ol class="items" id="ballotList">'+rows+'</ol>'+
+      '<hr class="hr">'+
+      '<div class="btn-bar">'+
+        '<button class="btn btn-red" onclick="submitBallot(\''+poll.id+'\')">Submit Ballot</button>'+
+        '<button class="btn btn-ghost" onclick="renderBallot()">Shuffle / Reset</button>'+
+        '<button class="btn btn-gold" onclick="openResults(\''+poll.id+'\')">View Results</button>'+
+      '</div>'+
+      '<p style="color:var(--muted);font-size:.85rem;margin:.7rem 0 0">'+
+        poll.ballots.length+' ballot'+(poll.ballots.length===1?'':'s')+' cast so far. Submit as many as you like to simulate multiple voters.</p>'+
+    '</div>';
+  listEl = document.getElementById("ballotList");
+  attachArrows();
+  attachDrag();
+  refreshArrowState();
+}
+
+function submitBallot(id){
+  var poll = getPoll(id);
+  if(!poll || !listEl) return;
+  var ranking = [];
+  listEl.querySelectorAll("li.item").forEach(function(li){
+    ranking.push(parseInt(li.getAttribute("data-idx"),10));
+  });
+  poll.ballots.push(ranking);
+  upsertPoll(poll);
+  toast("Ballot recorded \u2713 ("+poll.ballots.length+" total)");
+  renderBallot();
+}
+
+/* ---------- arrow reordering ---------- */
+function attachArrows(){
+  listEl.addEventListener("click", function(e){
+    var btn = e.target.closest(".arrows button"); if(!btn) return;
+    var li = e.target.closest("li.item"); if(!li) return;
+    if(btn.classList.contains("up") && li.previousElementSibling){
+      flipMove(function(){ listEl.insertBefore(li, li.previousElementSibling); });
+    } else if(btn.classList.contains("down") && li.nextElementSibling){
+      flipMove(function(){ listEl.insertBefore(li.nextElementSibling, li); });
+    }
+    refreshArrowState();
+  });
+}
+function refreshArrowState(){
+  var rows = listEl.querySelectorAll("li.item");
+  rows.forEach(function(li, idx){
+    var up = li.querySelector(".up"), down = li.querySelector(".down");
+    if(up) up.disabled = (idx===0);
+    if(down) down.disabled = (idx===rows.length-1);
+  });
+}
+
+/* ---------- FLIP animation ---------- */
+function flipMove(mutate){
+  var rows = Array.prototype.slice.call(listEl.querySelectorAll("li.item"));
+  var firstTop = rows.map(function(li){ return li.getBoundingClientRect().top; });
+  mutate();
+  rows.forEach(function(li, i){
+    if(li.classList.contains("lifted")) return;
+    var dy = firstTop[i] - li.getBoundingClientRect().top;
+    if(!dy) return;
+    li.classList.remove("flip");
+    li.style.transform = "translateY("+dy+"px)";
+    requestAnimationFrame(function(){ li.classList.add("flip"); li.style.transform=""; });
+  });
+}
+
+/* ---------- pointer drag (mouse + touch + pen) ---------- */
+var drag = null;
+function attachDrag(){
+  listEl.addEventListener("pointerdown", onPointerDown);
+  listEl.addEventListener("pointermove", onPointerMove);
+  listEl.addEventListener("pointerup", onPointerUp);
+  listEl.addEventListener("pointercancel", onPointerUp);
+}
+function onPointerDown(e){
+  if(e.button != null && e.button > 0) return;
+  if(e.target.closest(".arrows")) return;
+  var li = e.target.closest("li.item"); if(!li) return;
+  e.preventDefault();
+  var rect = li.getBoundingClientRect();
+  drag = { li:li, pointerId:e.pointerId, active:false, startX:e.clientX, startY:e.clientY,
+    offsetX:e.clientX-rect.left, offsetY:e.clientY-rect.top, width:rect.width, curLeft:rect.left, curTop:rect.top };
+  try{ li.setPointerCapture(e.pointerId); }catch(err){}
+}
+function beginLift(){
+  var li = drag.li, rect = li.getBoundingClientRect();
+  var ph = document.createElement("li");
+  ph.className = "item placeholder";
+  ph.style.height = rect.height+"px";
+  listEl.insertBefore(ph, li);
+  drag.placeholder = ph;
+  li.classList.add("lifted");
+  li.style.width = drag.width+"px";
+  drag.active = true;
+  refreshArrowState();
+}
+function positionLifted(x,y){
+  var left = x-drag.offsetX, top = y-drag.offsetY;
+  drag.curLeft = left; drag.curTop = top;
+  drag.li.style.transform = "translate("+left+"px,"+top+"px) scale(1.02) rotate(-.5deg)";
+}
+function refRowFor(y){
+  var rows = listEl.querySelectorAll("li.item:not(.lifted):not(.placeholder)");
+  for(var i=0;i<rows.length;i++){
+    var r = rows[i].getBoundingClientRect();
+    if(y < r.top + r.height/2) return rows[i];
+  }
+  return null;
+}
+function onPointerMove(e){
+  if(!drag || e.pointerId!==drag.pointerId) return;
+  if(!drag.active){
+    if(Math.abs(e.clientX-drag.startX)<5 && Math.abs(e.clientY-drag.startY)<5) return;
+    beginLift();
+  }
+  e.preventDefault();
+  positionLifted(e.clientX, e.clientY);
+  var ph = drag.placeholder, ref = refRowFor(e.clientY);
+  if(ref!==ph && ref!==ph.nextElementSibling){
+    flipMove(function(){ listEl.insertBefore(ph, ref); });
+  }
+}
+function onPointerUp(e){
+  if(!drag || e.pointerId!==drag.pointerId) return;
+  var li = drag.li;
+  try{ li.releasePointerCapture(drag.pointerId); }catch(err){}
+  if(drag.active){
+    var ph = drag.placeholder;
+    li.classList.remove("lifted");
+    li.style.width = "";
+    listEl.insertBefore(li, ph);
+    listEl.removeChild(ph);
+    var rect = li.getBoundingClientRect();
+    var dx = drag.curLeft-rect.left, dy = drag.curTop-rect.top;
+    li.classList.remove("flip");
+    li.style.transform = "translate("+dx+"px,"+dy+"px) scale(1.02) rotate(-.5deg)";
+    requestAnimationFrame(function(){ li.classList.add("flip"); li.style.transform=""; });
+    li.addEventListener("transitionend", function te(){ li.classList.remove("flip"); li.style.transform=""; li.removeEventListener("transitionend", te); });
+  }
+  drag = null;
+  refreshArrowState();
+}
+
+/* ============================ RCV tabulation ============================ */
+function runRCV(poll){
+  var n = poll.choices.length;
+  var ballots = poll.ballots.map(function(b){ return b.slice(); });
+  var eliminated = {};
+  var rounds = [];
+  var winner = null, tie = null, guard = 0;
+
+  while(guard++ < 1000){
+    var tally = new Array(n).fill(0);
+    var exhausted = 0;
+    ballots.forEach(function(b){
+      var pick = -1;
+      for(var k=0;k<b.length;k++){ if(!eliminated[b[k]]){ pick=b[k]; break; } }
+      if(pick<0) exhausted++; else tally[pick]++;
+    });
+    var active = [];
+    for(var i=0;i<n;i++) if(!eliminated[i]) active.push(i);
+    var totalActive = active.reduce(function(s,i){ return s+tally[i]; }, 0);
+
+    var leader = active[0];
+    active.forEach(function(i){ if(tally[i]>tally[leader]) leader=i; });
+
+    var roundData = { tally:tally.slice(), active:active.slice(), exhausted:exhausted,
+      totalActive:totalActive, eliminated:[], winner:null, tie:null };
+
+    if(active.length===1){
+      winner = active[0]; roundData.winner = winner; rounds.push(roundData); break;
+    }
+    if(totalActive>0 && tally[leader] > totalActive/2){
+      winner = leader; roundData.winner = winner; rounds.push(roundData); break;
+    }
+    var min = Infinity;
+    active.forEach(function(i){ if(tally[i]<min) min=tally[i]; });
+    var losers = active.filter(function(i){ return tally[i]===min; });
+    if(losers.length === active.length){
+      tie = active.slice(); roundData.tie = tie; rounds.push(roundData); break;
+    }
+    losers.forEach(function(i){ eliminated[i]=true; });
+    roundData.eliminated = losers.slice();
+    rounds.push(roundData);
+  }
+  return { rounds:rounds, winner:winner, tie:tie };
+}
+
+function renderResults(){
+  var host = document.getElementById("resultsBody");
+  var id = document.getElementById("resultsPoll").value;
+  var poll = getPoll(id);
+  if(!poll){
+    host.innerHTML = '<div class="empty-state"><div class="seal">&#128202;</div><p>No poll selected.</p></div>';
+    return;
+  }
+  if(!poll.ballots.length){
+    host.innerHTML =
+      '<div class="card accent-red"><div class="empty-state" style="border:none;padding:1rem">'+
+      '<div class="seal">&#128499;&#65039;</div><p>No ballots have been cast for <strong>'+escapeHtml(poll.name)+'</strong> yet.</p>'+
+      '<button class="btn btn-primary" onclick="openVote(\''+poll.id+'\')">Cast the First Ballot</button></div></div>';
+    return;
+  }
+
+  var res = runRCV(poll);
+  var html = "";
+
+  // winner / tie banner
+  if(res.winner != null){
+    var finalRound = res.rounds[res.rounds.length-1];
+    var pct = finalRound.totalActive ? Math.round(finalRound.tally[res.winner]/finalRound.totalActive*1000)/10 : 0;
+    html +=
+      '<div class="winner-banner"><div class="seal">&#127942;</div>'+
+      '<div class="sub">Winner by majority &mdash; '+poll.ballots.length+' ballot'+(poll.ballots.length===1?'':'s')+', '+res.rounds.length+' round'+(res.rounds.length===1?'':'s')+'</div>'+
+      '<div class="who">'+escapeHtml(poll.choices[res.winner])+'</div>'+
+      '<div class="sub">'+finalRound.tally[res.winner]+' votes &middot; '+pct+'% of the final tally</div></div>';
+  } else if(res.tie){
+    html +=
+      '<div class="winner-banner tie"><div class="seal">&#9878;&#65039;</div>'+
+      '<div class="sub">No majority &mdash; the contest ends in a tie</div>'+
+      '<div class="who">'+res.tie.map(function(i){return escapeHtml(poll.choices[i]);}).join(" &middot; ")+'</div>'+
+      '<div class="sub">'+poll.ballots.length+' ballot'+(poll.ballots.length===1?'':'s')+' cast</div></div>';
+  }
+
+  // round-by-round
+  res.rounds.forEach(function(rd, ri){
+    var maj = Math.floor(rd.totalActive/2)+1;
+    var sorted = rd.active.slice().sort(function(a,b){ return rd.tally[b]-rd.tally[a]; });
+    var maxTally = Math.max.apply(null, rd.active.map(function(i){return rd.tally[i];}).concat([1]));
+    html += '<div class="card round">';
+    html += '<h4><span class="pill">Round '+(ri+1)+'</span> '+rd.totalActive+' active vote'+(rd.totalActive===1?'':'s')+'</h4>';
+    html += '<div class="maj-line">Majority needed: <strong>'+maj+'</strong>'+
+            (rd.exhausted? ' &middot; Exhausted ballots: '+rd.exhausted : '')+'</div>';
+    sorted.forEach(function(i){
+      var isElim = rd.eliminated.indexOf(i)>=0;
+      var isWin = (rd.winner===i);
+      var isTie = rd.tie && rd.tie.indexOf(i)>=0;
+      var cls = isWin ? "win" : (isElim ? "elim" : "");
+      var pct = rd.totalActive ? Math.round(rd.tally[i]/rd.totalActive*100) : 0;
+      var w = Math.round(rd.tally[i]/maxTally*100);
+      html += '<div class="tally-row '+cls+'">'+
+        '<span class="name" title="'+escapeHtml(poll.choices[i])+'">'+escapeHtml(poll.choices[i])+
+          (isWin?' \u2714':'')+(isElim?' \u2716':'')+(isTie?' \u2696':'')+'</span>'+
+        '<span class="bar-wrap"><i style="width:'+w+'%"></i></span>'+
+        '<span class="cnt">'+rd.tally[i]+' ('+pct+'%)</span></div>';
+    });
+    if(rd.winner!=null){
+      html += '<p class="note">\u2714 <strong>'+escapeHtml(poll.choices[rd.winner])+'</strong> reached a majority and is declared the winner.</p>';
+    } else if(rd.tie){
+      html += '<p class="note">\u2696 All remaining candidates are tied \u2014 no winner can be determined.</p>';
+    } else if(rd.eliminated.length){
+      html += '<p class="note">\u2716 Eliminated: <strong>'+
+        rd.eliminated.map(function(i){return escapeHtml(poll.choices[i]);}).join(", ")+
+        '</strong>. Their ballots transfer to the next surviving choice.</p>';
+    }
+    html += '</div>';
+  });
+
+  host.innerHTML = html;
+}
+
+/* ============================ export / import / reset / sample ============================ */
+function exportData(){
+  var data = { app:"ranked-choice-voting", version:1, exported:new Date().toISOString(), polls:loadPolls() };
+  var blob = new Blob([JSON.stringify(data,null,2)], {type:"application/json"});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+  a.href = url; a.download = "rcv-polls-"+new Date().toISOString().slice(0,10)+".json";
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+  toast("Exported "+loadPolls().length+" poll(s)");
+}
+function importData(evt){
+  var file = evt.target.files && evt.target.files[0];
+  if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(){
+    try{
+      var data = JSON.parse(reader.result);
+      var incoming = Array.isArray(data) ? data : (data.polls||[]);
+      if(!Array.isArray(incoming) || !incoming.length){ toast("No polls found in file"); return; }
+      var polls = loadPolls();
+      var ids = polls.map(function(p){return p.id;});
+      var added = 0;
+      incoming.forEach(function(p){
+        if(!p || !p.name || !Array.isArray(p.choices)) return;
+        var poll = {
+          id: (p.id && ids.indexOf(p.id)<0) ? p.id : genId(),
+          name: String(p.name),
+          choices: p.choices.map(String),
+          ballots: Array.isArray(p.ballots) ? p.ballots : [],
+          created: p.created || Date.now()
+        };
+        ids.push(poll.id); polls.push(poll); added++;
+      });
+      savePolls(polls);
+      renderPollList();
+      toast("Imported "+added+" poll(s)");
+    }catch(err){ toast("Invalid JSON file"); }
+  };
+  reader.readAsText(file);
+  evt.target.value = "";
+}
+function resetAll(){
+  if(!confirm("Erase ALL polls and ballots from this browser? This cannot be undone.")) return;
+  localStorage.removeItem(STORE_KEY);
+  renderPollList();
+  populatePollSelect("votePoll"); populatePollSelect("resultsPoll");
+  toast("All data cleared");
+}
+function addSampleData(){
+  var choices = ["Eleanor Whitfield","Marcus Delgado","Priya Anand","Samuel Cohen"];
+  var poll = { id:genId(), name:"Sample City Council Election", choices:choices, ballots:[], created:Date.now() };
+  var base = choices.map(function(_,i){return i;});
+  for(var v=0; v<37; v++){
+    var r = base.slice();
+    for(var i=r.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=r[i];r[i]=r[j];r[j]=t; }
+    poll.ballots.push(r);
+  }
+  upsertPoll(poll);
+  renderPollList();
+  toast("Sample poll added ("+poll.ballots.length+" ballots)");
+}
+
+/* ============================ init ============================ */
+resetCreateForm();
+renderPollList();
+populatePollSelect("votePoll");
+populatePollSelect("resultsPoll");
+</script>
+</body>
+</html>

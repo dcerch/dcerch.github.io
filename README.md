@@ -3,7 +3,5 @@
 
 ## Page Structure
 * Home
-* Resume
-* Projects
-  * Snippets
-  * Full applications
+* Toolbox
+* Apps

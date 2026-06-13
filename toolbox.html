@@ -1,0 +1,1511 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Dominic Cerchio — a toolbox of small web app tools and experiments.">
+  <title>dominiccerchio — toolbox</title>
+  <style>
+    :root {
+      --bg: #050a05;
+      --bg-2: #081208;
+      --phosphor: #3dff7a;
+      --phosphor-dim: #1f8f43;
+      --phosphor-glow: rgba(61, 255, 122, 0.55);
+      --amber: #ffcf6a;
+      --magenta: #f012be;
+      --rule: rgba(61, 255, 122, 0.25);
+      --ink: #bdf5cd;
+      --danger: #ff5f56;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(ellipse at center, var(--bg-2) 0%, var(--bg) 75%);
+      color: var(--phosphor);
+      font-family: "Courier New", "DejaVu Sans Mono", monospace;
+      font-size: 16px;
+      line-height: 1.6;
+      text-shadow: 0 0 4px var(--phosphor-glow);
+    }
+
+    /* CRT scanlines + flicker overlay */
+    body::before {
+      content: ""; position: fixed; inset: 0; pointer-events: none;
+      background: repeating-linear-gradient(to bottom,
+        rgba(0,0,0,0) 0px, rgba(0,0,0,0) 2px, rgba(0,0,0,0.28) 3px, rgba(0,0,0,0.28) 4px);
+      z-index: 9999; mix-blend-mode: multiply;
+    }
+    body::after {
+      content: ""; position: fixed; inset: 0; pointer-events: none;
+      background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.55) 100%);
+      z-index: 9998; animation: flicker 6s infinite;
+    }
+    @keyframes flicker {
+      0%, 100% { opacity: 0.92; } 48% { opacity: 0.96; } 50% { opacity: 0.82; } 52% { opacity: 0.97; }
+    }
+
+    main { position: relative; z-index: 1; min-height: 100vh; padding: 2rem 1.25rem; }
+
+    .window {
+      width: min(1080px, 100%); margin: 0 auto;
+      border: 1px solid var(--phosphor-dim); border-radius: 6px;
+      background: rgba(8, 18, 8, 0.6);
+      box-shadow: 0 0 22px rgba(61,255,122,0.18), inset 0 0 60px rgba(61,255,122,0.04);
+      overflow: hidden;
+    }
+    .titlebar {
+      display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem 0.85rem;
+      border-bottom: 1px solid var(--rule); background: rgba(61,255,122,0.06);
+      font-size: 0.8rem; letter-spacing: 0.05em;
+    }
+    .dot { width: 11px; height: 11px; border-radius: 50%; border: 1px solid var(--phosphor-dim); }
+    .dot.r { background: #ff5f56; } .dot.y { background: var(--amber); } .dot.g { background: var(--phosphor); }
+    .titlebar .path { margin-left: auto; color: var(--phosphor-dim); }
+    .titlebar a { color: var(--phosphor-dim); text-decoration: none; }
+    .titlebar a:hover { color: var(--phosphor); }
+
+    .screen { padding: 1.75rem 1.5rem 1.6rem; }
+
+    .prompt { color: var(--phosphor-dim); }
+    .prompt::before { content: "dominic@home:~$ "; color: var(--phosphor-dim); }
+
+    h1.page-title {
+      margin: 0.3rem 0 0.2rem; font-size: clamp(1.6rem, 6vw, 2.6rem); font-weight: 700; letter-spacing: 0.04em;
+    }
+    .lede { margin: 0 0 1.3rem; color: var(--amber); font-style: italic; text-shadow: 0 0 5px rgba(255,207,106,0.5); }
+
+    /* Filter chips */
+    .filters { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.4rem; }
+    .chip {
+      font: inherit; cursor: pointer; color: var(--phosphor); background: transparent;
+      border: 1px solid var(--phosphor-dim); border-radius: 999px; padding: 0.25rem 0.85rem;
+      font-size: 0.82rem; letter-spacing: 0.04em; transition: background 0.15s, box-shadow 0.15s;
+    }
+    .chip:hover { background: rgba(61,255,122,0.12); }
+    .chip[aria-pressed="true"] { background: var(--phosphor-dim); color: #04130a; font-weight: 700; box-shadow: 0 0 12px var(--phosphor-glow); }
+
+    /* Card grid */
+    .grid { display: grid; gap: 0.9rem; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+    .card {
+      text-align: left; font: inherit; color: var(--phosphor); cursor: pointer;
+      background: rgba(61,255,122,0.03); border: 1px solid var(--rule); border-radius: 6px;
+      padding: 1rem 1.05rem; transition: background 0.15s, box-shadow 0.15s, transform 0.1s, border-color 0.15s;
+      display: flex; flex-direction: column; gap: 0.35rem; min-height: 116px;
+    }
+    .card:hover { background: rgba(61,255,122,0.1); border-color: var(--phosphor-dim); box-shadow: 0 0 16px var(--phosphor-glow); transform: translateY(-2px); }
+    .card:active { transform: translateY(0); }
+    .card h3 { margin: 0; font-size: 1rem; letter-spacing: 0.02em; }
+    .card h3::before { content: "> "; color: var(--phosphor-dim); }
+    .card .desc { margin: 0; font-size: 0.82rem; color: var(--ink); flex: 1; }
+    .card .cat { font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--amber); }
+    .card.is-hidden { display: none; }
+    .count { color: var(--phosphor-dim); font-size: 0.8rem; margin: 1.1rem 0 0; }
+
+    /* ---- Dialog / app shell ---- */
+    dialog#appModal {
+      width: min(880px, 94vw); max-height: 92vh; border: 1px solid var(--phosphor-dim); border-radius: 6px;
+      background: rgba(6, 14, 6, 0.98); color: var(--phosphor);
+      box-shadow: 0 0 40px rgba(61,255,122,0.25); padding: 0; overflow: hidden;
+    }
+    dialog#appModal::backdrop { background: rgba(0,0,0,0.78); }
+    .dlg-head {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.7rem 1.1rem; border-bottom: 1px solid var(--rule); background: rgba(61,255,122,0.06);
+    }
+    .dlg-head h2 { margin: 0; font-size: 1.05rem; letter-spacing: 0.06em; }
+    .dlg-head h2::before { content: "~/"; color: var(--phosphor-dim); }
+    .dlg-close {
+      font: inherit; cursor: pointer; color: var(--phosphor); background: transparent;
+      border: 1px solid var(--phosphor-dim); border-radius: 4px; padding: 0.1rem 0.6rem;
+    }
+    .dlg-close:hover { background: rgba(61,255,122,0.12); }
+    .dlg-body { padding: 1.2rem 1.3rem 1.5rem; overflow-y: auto; max-height: calc(92vh - 52px); }
+
+    /* ---- Reusable component kit (inside modals) ---- */
+    .app-lede { color: var(--amber); font-style: italic; margin: 0 0 1rem; }
+    .field { margin-bottom: 0.85rem; }
+    .field > label { display: block; font-size: 0.82rem; color: var(--phosphor-dim); margin-bottom: 0.25rem; letter-spacing: 0.04em; }
+    .row { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+    .row > .field { flex: 1 1 160px; margin-bottom: 0; }
+    input, select, textarea {
+      font: inherit; width: 100%; color: var(--phosphor); background: rgba(0,0,0,0.35);
+      border: 1px solid var(--phosphor-dim); border-radius: 4px; padding: 0.45rem 0.6rem;
+    }
+    input::placeholder, textarea::placeholder { color: rgba(61,255,122,0.4); }
+    input:focus, select:focus, textarea:focus { outline: none; box-shadow: 0 0 10px var(--phosphor-glow); border-color: var(--phosphor); }
+    select option { background: #081208; color: var(--phosphor); }
+    textarea { resize: vertical; min-height: 80px; }
+    .btn {
+      font: inherit; cursor: pointer; color: var(--phosphor); background: transparent;
+      border: 1px solid var(--phosphor-dim); border-radius: 4px; padding: 0.45rem 0.95rem;
+      transition: background 0.15s, box-shadow 0.15s; margin: 0.15rem 0.35rem 0.15rem 0;
+    }
+    .btn:hover { background: rgba(61,255,122,0.12); box-shadow: 0 0 12px var(--phosphor-glow); }
+    .btn::before { content: "> "; color: var(--phosphor-dim); }
+    .btn.plain::before { content: ""; }
+    .btn.danger { border-color: var(--danger); color: var(--danger); }
+    .btn.danger:hover { background: rgba(255,95,86,0.14); box-shadow: 0 0 12px rgba(255,95,86,0.4); }
+    .btn-row { margin: 0.4rem 0 0.9rem; }
+
+    table { width: 100%; border-collapse: collapse; margin: 0.6rem 0 0.9rem; font-size: 0.88rem; }
+    th, td { text-align: left; padding: 0.4rem 0.55rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+    th { color: var(--amber); font-weight: 700; letter-spacing: 0.04em; }
+    tbody tr:nth-child(odd) td { background: rgba(61,255,122,0.03); }
+    tr.best td { background: rgba(61,255,122,0.14); }
+    td ul, th ul { margin: 0.2rem 0 0; padding-left: 1.1rem; }
+
+    .note { font-size: 0.78rem; color: var(--phosphor-dim); margin-top: 0.6rem; }
+    .note a, .dlg-body a { color: var(--amber); }
+    .warn {
+      display: inline-block; border: 1px dashed var(--amber); color: var(--amber);
+      padding: 0.1rem 0.55rem; border-radius: 4px; font-size: 0.78rem; letter-spacing: 0.08em; margin-bottom: 0.8rem;
+    }
+    .result { color: var(--amber); font-weight: 700; }
+    .pos { color: var(--phosphor); } .neg { color: var(--danger); }
+    .mono-out {
+      background: rgba(0,0,0,0.4); border: 1px solid var(--rule); border-radius: 4px;
+      padding: 0.6rem 0.7rem; font-size: 0.82rem; word-break: break-all; white-space: pre-wrap; margin: 0.4rem 0;
+    }
+    .tag { font-size: 0.72rem; color: var(--phosphor-dim); }
+    .tabs { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.8rem; border-bottom: 1px solid var(--rule); padding-bottom: 0.5rem; }
+    .indicators { display: grid; gap: 0.6rem; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+    .ind { border: 1px solid var(--rule); border-radius: 4px; padding: 0.6rem 0.7rem; }
+    .ind .k { font-size: 0.7rem; color: var(--phosphor-dim); text-transform: uppercase; letter-spacing: 0.08em; }
+    .ind .v { font-size: 0.95rem; color: var(--amber); }
+    .progress { height: 10px; border: 1px solid var(--phosphor-dim); border-radius: 999px; overflow: hidden; background: rgba(0,0,0,0.4); margin: 0.5rem 0; }
+    .progress > span { display: block; height: 100%; width: 0; background: var(--phosphor); transition: width 0.3s ease; }
+    .ruler { display: flex; border: 1px solid var(--phosphor-dim); border-radius: 4px; overflow: hidden; margin: 0.6rem 0; }
+    .ruler .seg { flex: 1; text-align: center; font-size: 0.7rem; padding: 0.3rem 0; border-right: 1px solid var(--rule); }
+    .ruler .seg:last-child { border-right: 0; }
+    .ruler .seg.art { background: var(--phosphor-dim); color: #04130a; }
+    canvas { max-width: 100%; background: #04130a; border: 1px solid var(--phosphor-dim); border-radius: 4px; }
+    iframe { width: 100%; height: 460px; border: 1px solid var(--phosphor-dim); border-radius: 4px; }
+    .cards-mini { display: grid; gap: 0.8rem; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+    .cards-mini .mini { border: 1px solid var(--rule); border-radius: 4px; padding: 0.7rem 0.8rem; }
+    .cards-mini .mini h4 { margin: 0 0 0.3rem; font-size: 0.95rem; }
+    .ticket { border: 1px dashed var(--phosphor-dim); border-radius: 6px; padding: 0.8rem; margin: 0.6rem 0; display: flex; gap: 0.8rem; align-items: center; flex-wrap: wrap; }
+    .ticket .meta { flex: 1; min-width: 160px; }
+    .swatch { width: 100%; height: 120px; border: 1px solid var(--phosphor-dim); border-radius: 6px; margin: 0.6rem 0; }
+
+    @media (prefers-reduced-motion: reduce) { body::after { animation: none; } }
+    @media (max-width: 640px) { .screen { padding: 1.25rem 1rem; } .dlg-body { padding: 1rem; } }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="window">
+      <div class="titlebar">
+        <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+        <a href="index.html" title="Back home">&larr; home</a>
+        <span class="path">~/toolbox</span>
+      </div>
+      <div class="screen">
+        <div class="prompt">ls ./toolbox</div>
+        <h1 class="page-title">Toolbox</h1>
+        <p class="lede">A junk drawer of little web apps — calculators, tools, games, and half-finished experiments. Click one to run it right here.</p>
+
+        <div class="filters" id="filters"></div>
+        <div class="grid" id="grid"></div>
+        <p class="count" id="count"></p>
+      </div>
+    </div>
+  </main>
+
+  <dialog id="appModal">
+    <div class="dlg-head">
+      <h2 id="appTitle">snippet</h2>
+      <button class="dlg-close" id="appClose" aria-label="Close">esc</button>
+    </div>
+    <div class="dlg-body" id="appBody"></div>
+  </dialog>
+
+  <script>
+  "use strict";
+
+  /* ============================ tiny helpers ============================ */
+  function h(html) { var t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstChild; }
+  function money(n) { return "$" + (Number(n) || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  function signedMoney(n) { var v = Number(n) || 0; return (v >= 0 ? "+" : "\u2212") + "$" + Math.abs(v).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]; }); }
+
+  /* ============================ snippet registry ============================ */
+  var apps = [];
+  function app(def) { apps.push(def); }
+
+  /* ---- Finance: Bank Rewards ---- */
+  app({
+    id: "bankrewards", title: "bankrewards", cat: "Finance",
+    desc: "Compare the redemption value of your bank reward points across cards.",
+    render: function (b) {
+      var tiers = [
+        { name: "Chase Sapphire Reserve", method: "Travel portal (1.5\u00a2)", cpp: 0.015 },
+        { name: "Chase Sapphire Preferred", method: "Travel portal (1.25\u00a2)", cpp: 0.0125 },
+        { name: "Chase Ink Business Preferred", method: "Travel portal (1.25\u00a2)", cpp: 0.0125 },
+        { name: "Chase Freedom", method: "Cash back (1\u00a2)", cpp: 0.01 },
+        { name: "Chase Freedom Unlimited", method: "Cash back (1\u00a2)", cpp: 0.01 }
+      ];
+      b.innerHTML =
+        '<p class="app-lede">Find the best value for your bank\u2019s points.</p>' +
+        '<div class="field"><label>Number of reward points</label><input type="number" min="0" id="br-pts" placeholder="e.g. 60000"></div>' +
+        '<table><thead><tr><th>Card</th><th>Redemption</th><th>Value / point</th><th>Total value</th></tr></thead><tbody id="br-rows"></tbody></table>' +
+        '<p class="note">Focuses purely on the redemption options banks provide. Cashing out and investing may yield more.</p>';
+      var pts = b.querySelector("#br-pts"), rows = b.querySelector("#br-rows");
+      function draw() {
+        var p = Number(pts.value) || 0;
+        var best = Math.max.apply(null, tiers.map(function (t) { return t.cpp; }));
+        rows.innerHTML = tiers.map(function (t) {
+          return '<tr class="' + (t.cpp === best && p > 0 ? "best" : "") + '"><td>' + esc(t.name) + '</td><td>' + esc(t.method) +
+            '</td><td>' + (t.cpp * 100).toFixed(2) + '\u00a2</td><td class="result">' + money(p * t.cpp) + '</td></tr>';
+        }).join("");
+      }
+      pts.addEventListener("input", draw); draw();
+    }
+  });
+
+  /* ---- Finance: Crypto gain/loss ---- */
+  app({
+    id: "crypto", title: "crypto", cat: "Finance",
+    desc: "Track crypto gains/losses by entering your buys and a current price. No live feed.",
+    render: function (b) {
+      b.innerHTML =
+        '<p class="app-lede">Enter each position to see your gain/loss. Everything stays in your browser.</p>' +
+        '<table><thead><tr><th>Coin</th><th>Amount</th><th>Buy price</th><th>Current price</th><th>Gain/Loss</th><th></th></tr></thead><tbody id="cy-rows"></tbody></table>' +
+        '<div class="btn-row"><button class="btn" id="cy-add">Add position</button></div>' +
+        '<h3 style="margin:0.4rem 0 0">Total: <span class="result" id="cy-total">$0.00</span></h3>';
+      var rows = b.querySelector("#cy-rows"), total = b.querySelector("#cy-total");
+      function addRow(coin) {
+        var tr = h('<tr>' +
+          '<td><input style="width:80px" placeholder="BTC" value="' + (coin || "") + '"></td>' +
+          '<td><input style="width:90px" type="number" min="0" step="any" placeholder="0"></td>' +
+          '<td><input style="width:100px" type="number" min="0" step="any" placeholder="0"></td>' +
+          '<td><input style="width:100px" type="number" min="0" step="any" placeholder="0"></td>' +
+          '<td class="gl">$0.00</td><td><button class="btn danger plain" title="Remove">\u2715</button></td></tr>');
+        rows.appendChild(tr);
+        tr.querySelectorAll("input").forEach(function (i) { i.addEventListener("input", recalc); });
+        tr.querySelector("button").addEventListener("click", function () { tr.remove(); recalc(); });
+        recalc();
+      }
+      function recalc() {
+        var sum = 0;
+        rows.querySelectorAll("tr").forEach(function (tr) {
+          var v = tr.querySelectorAll("input");
+          var amt = Number(v[1].value) || 0, buy = Number(v[2].value) || 0, cur = Number(v[3].value) || 0;
+          var gl = amt * cur - amt * buy; sum += gl;
+          var cell = tr.querySelector(".gl");
+          cell.textContent = signedMoney(gl);
+          cell.className = "gl " + (gl >= 0 ? "pos" : "neg");
+        });
+        total.textContent = signedMoney(sum);
+        total.className = "result " + (sum >= 0 ? "pos" : "neg");
+      }
+      b.querySelector("#cy-add").addEventListener("click", function () { addRow(""); });
+      addRow("BTC");
+    }
+  });
+
+  /* ---- Finance: Income Savings (compound interest) ---- */
+  app({
+    id: "incomesavings", title: "incomesavings", cat: "Finance",
+    desc: "Project compound interest on a savings balance across several timeframes.",
+    render: function (b) {
+      b.innerHTML =
+        '<p class="app-lede">Calculate the accrued interest from a savings account.</p>' +
+        '<div class="row">' +
+          '<div class="field"><label>Principal ($)</label><input type="number" min="0" id="is-p" placeholder="10000"></div>' +
+          '<div class="field"><label>Accrual rate (%)</label><input type="number" min="0" step="0.01" id="is-r" value="0.06"></div>' +
+          '<div class="field"><label>Frequency</label><select id="is-f"><option>Yearly</option><option>Monthly</option><option>Daily</option></select></div>' +
+        '</div>' +
+        '<table><thead><tr><th>1 Month</th><th>6 Months</th><th>1 Year</th><th>3 Years</th><th>5 Years</th><th>10 Years</th></tr></thead><tbody><tr id="is-out"></tr></tbody></table>';
+      var p = b.querySelector("#is-p"), r = b.querySelector("#is-r"), f = b.querySelector("#is-f"), out = b.querySelector("#is-out");
+      var years = [1 / 12, 0.5, 1, 3, 5, 10];
+      function draw() {
+        var P = Number(p.value) || 0, rate = (Number(r.value) || 0) / 100;
+        var n = f.value === "Daily" ? 365 : f.value === "Monthly" ? 12 : 1;
+        out.innerHTML = years.map(function (t) { return "<td>" + money(P * Math.pow(1 + rate / n, n * t)) + "</td>"; }).join("");
+      }
+      [p, r, f].forEach(function (e) { e.addEventListener("input", draw); }); draw();
+    }
+  });
+
+  /* ---- Calc: PMP Calculator ---- */
+  app({
+    id: "pmpcalc", title: "pmpcalc", cat: "Tools",
+    desc: "Estimate project work hours and split them across the PMP lifecycle phases.",
+    render: function (b) {
+      var phases = [["Initiation", 0.13], ["Planning", 0.24], ["Executing", 0.31], ["Monitoring & Controlling", 0.25], ["Closing", 0.07]];
+      b.innerHTML =
+        '<p class="app-lede">Approximate work hours and compare against a standard PMP lifecycle curve.</p>' +
+        '<div class="row">' +
+          '<div class="field"><label>Project start date</label><input type="date" id="pm-s"></div>' +
+          '<div class="field"><label>Project end date</label><input type="date" id="pm-e"></div>' +
+        '</div>' +
+        '<table><thead><tr><th>PMP Phase</th><th>Involvement</th><th>Hours</th></tr></thead><tbody id="pm-rows"></tbody></table>' +
+        '<p class="note">Based on 8-hour days, 5 days a week (business days only, no holidays/PTO). See ' +
+        '<a href="https://www.interfacett.com/blogs/applying-for-the-pmp-exam-hours-what-about-my-hours/" target="_blank" rel="noopener">this blog</a> for PMP hour requirements.</p>';
+      var s = b.querySelector("#pm-s"), e = b.querySelector("#pm-e"), rows = b.querySelector("#pm-rows");
+      function bizDays(a, z) { var d = new Date(a), end = new Date(z), c = 0; if (isNaN(d) || isNaN(end) || d > end) return 0; while (d <= end) { var w = d.getDay(); if (w !== 0 && w !== 6) c++; d.setDate(d.getDate() + 1); } return c; }
+      function draw() {
+        var total = bizDays(s.value, e.value) * 8;
+        rows.innerHTML = phases.map(function (p) {
+          return "<tr><th>" + p[0] + "</th><td>" + Math.round(p[1] * 100) + "%</td><td class='result'>" + Math.round(total * p[1]).toLocaleString() + " h</td></tr>";
+        }).join("") + "<tr><th>Total</th><td>100%</td><td class='result'>" + total.toLocaleString() + " h</td></tr>";
+      }
+      [s, e].forEach(function (x) { x.addEventListener("input", draw); }); draw();
+    }
+  });
+
+  /* ---- Calc: Picture Spacer ---- */
+  app({
+    id: "picturespacer", title: "picturespacer", cat: "Tools",
+    desc: "Evenly space artwork on a wall — get the exact gap between each piece.",
+    render: function (b) {
+      b.innerHTML =
+        '<p class="app-lede">Hang a row of art with even gaps. Units are whatever you measure in.</p>' +
+        '<div class="row">' +
+          '<div class="field"><label>Wall width</label><input type="number" min="0" step="any" id="ps-w" value="120"></div>' +
+          '<div class="field"><label>Each art width</label><input type="number" min="0" step="any" id="ps-a" value="16"></div>' +
+          '<div class="field"><label># of pieces</label><input type="number" min="1" step="1" id="ps-n" value="3"></div>' +
+        '</div>' +
+        '<p>Gap between pieces (and at each end): <span class="result" id="ps-gap">0</span></p>' +
+        '<div class="ruler" id="ps-ruler"></div>';
+      var w = b.querySelector("#ps-w"), a = b.querySelector("#ps-a"), n = b.querySelector("#ps-n"),
+          gap = b.querySelector("#ps-gap"), ruler = b.querySelector("#ps-ruler");
+      function draw() {
+        var W = Number(w.value) || 0, A = Number(a.value) || 0, N = Math.max(1, Math.floor(Number(n.value) || 1));
+        var g = (W - A * N) / (N + 1);
+        gap.textContent = g >= 0 ? g.toFixed(2) : "won\u2019t fit";
+        gap.className = "result " + (g >= 0 ? "pos" : "neg");
+        var segs = [], total = N * 2 + 1;
+        for (var i = 0; i < total; i++) { var isArt = i % 2 === 1; segs.push('<div class="seg ' + (isArt ? "art" : "") + '">' + (isArt ? "art" : "gap") + "</div>"); }
+        ruler.innerHTML = segs.join("");
+      }
+      [w, a, n].forEach(function (x) { x.addEventListener("input", draw); }); draw();
+    }
+  });
+
+  /* ---- Tools: Mailto builder ---- */
+  app({
+    id: "mailto", title: "mailto", cat: "Tools",
+    desc: "Compose a draft email and generate a ready-to-use mailto link + HTML anchor.",
+    render: function (b) {
+      b.innerHTML =
+        '<p class="app-lede">Build a mailto: link without writing any markup.</p>' +
+        '<div class="row"><div class="field"><label>To</label><input id="mt-to" placeholder="someone@example.com"></div>' +
+        '<div class="field"><label>Cc</label><input id="mt-cc"></div><div class="field"><label>Bcc</label><input id="mt-bcc"></div></div>' +
+        '<div class="field"><label>Subject</label><input id="mt-sub"></div>' +
+        '<div class="field"><label>Body</label><textarea id="mt-body"></textarea></div>' +
+        '<div class="field"><label>mailto link</label><div class="mono-out" id="mt-link"></div>' +
+        '<button class="btn" data-copy="mt-link">Copy link</button> <a class="btn plain" id="mt-open">Open in mail app</a></div>' +
+        '<div class="field"><label>HTML anchor</label><div class="mono-out" id="mt-html"></div><button class="btn" data-copy="mt-html">Copy HTML</button></div>';
+      var f = {}; ["to", "cc", "bcc", "sub", "body"].forEach(function (k) { f[k] = b.querySelector("#mt-" + k); });
+      var link = b.querySelector("#mt-link"), html = b.querySelector("#mt-html"), open = b.querySelector("#mt-open");
+      function build() {
+        var params = [];
+        if (f.cc.value) params.push("cc=" + encodeURIComponent(f.cc.value));
+        if (f.bcc.value) params.push("bcc=" + encodeURIComponent(f.bcc.value));
+        if (f.sub.value) params.push("subject=" + encodeURIComponent(f.sub.value));
+        if (f.body.value) params.push("body=" + encodeURIComponent(f.body.value));
+        var url = "mailto:" + encodeURIComponent(f.to.value) + (params.length ? "?" + params.join("&") : "");
+        link.textContent = url; open.href = url;
+        html.textContent = '<a href="' + url + '">' + (f.sub.value || "Email me") + "</a>";
+      }
+      Object.keys(f).forEach(function (k) { f[k].addEventListener("input", build); });
+      b.querySelectorAll("[data-copy]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var txt = b.querySelector("#" + btn.getAttribute("data-copy")).textContent;
+          navigator.clipboard && navigator.clipboard.writeText(txt);
+          var old = btn.textContent; btn.textContent = "Copied!"; setTimeout(function () { btn.textContent = old; }, 1200);
+        });
+      });
+      build();
+    }
+  });
+
+  /* ---- Tools: Phone -> Name ---- */
+  app({
+    id: "phonename", title: "phonename", cat: "Tools",
+    desc: "Find real names and words a phone number can spell on a dial pad.",
+    render: function (b) {
+      // Keypad letters, and the reverse letter -> digit lookup.
+      var keypad = { "2": "ABC", "3": "DEF", "4": "GHI", "5": "JKL", "6": "MNO", "7": "PQRS", "8": "TUV", "9": "WXYZ" };
+      var L2D = {};
+      Object.keys(keypad).forEach(function (d) { keypad[d].split("").forEach(function (ch) { L2D[ch] = d; }); });
+      // A built-in word list (common names + everyday words). A word "fits" a run
+      // of digits when each of its letters maps back to that exact run.
+      var WORDS = (
+        // names
+        "ADAM ALAN ALEX ALICE ALLAN AMANDA AMBER AMY ANDREW ANGEL ANNA ANNE ANTHONY ARIA AUDREY BEN BETH BILL BLAKE BOB BRIAN BRUCE CARL CAROL CHASE CHRIS CINDY CLARK CONNOR DALE DAN DANA DAVE DAVID DEAN DEREK DON DOUG DREW EDGAR ELLA EMMA ERIC ERIN ETHAN EVAN FAITH FRANK FRED GARY GENE GINA GRACE GREG HANK HARRY HEATH HENRY HOLLY HUGH IAN IRENE IVAN JACK JADE JAKE JAMES JANE JASON JEAN JEFF JESS JILL JIM JOAN JODY JOE JOHN JON JOSH JUDE JUDY JULIA JULIE KARA KARL KATE KEN KENT KEVIN KIM KIRK KYLE LANCE LARRY LAURA LEAH LEE LEN LEO LIAM LILY LINDA LISA LOIS LOLA LUCAS LUKE MARC MARIA MARK MARY MASON MATT MAYA MEGAN MIA MIKE MOLLY NANCY NATE NEAL NED NEIL NICK NINA NOAH NOEL NORA OLIVE OSCAR OWEN PAM PAT PAUL PEARL PETE PHIL RACHEL RALPH RAY REESE RENE RICK ROB RON ROSE ROSS ROY RUBY RUTH RYAN SALLY SAM SARA SARAH SCOTT SEAN SETH SHANE SONIA STAN STEVE SUE TARA TED TESS TIM TINA TODD TOM TONY TROY VERA VICKY VINCE WADE WALT WAYNE WILL ZACH ZOE " +
+        // 3-letter words
+        "ACE ACT ADD AGE AID AIM AIR ALL AND ANT ANY APE APP ARC ARM ART ASK ATE BAD BAG BAR BAT BAY BED BEE BEG BET BIG BIT BOX BOY BUD BUG BUS BUY CAB CAN CAP CAR CAT COW CRY CUP CUT DAD DAY DEN DIG DOG DOT DRY EAR EAT EGG END EYE FAN FAR FAT FED FEE FEW FIN FIT FIX FLY FOG FOR FOX FUN FUR GAP GAS GEM GET GUN GUY HAM HAT HEN HID HIP HIT HOT HUB HUG HUT ICE ICY INK JAM JAR JAW JET JOB JOG JOY KEY KID KIT LAB LAP LAW LAY LEG LID LIP LOG LOT LOW MAD MAN MAP MAT MEN MIX MOB MOM MOP MUD MUG NAP NET NEW NOD NOR NOW NUT OAK OAR ODD OFF OIL OLD ONE OUR OUT OWL OWN PAD PAN PAW PAY PEA PEN PET PIE PIG PIN PIT POP POT PRO PUB PUP PUT RAG RAM RAN RAT RAW RED RIB RID RIM RIP ROB ROD ROW RUB RUG RUN SAD SAT SAW SAY SEA SEE SET SHE SHY SIN SIP SIR SIT SIX SKI SKY SLY SON SOW SOY SPA SPY SUM SUN TAB TAG TAN TAP TAR TAX TEA TEN THE TIE TIN TIP TOE TOP TOY TRY TUB TUG TWO USE VAN VAT VET VIA VOW WAR WAS WAX WAY WEB WED WET WHO WHY WIG WIN WIT WOK WON WOW YAK YES YET YOU ZIP ZOO " +
+        // 4-letter words
+        "BAND BANK BARN BASE BEAR BEAT BEST BIRD BLUE BOAT BODY BOLD BOND BONE BOOK BOOM BOOT BORN BOSS CALL CALM CARD CARE CASE CASH CAST CAVE CELL CHAT CITY CLUB CODE COIN COLD COOK COOL CORE COST CREW CUBE CURE DARE DARK DASH DATA DATE DAWN DEAL DEAR DEEP DESK DIAL DICE DISH DIVE DOOR DOVE DRAW DROP DRUM DUCK DUKE DUNE DUST EARN EAST EASY EDGE EPIC EVEN EXIT FACE FAIR FALL FARM FAST FATE FEAR FERN FILM FIND FINE FIRE FISH FIST FIVE FLAG FLAT FLEX FLOW FOAM FOLD FOND FONT FOOD FOOT FORM FORT FOUR FREE FROG FUEL FUND FURY GAIN GAME GANG GATE GAZE GEAR GIFT GIRL GLOW GOAL GOAT GOLD GOLF GONE GOOD GRAB GRID GROW GULF HAIL HAIR HALF HALL HAND HARD HARM HAWK HAZE HEAD HEAL HEAT HELP HERB HERO HIDE HIGH HILL HINT HIVE HOLD HOLE HOLY HOME HOOK HOPE HORN HOST HOUR HUNT HURT ICON IDEA INCH INFO IRON ITEM JADE JAZZ JOBS JOIN JOKE JUMP JURY JUST KEEN KEEP KICK KIND KING KISS KITE KNEE KNOT LACE LAKE LAMP LAND LANE LATE LAVA LAWN LEAD LEAF LEAN LEAP LENS LIFE LIFT LIME LINE LINK LION LIST LIVE LOAD LOAN LOCK LOFT LONG LOOK LOOP LORD LOSE LOST LOUD LOVE LUCK LUMP MAID MAIL MAIN MAKE MALL MANE MANY MARK MASK MATE MAZE MEAL MEAT MELT MEMO MEND MENU MICE MILD MILE MILK MIND MINE MINT MISS MIST MODE MOLD MOON MORE MOSS MOST MOTH MOVE MUCH MULE MUTE NAME NAVY NEAR NEAT NECK NEED NEON NEST NEWS NICE NINE NODE NOON NOSE NOTE NOUN OBEY ODDS OPEN OVAL OVEN OWED PACE PACK PAGE PAID PAIN PAIR PALM PARK PART PASS PAST PATH PAVE PAWN PEAK PEAR PEAT PECK PEEL PEER PILE PINE PINK PIPE PLAN PLAY PLOT PLUG PLUS POEM POET POLE POLL POND PONY POOL POOR PORT POSE POST POUR PRAY PREP PREY PROP PUMP PURE PUSH QUIT RACE RAGE RAID RAIL RAIN RAMP RANK RARE RATE RAVE READ REAL REAP REAR REEF REEL RELY RENT REST RICE RICH RIDE RING RIPE RISE RISK ROAD ROAM ROAR ROBE ROCK ROLE ROLL ROOF ROOM ROOT ROPE ROSE RUBY RUDE RUIN RULE RUSH SAFE SAGE SAIL SAKE SALE SALT SAME SAND SAVE SCAN SEAL SEAT SEED SEEK SEEM SELF SELL SEND SHIP SHOP SHOT SHOW SHUT SICK SIDE SIGN SILK SING SINK SITE SIZE SKIN SKIP SLED SLIP SLOT SLOW SNAP SNOW SOAP SOFT SOIL SOLD SOLE SOLO SONG SOON SORT SOUL SOUP SPAN SPIN SPOT STAR STAY STEM STEP STIR STOP SUCH SUIT SURE SWAN SWAP SWAY SWIM TAIL TAKE TALE TALK TAME TANK TAPE TASK TEAM TEAR TECH TELL TEND TENT TERM TEST TEXT THAN THAT THEM THEN THEY THIN THIS TIDE TIDY TILE TIME TINY TIPS TOLL TONE TOOL TOUR TOWN TRAP TREE TRIM TRIP TROT TRUE TUBE TUNE TURN TWIN TYPE UNIT URGE USED USER VAIN VARY VAST VEIL VEIN VENT VERB VERY VEST VIEW VINE VOID VOTE WADE WAGE WAIT WAKE WALK WALL WAND WANT WARD WARM WARN WASH WAVE WEAK WEAR WEED WEEK WEPT WEST WIDE WILD WILL WIND WINE WING WIPE WIRE WISE WISH WOLF WOOD WOOL WORD WORE WORK WORM WRAP YARD YARN YEAR YOGA YOLK ZERO ZINC ZONE ZOOM " +
+        // 5-letter words
+        "ALARM ALBUM ALERT ALIVE ALONE ANGEL ANGER APPLE ARROW BACON BADGE BEACH BERRY BLAZE BLEND BLOCK BLOOM BOARD BOAST BONUS BRAIN BRAND BRAVE BREAD BREAK BRICK BRIDE BRIEF BRING BROAD BROWN BUILD CABIN CANDY CARGO CHAIN CHAIR CHALK CHARM CHART CHEAP CHEER CHESS CHIEF CHILD CLEAN CLEAR CLICK CLIMB CLOCK CLOUD COACH COAST CORAL COUNT COURT COVER CRAFT CRANE CRASH CREAM CROWD CROWN CURVE DAILY DAIRY DANCE DELAY DEPTH DIARY DOZEN DREAM DRESS DRIFT DRINK DRIVE EAGLE EARLY EARTH EIGHT ELITE ENJOY ENTRY EQUAL EVENT EXACT EXTRA FAITH FANCY FAULT FEAST FENCE FIELD FIGHT FINAL FLAME FLASH FLEET FLOAT FLOOD FLOOR FLOUR FLUTE FOCUS FORCE FRAME FRESH FRONT FROST FRUIT FUNDS GIANT GLASS GLOBE GLORY GRACE GRADE GRAIN GRAND GRANT GRAPE GRASS GREAT GREEN GROUP GUARD GUEST GUIDE HABIT HAPPY HEART HEAVY HONEY HORSE HOTEL HOUSE HUMOR IDEAL IMAGE INDEX INNER IVORY JELLY JEWEL JOINT JUICE KNIFE LABEL LARGE LASER LAYER LEARN LEMON LEVEL LIGHT LIVER LOGIC LOYAL LUCKY LUNCH MAGIC MAJOR MAPLE MARCH MATCH MERIT METAL METER MIGHT MINER MINOR MODEL MONEY MONTH MOTOR MOUNT MOUSE MOUTH MOVIE MUSIC NIGHT NINTH NOBLE NORTH NOVEL NURSE OCEAN OFFER OLIVE ONION ORBIT ORDER OTTER OWNER PAINT PANEL PAPER PARTY PASTA PATCH PAUSE PEACE PEACH PEARL PENNY PHASE PHONE PIANO PILOT PITCH PIZZA PLACE PLAIN PLANE PLANT PLATE PLAZA PLUSH POINT POLAR PORCH POUND POWER PRESS PRICE PRIDE PRINT PRIZE PROOF PROUD QUEEN QUERY QUEST QUICK QUIET QUILT QUOTE RADAR RADIO RAISE RANCH RANGE RAPID REACH READY REALM REBEL RELAX REPLY RHYME RIDGE RIVER ROAST ROBIN ROBOT ROUND ROUTE ROYAL RUGBY RURAL SALAD SAUCE SCALE SCENE SCOPE SCORE SCOUT SHADE SHAKE SHARE SHARK SHARP SHEEP SHEET SHELF SHELL SHIFT SHINE SHIRT SHOCK SHORE SHORT SIGHT SILLY SIXTH SKILL SLEEP SLICE SLIDE SMALL SMART SMILE SMOKE SNAKE SOLAR SOLID SOLVE SOUND SOUTH SPACE SPARE SPARK SPEAK SPEED SPELL SPEND SPICE SPINE SPLIT SPOON SPORT SQUAD STACK STAFF STAGE STAIR STAKE STAMP STAND STARE START STATE STEAM STEEL STEEP STERN STICK STILL STING STOCK STONE STOOL STORE STORM STORY STOUT STOVE STRAP STRAW STRIP STUDY STUFF STYLE SUGAR SUITE SUNNY SUPER SWEAT SWEEP SWEET SWELL SWIFT SWING SWORD TABLE TASTE TEACH TEMPO TENTH THANK THEME THICK THING THINK THIRD THORN THREE THROW TIGER TIGHT TITLE TOAST TODAY TOKEN TONIC TOOTH TOPIC TORCH TOTAL TOUCH TOUGH TOWEL TOWER TRACE TRACK TRADE TRAIL TRAIN TREAT TREND TRIAL TRIBE TRICK TRUCK TRULY TRUNK TRUST TRUTH TULIP TWIST UNCLE UNDER UNION UNITE UNITY UPPER URBAN USAGE VAGUE VALID VALUE VAULT VENUE VERSE VIDEO VINYL VIRUS VISIT VITAL VOCAL VOICE VOWEL WAGON WATCH WATER WHALE WHEAT WHEEL WHERE WHICH WHILE WHITE WHOLE WIDTH WORLD WORRY WORTH WOUND WRIST WRITE YACHT YIELD YOUNG YOUTH ZEBRA"
+      ).split(/\s+/);
+      // Build digit-signature -> [words] once.
+      var index = {};
+      WORDS.forEach(function (w) {
+        if (w.length < 3) return;
+        var sig = "", ok = true;
+        for (var i = 0; i < w.length; i++) { var d = L2D[w[i]]; if (!d) { ok = false; break; } sig += d; }
+        if (!ok) return;
+        if (!index[sig]) index[sig] = [];
+        if (index[sig].indexOf(w) < 0) index[sig].push(w);
+      });
+      b.innerHTML =
+        '<p class="app-lede">Each digit (2\u20139) maps to keypad letters \u2014 we list the real names and words your number can spell. All local, nothing leaves your browser.</p>' +
+        '<div class="field"><label>Phone number</label><input id="pn-in" placeholder="800-266-8378" inputmode="tel"></div>' +
+        '<button class="btn" id="pn-go">Find names</button>' +
+        '<p id="pn-meta" class="note"></p><div id="pn-out" hidden></div>';
+      var inp = b.querySelector("#pn-in"), meta = b.querySelector("#pn-meta"), out = b.querySelector("#pn-out");
+      function gen() {
+        var raw = (inp.value.match(/\d/g) || []).join("");
+        if (!raw.length) { meta.textContent = "Enter a phone number first."; out.hidden = true; return; }
+        // 0 and 1 carry no letters, so they break the number into searchable runs.
+        var segments = raw.split(/[01]/), found = {};
+        segments.forEach(function (seg) {
+          for (var i = 0; i < seg.length; i++) {
+            for (var j = i + 3; j <= seg.length; j++) {
+              var sub = seg.slice(i, j);
+              if (index[sub]) index[sub].forEach(function (w) { found[w] = true; });
+            }
+          }
+        });
+        var names = Object.keys(found).sort(function (a, z) { return z.length - a.length || (a < z ? -1 : 1); });
+        if (!names.length) { meta.textContent = "No usable names or words found in that number."; out.hidden = true; return; }
+        meta.textContent = "Found " + names.length + " usable name(s)/word(s):";
+        out.hidden = false;
+        out.innerHTML = names.map(function (w) {
+          return '<span style="display:inline-block;border:1px solid var(--rule);border-radius:4px;padding:.15rem .5rem;margin:.15rem;color:var(--amber)">' + w + "</span>";
+        }).join("");
+      }
+      b.querySelector("#pn-go").addEventListener("click", gen);
+      inp.addEventListener("keydown", function (e) { if (e.key === "Enter") gen(); });
+    }
+  });
+
+  /* ---- Tools: Package tracking deep-links ---- */
+  app({
+    id: "package", title: "package", cat: "Tools",
+    desc: "Jump straight to a carrier's tracking page and keep a list of recent numbers.",
+    render: function (b) {
+      var carriers = {
+        UPS: "https://www.ups.com/track?tracknum=",
+        FedEx: "https://www.fedex.com/fedextrack/?trknbr=",
+        USPS: "https://tools.usps.com/go/TrackConfirmAction?tLabels=",
+        DHL: "https://www.dhl.com/us-en/home/tracking.html?tracking-id="
+      };
+      b.innerHTML =
+        '<p class="app-lede">Enter a tracking number, pick a carrier, and open its tracking page.</p>' +
+        '<div class="field"><label>Tracking number</label><input id="pk-num" placeholder="1Z..."></div>' +
+        '<div class="btn-row">' + Object.keys(carriers).map(function (c) { return '<button class="btn" data-c="' + c + '">' + c + "</button>"; }).join("") + '</div>' +
+        '<h3 style="font-size:1rem;margin:.6rem 0 .3rem">Recent</h3><ul id="pk-recent" style="padding-left:1.1rem"></ul>' +
+        '<button class="btn danger" id="pk-clear">Clear recent</button>';
+      var num = b.querySelector("#pk-num"), recent = b.querySelector("#pk-recent");
+      function load() { try { return JSON.parse(localStorage.getItem("pkg_recent") || "[]"); } catch (e) { return []; } }
+      function save(a) { localStorage.setItem("pkg_recent", JSON.stringify(a.slice(0, 8))); }
+      function drawRecent() {
+        var a = load();
+        recent.innerHTML = a.length ? a.map(function (r) { return "<li>" + esc(r.carrier) + ": " + esc(r.num) + "</li>"; }).join("") : "<li class='note'>Nothing yet.</li>";
+      }
+      b.querySelectorAll("[data-c]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var n = num.value.trim(); if (!n) { num.focus(); return; }
+          var c = btn.getAttribute("data-c");
+          var a = load().filter(function (r) { return !(r.num === n && r.carrier === c); }); a.unshift({ carrier: c, num: n }); save(a); drawRecent();
+          window.open(carriers[c] + encodeURIComponent(n), "_blank", "noopener");
+        });
+      });
+      b.querySelector("#pk-clear").addEventListener("click", function () { save([]); drawRecent(); });
+      drawRecent();
+    }
+  });
+
+  /* ---- Tools: Cookie demo ---- */
+  app({
+    id: "cookie", title: "cookie", cat: "Tools",
+    desc: "A tiny demo of creating, reading, and deleting a browser cookie.",
+    render: function (b) {
+      // Real cookies silently fail on file:// pages, so detect support and
+      // transparently fall back to a localStorage-backed store when needed.
+      function cookiesWork() {
+        try {
+          document.cookie = "__ck_test=1;path=/";
+          var ok = document.cookie.indexOf("__ck_test=1") > -1;
+          document.cookie = "__ck_test=;path=/;max-age=0";
+          return ok;
+        } catch (e) { return false; }
+      }
+      var native = cookiesWork();
+      var FB = "cookie_demo_fallback";
+      function fbLoad() { try { return JSON.parse(localStorage.getItem(FB) || "{}"); } catch (e) { return {}; } }
+      function fbSave(o) { localStorage.setItem(FB, JSON.stringify(o)); }
+      var store = {
+        set: function (name, val) {
+          if (native) { document.cookie = encodeURIComponent(name) + "=" + encodeURIComponent(val) + ";path=/;max-age=86400"; }
+          else { var o = fbLoad(); o[name] = val; fbSave(o); }
+        },
+        del: function (name) {
+          if (native) { document.cookie = encodeURIComponent(name) + "=;path=/;max-age=0"; }
+          else { var o = fbLoad(); delete o[name]; fbSave(o); }
+        },
+        all: function () {
+          if (native) {
+            return (document.cookie ? document.cookie.split(/;\s*/) : []).map(function (p) {
+              var i = p.indexOf("="); return { k: decodeURIComponent(p.slice(0, i)), v: decodeURIComponent(p.slice(i + 1)) };
+            });
+          }
+          var o = fbLoad(); return Object.keys(o).map(function (key) { return { k: key, v: o[key] }; });
+        }
+      };
+      b.innerHTML =
+        '<p class="app-lede">Set a named value and watch it persist (then delete it).</p>' +
+        (native ? '' : '<div class="note">Real cookies are blocked in this context (e.g. opening the file directly), so this demo uses a <code>localStorage</code>-backed fallback that behaves the same way.</div>') +
+        '<div class="row"><div class="field"><label>Name</label><input id="ck-k" value="demo"></div>' +
+        '<div class="field"><label>Value</label><input id="ck-v" placeholder="hello"></div></div>' +
+        '<div class="btn-row"><button class="btn" id="ck-set">Create</button><button class="btn danger" id="ck-del">Delete</button></div>' +
+        '<div class="progress"><span id="ck-bar"></span></div>' +
+        '<div class="field"><label>' + (native ? 'document.cookie' : 'stored values') + '</label><div class="mono-out" id="ck-out"></div></div>';
+      var k = b.querySelector("#ck-k"), v = b.querySelector("#ck-v"), bar = b.querySelector("#ck-bar"), out = b.querySelector("#ck-out");
+      function show() {
+        var rows = store.all();
+        out.textContent = rows.length ? rows.map(function (r) { return r.k + "=" + r.v; }).join("\n") : "(nothing stored for this page)";
+      }
+      function pulse() { bar.style.width = "100%"; setTimeout(function () { bar.style.width = "0"; }, 600); }
+      b.querySelector("#ck-set").addEventListener("click", function () {
+        if (!k.value) { k.focus(); return; } store.set(k.value, v.value); pulse(); show();
+      });
+      b.querySelector("#ck-del").addEventListener("click", function () {
+        if (!k.value) { k.focus(); return; } store.del(k.value); pulse(); show();
+      });
+      show();
+    }
+  });
+
+  /* ---- Tools: Device & Environment ---- */
+  app({
+    id: "deviceenvironment", title: "deviceenvironment", cat: "Tools",
+    desc: "Detect your device, browser, OS, and connection from the browser alone.",
+    render: function (b) {
+      var ua = navigator.userAgent;
+      function pick(re, list) { for (var i = 0; i < list.length; i++) { if (re[i].test(ua)) return list[i]; } return "Unknown"; }
+      var os = pick([/Windows/, /Mac OS X|Macintosh/, /Android/, /iPhone|iPad|iPod/, /Linux/], ["Windows", "macOS / iOS", "Android", "iOS", "Linux"]);
+      var browser = pick([/Edg\//, /OPR\//, /Chrome\//, /Firefox\//, /Safari\//], ["Edge", "Opera", "Chrome", "Firefox", "Safari"]);
+      var touch = (navigator.maxTouchPoints || 0) > 0 || "ontouchstart" in window;
+      var mobile = /Mobi|Android|iPhone|iPad|iPod/.test(ua);
+      var items = [
+        ["Device", mobile ? "Mobile / Tablet" : "Desktop"],
+        ["Touchscreen", touch ? "Yes" : "No"],
+        ["Operating system", os],
+        ["Browser", browser],
+        ["Online", navigator.onLine ? "Connected" : "Offline"],
+        ["Screen", window.screen.width + " \u00d7 " + window.screen.height],
+        ["Viewport", window.innerWidth + " \u00d7 " + window.innerHeight],
+        ["Language", navigator.language || "?"],
+        ["Cookies enabled", navigator.cookieEnabled ? "Yes" : "No"],
+        ["CPU cores", navigator.hardwareConcurrency || "?"]
+      ];
+      b.innerHTML = '<p class="app-lede">Everything below is read from your browser, live.</p><div class="indicators">' +
+        items.map(function (i) { return '<div class="ind"><div class="k">' + i[0] + '</div><div class="v">' + esc(String(i[1])) + "</div></div>"; }).join("") + "</div>";
+    }
+  });
+
+  /* ---- Tools: Randomizer ---- */
+  app({
+    id: "randomizer", title: "randomizer", cat: "Tools",
+    desc: "Pit a homemade RNG against Math.random, and conjure random Unicode symbols.",
+    render: function (b) {
+      b.innerHTML =
+        '<p class="app-lede">Two experiments in randomness.</p>' +
+        '<h3 style="font-size:1rem;margin:.2rem 0 .3rem">1. RNG distribution (digits 0\u20139)</h3>' +
+        '<button class="btn" id="rz-run">Run 1,000 draws</button>' +
+        '<table><thead><tr><th>Digit</th><th>Custom LCG</th><th>Math.random</th></tr></thead><tbody id="rz-rows"></tbody></table>' +
+        '<h3 style="font-size:1rem;margin:.8rem 0 .3rem">2. Random Unicode symbols</h3>' +
+        '<div class="field"><select id="rz-cat">' +
+          '<option value="9728,9983">Miscellaneous Symbols</option><option value="9984,10175">Dingbats</option>' +
+          '<option value="8592,8703">Arrows</option><option value="9632,9727">Geometric Shapes</option>' +
+          '<option value="880,1023">Greek &amp; Coptic</option><option value="8448,8527">Letterlike Symbols</option></select></div>' +
+        '<button class="btn" id="rz-sym">Generate 24 symbols</button><div class="mono-out" id="rz-out" style="font-size:1.4rem"></div>';
+      var seed = Date.now() % 2147483647;
+      function lcg() { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }
+      b.querySelector("#rz-run").addEventListener("click", function () {
+        var a = new Array(10).fill(0), m = new Array(10).fill(0), N = 1000;
+        for (var i = 0; i < N; i++) { a[Math.floor(lcg() * 10)]++; m[Math.floor(Math.random() * 10)]++; }
+        b.querySelector("#rz-rows").innerHTML = a.map(function (_, d) { return "<tr><th>" + d + "</th><td>" + a[d] + "</td><td>" + m[d] + "</td></tr>"; }).join("");
+      });
+      b.querySelector("#rz-sym").addEventListener("click", function () {
+        var rng = b.querySelector("#rz-cat").value.split(",").map(Number), s = "";
+        for (var i = 0; i < 24; i++) { s += "&#" + (Math.floor(Math.random() * (rng[1] - rng[0] + 1)) + rng[0]) + "; "; }
+        b.querySelector("#rz-out").innerHTML = s;
+      });
+    }
+  });
+
+  /* ---- Tools: Ticket Generator ---- */
+  app({
+    id: "ticketgenerator", title: "ticketgenerator", cat: "Tools",
+    desc: "Generate event tickets with unique IDs and a scannable-looking barcode.",
+    render: function (b) {
+      b.innerHTML =
+        '<p class="app-lede">Spin up numbered event tickets, each with a unique code.</p>' +
+        '<div class="row"><div class="field"><label>Event name</label><input id="tk-ev" value="Launch Party"></div>' +
+        '<div class="field"><label>Organization</label><input id="tk-org" value="dominiccerchio"></div>' +
+        '<div class="field"><label>How many</label><input type="number" min="1" max="20" id="tk-n" value="3"></div></div>' +
+        '<button class="btn" id="tk-go">Create tickets</button><div id="tk-out"></div>';
+      function barcode(canvas, code) {
+        var ctx = canvas.getContext("2d"), w = canvas.width, hgt = canvas.height; ctx.clearRect(0, 0, w, hgt);
+        ctx.fillStyle = "#3dff7a"; var x = 4;
+        for (var i = 0; i < code.length && x < w - 4; i++) { var bw = (code.charCodeAt(i) % 4) + 1; if (i % 2 === 0) ctx.fillRect(x, 4, bw, hgt - 8); x += bw + 2; }
+      }
+      b.querySelector("#tk-go").addEventListener("click", function () {
+        var ev = b.querySelector("#tk-ev").value || "Event", org = b.querySelector("#tk-org").value || "ORG";
+        var n = Math.min(20, Math.max(1, Number(b.querySelector("#tk-n").value) || 1)), out = b.querySelector("#tk-out"); out.innerHTML = "";
+        for (var i = 1; i <= n; i++) {
+          var code = (org.slice(0, 3).toUpperCase()) + "-" + Date.now().toString(36).toUpperCase().slice(-4) + "-" + Math.random().toString(36).slice(2, 6).toUpperCase();
+          var card = h('<div class="ticket"><div class="meta"><strong>' + esc(ev) + '</strong><br><span class="tag">' + esc(org) + ' \u2022 Ticket ' + i + " of " + n + '</span><br><span class="result">' + code + '</span></div><canvas width="180" height="56"></canvas></div>');
+          out.appendChild(card); barcode(card.querySelector("canvas"), code);
+        }
+      });
+    }
+  });
+
+  /* ---- Tools: Time Wrap ---- */
+  app({
+    id: "timewrap", title: "timewrap", cat: "Tools",
+    desc: "Run multiple labeled timers by labor category and track your total time.",
+    render: function (b) {
+      var cats = ["Premier - Presales Activity", "General Administration", "Meetings & Events", "New Hire Training",
+        "Training Taken", "Standby / Bench Time", "Time Away", "Travel - Non-Util",
+        "Service Delivery Management", "Reactive Service Management", "Cloud Consumption Management",
+        "Advisory Services", "Travel (Non-Billable)", "Travel (Billable)"];
+      b.innerHTML =
+        '<p class="app-lede">Keep track of time spent across projects and categories.</p>' +
+        '<div id="tw-list"></div>' +
+        '<div class="btn-row"><button class="btn" id="tw-add">Add new timer</button></div>' +
+        '<h3 style="margin:0">Total time: <span class="result" id="tw-total">00:00:00</span></h3>';
+      var list = b.querySelector("#tw-list"), totalEl = b.querySelector("#tw-total");
+      var timers = [];
+      function fmt(s) { var p = function (x) { return String(x).padStart(2, "0"); }; return p(Math.floor(s / 3600)) + ":" + p(Math.floor(s / 60) % 60) + ":" + p(s % 60); }
+      function updateTotal() { totalEl.textContent = fmt(timers.reduce(function (a, t) { return a + t.sec; }, 0)); }
+      function addTimer() {
+        var t = { sec: 0, running: false, iv: null };
+        var row = h('<div class="row" style="align-items:flex-end;margin-bottom:.6rem">' +
+          '<div class="field"><label>Label</label><input placeholder="Timer label"></div>' +
+          '<div class="field"><label>Category</label><select><option disabled selected>Labor Category</option>' +
+          cats.map(function (c) { return "<option>" + esc(c) + "</option>"; }).join("") + '</select></div>' +
+          '<div class="field" style="flex:0 0 110px"><label>Elapsed</label><input class="disp" readonly value="00:00:00"></div>' +
+          '<div style="flex:0 0 auto"><button class="btn toggle">Start</button><button class="btn danger plain rm" title="Remove">\u2715</button></div></div>');
+        var disp = row.querySelector(".disp"), toggle = row.querySelector(".toggle");
+        toggle.addEventListener("click", function () {
+          t.running = !t.running;
+          if (t.running) { toggle.textContent = "Pause"; t.iv = setInterval(function () { t.sec++; disp.value = fmt(t.sec); updateTotal(); }, 1000); }
+          else { toggle.textContent = "Start"; clearInterval(t.iv); }
+        });
+        row.querySelector(".rm").addEventListener("click", function () { clearInterval(t.iv); timers.splice(timers.indexOf(t), 1); row.remove(); updateTotal(); });
+        timers.push(t); list.appendChild(row);
+      }
+      b.querySelector("#tw-add").addEventListener("click", addTimer); addTimer();
+      return function cleanup() { timers.forEach(function (t) { clearInterval(t.iv); }); };
+    }
+  });
+
+  /* ---- Tools: Weather Clothing Advisor ---- */
+  app({
+    id: "weatheradvisor", title: "weatheradvisor", cat: "Tools",
+    desc: "Suggests what to wear based on how you like your room temperature.",
+    render: function (b) {
+      var advice = {
+        burning: "You run hot. Light layers only: tee + shorts indoors; a light jacket outside if it dips below 60\u00b0F.",
+        hot: "Breathable fabrics. Short sleeves inside; carry a light layer for the evening.",
+        warm: "A long-sleeve tee or light sweater covers most situations. Add a jacket under 55\u00b0F.",
+        normal: "Standard layering: shirt + light sweater indoors, a proper coat outdoors in winter.",
+        cool: "You like it cool, so dress warm: sweater indoors, insulated coat + hat once it's near freezing.",
+        cold: "You feel cold easily. Thermal base layer, sweater, and a heavy coat with gloves outdoors.",
+        freezing: "Bundle up: thermals, fleece mid-layer, heavy insulated coat, hat, gloves, and a scarf."
+      };
+      b.innerHTML =
+        '<p class="app-lede">Find clothing that suits how you experience temperature.</p>' +
+        '<div class="field"><label>How do you prefer your room temperature?</label><select id="wa-pref">' +
+        '<option value="burning">Burning (above 79\u00b0F)</option><option value="hot">Hot (76\u201378\u00b0F)</option>' +
+        '<option value="warm">Warm (73\u201375\u00b0F)</option><option value="normal" selected>Normal (70\u201372\u00b0F)</option>' +
+        '<option value="cool">Cool (67\u201369\u00b0F)</option><option value="cold">Cold (64\u201366\u00b0F)</option>' +
+        '<option value="freezing">Freezing (below 63\u00b0F)</option></select></div>' +
+        '<div class="mono-out" id="wa-out" style="color:var(--amber)"></div>';
+      var sel = b.querySelector("#wa-pref"), out = b.querySelector("#wa-out");
+      function draw() { out.textContent = advice[sel.value]; }
+      sel.addEventListener("change", draw); draw();
+    }
+  });
+
+  /* ---- Games: Point Keeper ---- */
+  app({
+    id: "pointkeeper", title: "pointkeeper", cat: "Games",
+    desc: "A simple multi-player score keeper that remembers between visits.",
+    render: function (b) {
+      b.innerHTML =
+        '<p class="app-lede">Track scores for any game. Saved in your browser.</p>' +
+        '<div class="row"><div class="field"><label>Add player</label><input id="pk2-name" placeholder="Name"></div>' +
+        '<div style="flex:0 0 auto;align-self:flex-end"><button class="btn" id="pk2-add">Add</button></div></div>' +
+        '<div class="cards-mini" id="pk2-list"></div>' +
+        '<div class="btn-row"><button class="btn danger" id="pk2-reset">Reset all</button></div>';
+      var name = b.querySelector("#pk2-name"), list = b.querySelector("#pk2-list");
+      function load() { try { return JSON.parse(localStorage.getItem("pk_players") || "[]"); } catch (e) { return []; } }
+      function save(p) { localStorage.setItem("pk_players", JSON.stringify(p)); }
+      var players = load();
+      function draw() {
+        list.innerHTML = players.length ? players.map(function (p, i) {
+          return '<div class="mini"><h4>' + esc(p.name) + '</h4><div class="result" style="font-size:1.5rem">' + p.score + '</div>' +
+            '<div class="btn-row"><button class="btn plain" data-d="-1" data-i="' + i + '">\u2212</button>' +
+            '<button class="btn plain" data-d="1" data-i="' + i + '">+</button>' +
+            '<button class="btn danger plain" data-rm="' + i + '">\u2715</button></div></div>';
+        }).join("") : '<p class="note">No players yet. Add one above.</p>';
+        list.querySelectorAll("[data-d]").forEach(function (btn) { btn.addEventListener("click", function () { players[+btn.dataset.i].score += +btn.dataset.d; save(players); draw(); }); });
+        list.querySelectorAll("[data-rm]").forEach(function (btn) { btn.addEventListener("click", function () { players.splice(+btn.dataset.rm, 1); save(players); draw(); }); });
+      }
+      function add() { if (!name.value.trim()) return; players.push({ name: name.value.trim(), score: 0 }); name.value = ""; save(players); draw(); }
+      b.querySelector("#pk2-add").addEventListener("click", add);
+      name.addEventListener("keydown", function (e) { if (e.key === "Enter") add(); });
+      b.querySelector("#pk2-reset").addEventListener("click", function () { players = []; save(players); draw(); });
+      draw();
+    }
+  });
+
+  /* ---- Games: One-Shot hub ---- */
+  app({
+    id: "oneshot", title: "oneshot", cat: "Games",
+    desc: "A resource hub for short, self-contained tabletop adventures.",
+    render: function (b) {
+      // Reusable helpers for building characters/areas/items.
+      // ch(name, sub, desc, stats, abilities) -> character object.
+      function ch(name, sub, desc, stats, abilities) { return { name: name, sub: sub, desc: desc, stats: stats, abilities: abilities || [] }; }
+      function st(hp, ac, spd, str, dex, con, int_, wis, cha) { return { HP: hp, AC: ac, SPD: spd, STR: str, DEX: dex, CON: con, INT: int_, WIS: wis, CHA: cha }; }
+
+      // ----- Shinra enemy stat blocks reused across the two FFVII adventures -----
+      var securityOfficer = ch("Security Officer", "Level 3 \u00b7 Lawful Evil \u00b7 Human",
+        "Troopers belonging to Shinra's Public Security Division. Typically seen patrolling the city streets and company installations. Many are new recruits with little training. Though they are not seasoned fighters, they do know a variety of different attacks.",
+        st(50, 12, 35, "15 (+2)", "15 (+2)", "12 (+1)", "12 (+1)", "12 (+1)", "10 (+0)"),
+        ["Grenade (Combat only, 1 action, 1 round cooldown): Throws a grenade at a target that explodes on impact. Targets within a 5 foot radius make a DEX saving throw of 12 or more. If succeeded, take half of 3x normal trooper damage. If failed, take full 3x normal trooper damage.",
+         "Burst Fire (Combat only, 1 action, 1 round cooldown): Shoots a barrage of bullets at a target by making three separate attacks."]);
+      var monoDrive = ch("Mono Drive", "Level 3 \u00b7 Lawful Evil \u00b7 Creature",
+        "A drill, eyeball monster that hovers slightly above the ground, cooked up in Shinra's R&D department.",
+        st(25, 12, 35, "10 (+0)", "12 (+1)", "10 (+0)", "10 (+0)", "-8 (-1)", "-8 (-1)"),
+        ["Fire (Combat only, 1 action, 1 round cooldown): Blast a ball of fire at one target. Does 1x normal damage for 2 rounds."]);
+      var guardDog = ch("Guard Dog", "Level 5 \u00b7 Lawful Evil \u00b7 Creature",
+        "Military canines employed by Shinra Public Security. Under the control of expert trainers, these dogs can sniff out intruders and launch ferocious attacks.",
+        st(75, 10, 40, "15 (+2)", "13 (+1)", "10 (+0)", "10 (+0)", "10 (+0)", "10 (+0)"),
+        ["Whirlwhip (Combat only, 1 action, 1 round cooldown): Lunges forward up to 15 feet and swings its whip-like tail. Target takes 1x normal damage, interrupts a character's action (if applicable), and applies poison. CONST saving throw of 12 or more to resist poison. Poison denies any healing on target until dispelled or downed.",
+         "Clamp (Combat only, 1 action, 1 round cooldown): Pounces on one target and applies grapple. STR or DEX saving throw to break free of restrained effect."]);
+      var shockTrooper = ch("Shock Trooper", "Level 5 \u00b7 Lawful Evil \u00b7 Human",
+        "Troopers serving the Shinra Company Public Security Corps. Pharmacological agents and reinforced suits make these troopers tough to take down. They attack with claw weapons equipped to both arms.",
+        st(100, 12, 40, "15 (+2)", "16 (+3)", "12 (+1)", "12 (+1)", "12 (+1)", "10 (+0)"),
+        ["Backspring Kick (Combat only, 1 action, 1 round cooldown): Flip backwards and uppercut kick the target. Target takes 2x normal damage and is kicked 20 feet into the air. Upon falling, target takes falling damage. STR saving throw to resist.",
+         "Diving Kick (Combat only, 1 action, 1 round cooldown): Jumps away and lunges forward with a strong kick to the head. Target takes up to 3x normal damage and gains darkness. Darkness reduces STR by 5 until dispelled or downed. DEX saving throw of 12 or more to resist."]);
+
+      // ----- Restorative items reused across the two FFVII adventures -----
+      var ff7Items = [
+        { name: "Potion", cost: "50", desc: "Restore 4d20 hit die worth of health." },
+        { name: "Phoenix Down", cost: "300", desc: "Remove all status effects on target and restore half of their max health." },
+        { name: "Antidote", cost: "80", desc: "Remove poison status from target and grant poison immunity for 2 rounds." },
+        { name: "Echo Screen", cost: "100", desc: "Remove silence status from target and grant silence immunity for 2 rounds." },
+        { name: "Eye Drop", cost: "50", desc: "Remove darkness status from target and grant darkness immunity for 2 rounds." },
+        { name: "Hyper", cost: "100", desc: "Grants target \"fury\" status which increases all net damage by 1.5x for 2 rounds." },
+        { name: "Tranquilizer", cost: "100", desc: "Grants target \"sadness\" status which decreases all net damage by 1.5x for 2 rounds." },
+        { name: "Hi-Potion", cost: "300", desc: "Restore 4d20 hit die times two worth of health." },
+        { name: "Tent", cost: "500", desc: "Restore all health and spell slots. Can only be used outside of combat and acts as a long rest." }
+      ];
+
+      var adventures = [
+        {
+          name: "Mako Reactor 1",
+          desc: "Fight alongside the resistance to take back a city from an acquisitive mega-corporation.",
+          backstory:
+            "The eco-terrorist group Avalanche, in an attempt to save the Planet from the corrupting ways of Shinra, attacks the reactor. The effort is led by Barret Wallace, accompanied by Biggs, Wedge, Jessie, and the recently hired mercenary Cloud Strife. The team captures a train and uses it to break into the reactor grounds, defended by Shinra guards.\n\n" +
+            "The team fights its way down into the main generator and prepares to set the charges. Cloud has a brief flashback to the incident in Nibelheim and suffers a psychic disturbance. Before the charges can be pulled, the robot Guard Scorpion attacks, and is defeated by Cloud and Barret before the rest of Avalanche make their way back out as the reactor explodes. The explosion causes massive destruction with unknown numbers of civilian casualties. Cloud and Avalanche scatter to regroup at the train heading for the Sector 7 slums.\n\n" +
+            "SPECIAL ENCOUNTERS\n\n" +
+            "Hackable Mono Drive \u2014 A deploying station in the reactor grounds holds 1 malfunctioned Mono Drive. An Intelligence check of 12+ reprograms it into an ally, granting advantage vs. Shinra scientists.\n\n" +
+            "Experimental Gun \u2014 A special crate within utility access holds a gauss cannon. Heavy: requires 1 action and bonus action to use; speed halved while held. Deals 2x strength worth of damage and has a 1d4 chance to blind a target for 1 round.\n\n" +
+            "Shinra Scientist \u2014 A scientist found at the entrance is an Avalanche sympathizer. He offers the party 4 potions and 1 phoenix down.\n\n" +
+            "Scorpion Emails \u2014 A hackable terminal at the entrance has an email thread about the new beefed-up security; the party can gather a basic understanding of Scorpion's abilities.\n\n" +
+            "Pristine Outfit \u2014 In the breakroom of the North Edge station, a crisp elite security officer outfit sits in a locker alongside normal security officer outfits.",
+          areas: [
+            { name: "Mako Reactor 1 Introduction", desc: "The area just outside the reactor includes the platform, a train station reached by stairs, a walled-off area just north of the station, and a walkway connecting Sector 1 and Sector 8. The entrance to the reactor is a set of machinery rooms leading to an elevator, which travels down to vast rooms and piping. Ladders eventually lead down to the core." },
+            { name: "Platform", desc: "A stone platform alongside the railway track, with metal gates on the left and the sign \"1-0b\" painted on the wall. At the far end on the left is the exit onto the North Edge Station." },
+            { name: "North Edge Station", desc: "Inside, train schedules are listed and vending machines and poster ads line the corners and walls. Trains to Sector 5, a route map, and ticket stations sit past the entry barrier. Near the back are stairs to an upper level still under construction \u2014 construction materials and poor lighting." },
+            { name: "Reactor Grounds", desc: "A walled-off area of small metal structures across a stone floor. Metal pipes, framing, and dim lights. A screen above some framing shows \"INTRUDER\" and \"WARNING\". In the center is a narrow bunker-like building with a large clock tower. A tall hallway leads to a switch that opens onto the reactor walkway, with another door to Sector 8." },
+            { name: "Reactor Walkway", desc: "A metal walkway connecting Sector 1 and Sector 8, with a path in the middle leading directly to Mako Reactor 1. Suspended above a vast abyss over the lower city. Used to access the reactor \u2014 and to escape." },
+            { name: "Entrance / Interior", desc: "A metallic, brownish area of large pipes, rusting doors, and machinery: joined rooms with terminals, their doors locked until codes are deciphered. At the northeast-most point, an elevator leads down. The elevator is a dim, purple-tinted enclosed space with a valve and flashing lights." },
+            { name: "Utility Access", desc: "A large, expansive room with a red tint on the stairways, dark brick walls, and metallic pipes. The elevator opens atop a large structure; a staircase descends to a door leading to the mako storage. A small round tower can be climbed but holds nothing of interest." },
+            { name: "Mako Storage", desc: "Pipes ranging from large to humongous, and temperature-regulating fans, fill the walls. Large circular vents direct mako smoke upward, visible outside as a huge cluster of smoke from the top of the reactor." },
+            { name: "Mako Reactor 1 Destruction", desc: "After detonation, all of Sector 1 flashes blue-green then falls dark as power gives out. Residents flood the streets in confusion as a looped announcement drowns out the chatter. Locals near the reactor are in dire states \u2014 collapsing or burning buildings, screaming, trapped under debris \u2014 while brave citizens and Shinra officers tend to the worst." }
+          ],
+          characters: [
+            ch("Cloud Strife", "Level 7 \u00b7 True Neutral \u00b7 Human",
+              "An ex-SOLDIER first class, Cloud came to Midgar to start a new chapter as a mercenary. At the invitation of his childhood friend Tifa, he accepted a job with Avalanche. He may bring his buster sword against Shinra troopers, but he does not care for the plight of the Planet. For him, this is a job and nothing more.",
+              st(50, 10, 10, "15 (+2)", "13 (+1)", "10 (+0)", "10 (+0)", "10 (+0)", "8 (-1)"),
+              ["Fire (Combat only, 1 action, 2 round cooldown): Cast a fireball at one target for 1x strength damage, plus 1 more next round if the target is vulnerable to fire.",
+               "Focused Thrust (Combat only, 1 action, 1 round cooldown): Lunge with a piercing strike for 1x strength damage; automatically hits and knocks the target prone.",
+               "Limit Break: Cross-Slash (Combat only, 1 action, long rest cooldown): Slash one target up to three times for 3x strength damage and stun the enemy for 1 round."]),
+            ch("Barret Wallace", "Level 5 \u00b7 Chaotic Good \u00b7 Human",
+              "Leader of an independent Avalanche cell in Midgar, disavowed by the old guard for extreme methods. He pursues his vendetta against Shinra with a small, trusted group, and serves the neighborhood watch to keep the people \u2014 and his daughter Marlene \u2014 safe.",
+              st(50, 10, 10, "15 (+3)", "13 (+2)", "12 (+1)", "8 (-1)", "8 (-1)", "10 (+0)"),
+              ["Lightning (Combat only, 1 action, 2 round cooldown): Cast lightning at one target for 1x strength damage and daze it if vulnerable to lightning.",
+               "Focused Shot (Combat only, 1 action, 1 round cooldown): Release a concentrated burst of energy for 2x strength damage.",
+               "Limit Break: Fire in the Hole (Combat only, 1 action, long rest cooldown): Shoot an orb of energy that explodes for 2x strength damage to all characters in a 30 foot radius."]),
+            ch("Biggs", "Level 3 \u00b7 Neutral Good \u00b7 Human",
+              "A technical expert like Jessie, skilled in both hand-to-hand and artillery combat. Sometimes hotheaded but mostly energetic, especially out in the field.",
+              st(50, 10, 10, "10 (+0)", "13 (+2)", "8 (-1)", "13 (+2)", "12 (+1)", "10 (+0)"),
+              ["Hack (RP only, 1 action, no cooldown): Break into a computer terminal to discover exploitations and access connected security technologies.",
+               "Smoke Grenade (Combat/RP, 1 action, 2 round cooldown): Obscure a 30 foot radius. Characters in the smoke are difficult to see."]),
+            ch("Jessie Rasberry", "Level 3 \u00b7 Neutral Good \u00b7 Human",
+              "The group's technical expert who specializes in the bombs used to raid a Mako Reactor. Sometimes acts as Barret's second-in-command overseeing Avalanche's plans.",
+              st(50, 12, 10, "10 (+0)", "13 (+2)", "8 (-1)", "13 (+2)", "12 (+1)", "10 (+0)"),
+              ["Hack (RP only, 1 action, no cooldown): Break into a computer terminal to discover exploitations and access connected security technologies.",
+               "Whirlwind Kick (Combat only, 1 action, 2 round cooldown): A devastating kick; target makes a CONST saving throw of 13+ or is incapacitated."]),
+            ch("Wedge", "Level 3 \u00b7 Neutral Good \u00b7 Human",
+              "Support for the team, with experience in combat and artillery. Upbeat and easygoing, he shows concern for Cloud's state of mind and loves food \u2014 especially Tifa's cooking.",
+              st(50, 10, 10, "12 (+1)", "8 (-1)", "12 (+1)", "10 (+0)", "10 (+0)", "10 (+0)"),
+              ["Assault Rifle (Combat only, 1 action, 1 round cooldown): Barrage one target for 1x strength damage and give them disadvantage on their next attack of opportunity.",
+               "Snack (Combat/RP, 1 action, 2 round cooldown): Consume one of the various adventure snacks to restore 1d20 health."]),
+            ch("Resistance Fighter", "Level 3 \u00b7 True Neutral \u00b7 Human",
+              "A rank-and-file member of the resistance fighting alongside the party.",
+              st(50, 10, 10, "12 (+1)", "13 (+2)", "12 (+1)", "10 (+0)", "10 (+0)", "10 (+0)"), []),
+            securityOfficer,
+            monoDrive,
+            guardDog,
+            shockTrooper,
+            ch("Sweeper", "Level 7 \u00b7 Lawful Evil \u00b7 Mechanical",
+              "A self-propelled antipersonnel weapon by Shinra's Advanced Weaponry Division. It stays in sleep mode until it detects intruders, then enters threat-elimination mode.",
+              st(100, 15, 20, "15 (+2)", "10 (+0)", "10 (+0)", "10 (+0)", "10 (+0)", "10 (+0)"),
+              ["Hard Charger (Combat only, 2 actions, no cooldown): Charge forward; all targets in the path take double normal attack damage and are knocked back 15 feet.",
+               "Steam Blast (Combat only, 1 action, 1 round cooldown): A controllable stream of fire for damage equal to its strength, leaving a 10 foot cone of fire for 1 round."]),
+            ch("Scorpion Sentinel", "Level 10 \u00b7 Lawful Evil \u00b7 Mechanical",
+              "A large sentry weapon by Shinra's Advanced Weaponry Division. Highly mobile on many legs and armed with heavy weapons. Deployed at Mako Reactor 1 to protect the core.",
+              st(500, 15, 30, "15 (+3)", "12 (+1)", "13 (+2)", "10 (+0)", "10 (+0)", "10 (+0)"),
+              ["Electrostomp (Combat only, 1 action, 2 round cooldown): Stomp targets within 15 feet for 2x strength damage. DEX saving throw of 12+ to dodge.",
+               "Target Scanner + Mark 99 Launchers (Combat only, 2 actions, 2 round cooldown): Spend 1 action targeting a character, then launch rockets next round for 3x strength damage.",
+               "Mark 98 Cannons (Combat only, 1 action, 2 round cooldown): Fire arm cannons point-blank for 1x strength damage and stun for 1 round.",
+               "Tail Swipe (Combat only, 1 bonus action, no cooldown): Swipe all characters within 15 feet behind it, knocking them back 15 feet. DEX saving throw of 13+ to dodge.",
+               "Death Grip (Combat only, 1 bonus action, 1 round cooldown): Pin a character within 15 feet to the ground, restraining them. STR saving throw of 15+ to escape, or until Tail Swipe is used.",
+               "EM Field (Combat only, passive, 1 long rest): At 100 health, jump up to 100 feet, deploy an EMP field (60 foot radius stun, 1 round; CONST save to resist) and a utility drone (50 HP, 8 AC, repairs 2d20/round).",
+               "Limit Break: Overkill (Combat only, passive, 1 long rest): At 50 health, use all active abilities each round, targeted in 1d12 clockwise directions."])
+          ],
+          items: ff7Items
+        },
+        {
+          name: "Trouble in Wall Market",
+          desc: "Maintain your composure in Midgar's most dangerous \"red light district\" shopping center.",
+          backstory:
+            "Walled in on all sides, Midgar's biggest and most infamous entertainment quarter is run almost entirely by a man named Don Corneo. Free of Shinra's influence, this dangerous area offers \"intriguing\" ways to pass the lonely nights.\n\n" +
+            "The adventure follows the trio and Don as they first encounter Cloud and Aerith. After Cloud and Aerith request entry to the Don's bride showcase, Shinra's head of public safety (Heidegger) catches wind and leads a full assault on Wall Market to take down Avalanche. After several failed attempts to apprehend Cloud and team, Heidegger locks down the Sector 6 entrance, floods the sewers, and lays siege to the marketplace \u2014 spun as a war for the safety of Shinra's upstanding citizens. It is up to the Don and his \"trusty\" trio to defend their home or be left in the rubble.\n\n" +
+            "SPECIAL RULE \u2014 When health reaches 0, make a constitution saving throw. 14 or less grants an Affliction; 15 or more grants a Virtue.\n\n" +
+            "AFFLICTIONS\n" +
+            "\u2022 Abusive: 10% chance to attack allies.\n" +
+            "\u2022 Fearful: -2 strength.\n" +
+            "\u2022 Paranoid: -2 charisma.\n" +
+            "\u2022 Hopeless: -2 wisdom.\n" +
+            "\u2022 Selfish: always starts initiative last.\n" +
+            "\u2022 Masochistic: -2 constitution.\n" +
+            "\u2022 Irrational: -2 intelligence.\n\n" +
+            "VIRTUES\n" +
+            "\u2022 Stalwart: +2 armor.\n" +
+            "\u2022 Courageous: +2 constitution.\n" +
+            "\u2022 Focused: +2 dexterity.\n" +
+            "\u2022 Powerful: +2 strength.\n" +
+            "\u2022 Vigorous: +10 max health.",
+          areas: [
+            { name: "South Wall Market", desc: "Entered through the path in Sector 6. Home to the Inn, Item Store, Diner, Pharmacy, Boutique, and Materia Store. A screen is located halfway along the left end." },
+            { name: "North Wall Market", desc: "A little smaller than the south. Home to the Bar, Weapon Store, and the Men's Hall gym, with more piles of scrap along the tents left over from the Weapon Store owner." },
+            { name: "[SOUTH] Inn", desc: "Directly at the entrance to Wall Market; costs 10 gil to stay. Its vending machine sells items for 200, 100, or 50 gil after speaking with the Materia Store owner \u2014 the most expensive item gives the best reward." },
+            { name: "[SOUTH] Item Store", desc: "The shop labeled \"Item\" has no human clerk and no purchasable goods. At the end is a computer terminal, guarded by a machine gun turret above." },
+            { name: "[SOUTH] Diner", desc: "A standard American-style diner selling food for 70 gil (Korean B.B.Q. Plate, Sushi Plate, or Today's Special). Answering favorably about the food rewards a Pharmacy Coupon used for Cloud's disguise." },
+            { name: "[SOUTH] Pharmacy", desc: "A small one-room store with shelves of medicine. Restorative items can be purchased, and a Pharmacy Coupon trades for a Deodorant, Disinfectant, or Digestive \u2014 the Digestive being best for Cloud's disguise." },
+            { name: "[SOUTH] Boutique", desc: "A clothing store that makes custom dresses. Cloud obtains a custom dress after fetching the owner from a bar: a Cotton, Satin, or Silk Dress \u2014 the Silk Dress (\"feels soft\" and \"shimmers\") scores most in the disguise quest." },
+            { name: "[SOUTH] Materia", desc: "A well-decorated store that initially sells no Materia. The merchant hires the player to buy an item from the inn's vending machine, rewarding a Glass, Ruby, or Diamond Tiara (Diamond is best). After the Sector 7 incident, it stocks basic Materia for sale." },
+            { name: "[SOUTH] Honey Bee Inn", desc: "A members-only adult club, brightly lit with neon. Cloud enters with a membership card and, depending on the room chosen, obtains either Bikini briefs or Lingerie for the disguise, plus make-up in the dressing room." },
+            { name: "[NORTH] Bar", desc: "A wider room with a kitchen, stalls, a screen, and a karaoke booth. Helping a sick patron rewards a Cologne, Flower Cologne, or Sexy Cologne (best, given for a Digestive)." },
+            { name: "[NORTH] Weapon Store", desc: "Near piles of scrap, advertised by a neon \"Machine Gun\" sign. Two rooms behind metal fences: a counter with guns and ammo on display, and an office with posters, a computer, and the owner's tank." },
+            { name: "[NORTH] Men's Hall", desc: "A boxing gym that also serves as a gathering point for cross-dressers, led by \"Beautiful Bro\". Cloud visits to obtain a wig for his disguise." },
+            { name: "[NORTH] Corneo Hall", desc: "Corneo's mansion at the north end. The entrance is guarded by a bouncer who only lets women enter \u2014 prompting Aerith's idea to disguise Cloud. After the Sector 7 incident the mansion is abandoned." },
+            { name: "[NORTH] Corneo Hall Lobby", desc: "Headquarters of the crime lord Don Corneo, full of debauchery and a grand oriental aesthetic in red and gold. Beneath Corneo's chambers lurks the monster Aps in the sewers. The lobby's stairs lead to the Office, the Lackey Room, and the Torture Room." },
+            { name: "[NORTH] Corneo Hall Office", desc: "Where Corneo chooses his \"bride\". Statues line the entrance, a long red carpet leads to his desk, and a door at the back leads to his bedroom. The party is taken here after rendezvousing with Tifa in the Torture Room." }
+          ],
+          characters: [
+            ch("Andrea Rhodea", "Level 3 \u00b7 True Neutral \u00b7 Human",
+              "Owner and lead dancer of the Honeybee Inn. One of the Wall Market Trio \u2014 high-profile \"scouts\" for Don Corneo's bridal auditions \u2014 with great influence in the near-lawless district. He trains body and spirit in pursuit of supreme beauty.",
+              st(80, 10, 40, "10 (+0)", "15 (+2)", "10 (+0)", "10 (+0)", "10 (+0)", "16 (+3)"),
+              ["Dance! (Combat only, 1 action, no cooldown): Dodge all incoming damage for one round.",
+               "Makosexual Temptations (Combat/RP, 1 action, no cooldown): Charm a human within 5 feet. CHA saving throw of 12 + Andrea's CHA modifier to resist. Lasts until dispelled or the save succeeds.",
+               "Limit Break: Role Call (Combat/RP, 1 action, long rest cooldown): Summon 4 elite Honey Bee staff to attack or charm up to 4 targets. Costs 100 gil per round until disbanded or out of gil."]),
+            ch("Chocobo Sam", "Level 3 \u00b7 Lawful Neutral \u00b7 Human",
+              "Owner of a chocobo hut and the successful \"Sam's Delivery\" business in Wall Market. A seeker of thrills and gambles, and a recommended agent for Don Corneo's bride auditions.",
+              st(160, 13, 35, "15 (+2)", "10 (+0)", "16 (+3)", "10 (+0)", "10 (+0)", "8 (-1)"),
+              ["Call it! (Combat only, 1 action, no cooldown): Flip a coin and call it. If correct, your next successful attack deals 6x normal damage.",
+               "Call the Cavalry (Combat/RP, 2 actions, short rest): Request a pickup to move Sam and 3 friendly targets anywhere in Wall Market immediately.",
+               "Limit Break: Advanced Machinery (Combat/RP, 1 action, long rest cooldown): Summon personal Shinra Sweeper tech \u2014 Sweepy and Cutty \u2014 for rounds equal to Sam's CONST modifier."]),
+            ch("Madam M", "Level 3 \u00b7 Chaotic Neutral \u00b7 Human",
+              "A prideful woman who runs a massage parlor in Wall Market. Like Andrea and Sam, she holds the rank of approving women to see Don Corneo.",
+              st(80, 12, 40, "8 (-1)", "12 (+1)", "8 (-1)", "16 (+3)", "15 (+2)", "15 (+2)"),
+              ["Professional Masseuse (Combat/RP, 1 action, no cooldown): Grant a friendly target +2 to any attribute modifier (no stacking). Lasts until a short rest.",
+               "Retaliation (Combat only, 1 action, 1 round cooldown): In a fit of rage, strike a target for damage equal to her missing health.",
+               "Limit Break: Breaking Point (Combat/RP, 1 action, long rest cooldown): Frighten all characters within 30 feet. WIS saving throw of 13 + Madam's CHA modifier or be terrified (stunned, modifiers/armor/attack reduced to 0, can't approach for 2 rounds)."]),
+            ch("Don Corneo", "Level 3 \u00b7 Neutral Evil \u00b7 Human",
+              "The true ruler of Wall Market. A lecherous scumbag who hosts nightly auditions for the \"next Mrs. Corneo.\" Foul of mouth and face, but with an uncanny way with people \u2014 even the dregs of society are under his thumb.",
+              st(80, 12, 30, "8 (-1)", "8 (-1)", "16 (+3)", "12 (+1)", "10 (+0)", "15 (+2)"),
+              ["Call Lackey (Combat/RP, 1 action, 1 round cooldown): Summon a Corneo Lackey (max 3 at a time).",
+               "Escape Artist (Combat/RP, 2 actions, short rest cooldown): INT check of 12+ to instantly appear in the Corneo Hall office.",
+               "Limit Break: House Party (Combat only, 1 action, long rest cooldown): Summon Hell House until combat ends or it is defeated."]),
+            ch("Corneo's Lackey", "Level 3 \u00b7 Neutral Evil \u00b7 Human",
+              "One of many henchmen that work for the Don.",
+              st(40, 10, 30, "10 (+0)", "10 (+0)", "10 (+0)", "8 (-1)", "8 (-1)", "8 (-1)"),
+              ["Heckle (Combat only, 1 action, no cooldown): Taunt an NPC, forcing it to attack the Lackey."]),
+            ch("Hell House", "Level 10 \u00b7 Chaotic Evil \u00b7 House",
+              "Inside its house-looking shell, its true form is a three-armed mechanical creature with four legs and mismatched thrusters.",
+              st(500, 15, 10, "50 (+10)", "1 (-10)", "16 (+3)", "1 (-10)", "1 (-10)", "1 (-10)"),
+              ["Inhale (Combat only, 1 action, no cooldown): Trap one target inside the house for 2 rounds. DEX saving throw of 12+ to resist.",
+               "Flaming Chairs (Combat only, 1 action, no cooldown): Attack up to 5 targets with chairs for damage equal to the house's attack.",
+               "Suicide Drop (Combat only, 2 actions, no cooldown): Fly up and drop on a target for damage equal to the house's remaining health to both target and itself (ineffective against the trio)."]),
+            ch("Sweepy", "Level 3 \u00b7 Lawful Neutral \u00b7 Mechanical",
+              "A self-propelled antipersonnel weapon by Shinra's Advanced Weaponry Division. Sleeps until it detects intruders, then enters threat-elimination mode.",
+              st(100, 15, 20, "15 (+2)", "10 (+0)", "10 (+0)", "10 (+0)", "10 (+0)", "10 (+0)"),
+              ["Hard Charger (Combat only, 2 actions, no cooldown): Charge forward; targets in the path take double normal attack damage and are knocked back 15 feet.",
+               "Steam Blast (Combat only, 1 action, 1 round cooldown): A controllable stream of fire for damage equal to its strength, leaving a 10 foot cone of fire for 1 round."]),
+            ch("Cutty", "Level 3 \u00b7 Lawful Neutral \u00b7 Mechanical",
+              "An improved sweeper outfitted with spinning saw blades at the end of each arm.",
+              st(100, 15, 20, "16 (+3)", "10 (+0)", "10 (+0)", "10 (+0)", "10 (+0)", "10 (+0)"),
+              ["Hard Charger (Combat only, 2 actions, no cooldown): Charge forward; targets in the path take double normal attack damage and are knocked back 15 feet.",
+               "Cleave (Combat only, passive, no cooldown): Saw-blade swings deal full damage to 3 other targets within melee range."]),
+            ch("Tonberry", "Level 1 \u00b7 True Neutral \u00b7 Creature",
+              "Sneaky beings that creep through the darkness carrying knives and lanterns. Their incessant, innocent stare stabs opponents, pushing them over the brink of despair.",
+              st(500, 0, 5, "10 (+0)", "10 (+0)", "10 (+0)", "10 (+0)", "10 (+0)", "10 (+0)"),
+              ["Chef's Knife (Combat only, 1 action, 1 round cooldown): Deal damage equal to the target's remaining health within melee range.",
+               "Karma (Combat only, passive, no cooldown): Deal 5 damage to the attacker per character they have killed."]),
+            securityOfficer,
+            monoDrive,
+            guardDog,
+            shockTrooper,
+            ch("Helitrooper", "Level 7 \u00b7 Lawful Evil \u00b7 Human",
+              "Troopers of Shinra's Public Security Division in power-enhancing suits, fighting airborne with rotors. They perform recon and pursue targets where other troopers cannot.",
+              st(125, 12, 40, "15 (+2)", "16 (+3)", "12 (+1)", "12 (+1)", "12 (+1)", "10 (+0)"),
+              ["Whirlwind (Combat only, 1 action, 1 round cooldown): Land and reverse propellers, blowing targets back 60 feet. DEX or STR saving throw of 15+ to resist.",
+               "Airborne (Combat/RP, passive, no cooldown): While not attacking, hovers 15 feet up, making it extremely difficult to attack."]),
+            ch("Heidegger", "Level 10 \u00b7 Lawful Evil \u00b7 Human",
+              "A high-ranking member of Shinra and head of Public Safety (a euphemism for the military).",
+              st(500, 13, 40, "50 (+10)", "16 (+3)", "16 (+3)", "16 (+3)", "16 (+3)", "16 (+3)"),
+              ["Horse Laugh (Combat only, 1 bonus action, no cooldown): Gya haa haa haa! Enemies within 30 feet make an INT, WIS or CHA saving throw of 15+ or deal 10 less damage until they succeed.",
+               "Silence (Combat only, 1 bonus action, no cooldown): Silence one target for 2 rounds. WIS saving throw to resist.",
+               "Command (Combat only, 1 action, 1 round cooldown): Order all allies within 60 feet to attack a single target.",
+               "Refuse (Combat only, passive, no cooldown): Immune to personality status effects like charmed and terrified.",
+               "Plot Point (Combat only, passive, long rest cooldown): Instead of dying at 0 health, take death saves for permadeath.",
+               "Limit Break: Reinforcements (Combat only, passive, long rest cooldown): At 20% health or less, call additional troops and a helicopter; in 1 round, he is whisked back to Shinra HQ."])
+          ],
+          items: ff7Items
+        },
+        {
+          name: "World on Fire",
+          desc: "Avatar: The Last Airbender \u2014 what if Firelord Ozai had defeated Aang during the harmonic convergence? 500 years later, a corrupt imperial Fire Nation controls all ways of life, and it is up to the people to decide their fate against impossible odds.",
+          backstory:
+            "THEMES\n" +
+            "\u2022 Imperialism \u2014 Zuko Alone (Book 2, E07)\n" +
+            "\u2022 Corruption in Government \u2014 Lake Laogai (Book 2, E17) & The Earth King (Book 2, E18)\n" +
+            "\u2022 Class Struggles \u2014 City of Walls and Secrets (Book 2, E14)\n" +
+            "\u2022 Genocide \u2014 The Southern Air Temple (Book 1, E03)\n" +
+            "\u2022 The Environment \u2014 Winter Solstice (Book 1, E07) & The Painted Lady (Book 3, E03)\n" +
+            "\u2022 Propaganda \u2014 The Headband (Book 3, E02)\n\n" +
+            "ELEMENTS\n" +
+            "\u2022 Water \u2014 calm, healing, traditional, moon.\n" +
+            "\u2022 Earth \u2014 lawful, disciplined, fragmented, natural wonders.\n" +
+            "\u2022 Fire \u2014 militarized, aggressive, ruthless, sun.\n" +
+            "\u2022 Air \u2014 peaceful, pacifist, nomads, openness.\n\n" +
+            "OPENING SEQUENCE\n" +
+            "It has been 500 years since Aang and Ozai fought, but the consequences still resonate. The sky is painted with dark clouds, lit a reddish-black hue. Fire Nation history has been rewritten or burned; few know the horrors of the past, and any mention of past events is considered illegal.\n\n" +
+            "After conquering the world, the Fire Nation imprisoned elite Earth and Water benders and killed the rest. With Aang and the air temples destroyed, airbending was snuffed out. Bending is forbidden except by Fire Nation military or enslaved benders (Earth for city-building, Water for medics). Technology advanced into an industrial/steampunk age, and ruthless military squads called Embers enforce the law, sometimes with tanks or cannons.\n\n" +
+            "In this police state, all business profit is forfeited monthly to the Fire Nation, then a discretionary stipend is returned \u2014 just enough to stay afloat. Living outside Fire Nation society means dealing with rage-filled spirits that roam the land.\n\n" +
+            "We open in Smolder, a former Earth Kingdom city (Boulder) now the largest producer of steel plates, piping, and industrial components, worked endlessly by enslaved metal-benders under Ember supervision. It is a late spring morning on collections day, and more Ember squads than usual arrive \u2014 rumor says the Phoenix King has ordered production increased by any means.\n\n" +
+            "SPECIAL EVENTS / RULES\n\n" +
+            "Weather Patterns \u2014 1d10: evens = normal day; 1/3/5 = rain; 7 = solar flare; 9 = windy.\n\n" +
+            "Global Strategy \u2014 Controlling a major city lets the group prepare a military play using any resources to take other parts of the world.\n\n" +
+            "War of Spirits \u2014 While campaigning, there's a chance to find 10 good spirits fighting 10 bad spirits. Saved good spirits drop a coin of their slogan that, when used, calls upon them to perform it.\n\n" +
+            "Improvised Combat \u2014 Benders can bend up to their weight in their element (double or more in great need, at a cost to safety). Damage is normally 1d10, scaling up or down with the scenario.\n\n" +
+            "Radiation Poisoning \u2014 CONST of 12+ periodically. Gon's healing lowers the counter one per short rest. Failed checks: 1) hot; 2) dizzy (DEX 10+ to not trip); 3) nauseous (CONST 15+ to not vomit); 4) weak (disadvantage on physical checks); 5) max health reduced 1d10 (min 1); 6) unconscious.\n\n" +
+            "Civil Unrest \u2014 PERCEPTION 12+ periodically, 1d4 result: 1) Ember squad with ~10 detained civilians; 2) a couple talking to an Ember scribe pointing at you; 3) Boomey's employee fighting an Ember squad; 4) youths vandalizing stores.\n\n" +
+            "Heated Springs Raid \u2014 The Fire Nation orders the Heated Springs tribe dismantled; war balloons rain fire. Each Fire Nation encounter raises the PK bar by 1; at 3, the Phoenix King arrives.\n\n" +
+            "Heated Springs Liberation \u2014 If the Fire Nation is defeated, decide the fate of up to 50 remaining tribe members; you may deploy that many by messenger bird.\n\n" +
+            "PK Arrival \u2014 Sky turns dark red, a giant phoenix of fire melts large portions of ice, and reincarnates from an egg after a few hours if somehow defeated.",
+          areas: [
+            { name: "World Map", desc: "World map of Earth." },
+            { name: "EARTH: Smolder", desc: "Largest population and producer of industrial materials \u2014 steel plates, cabling, piping. Key settlement for technological advancement." },
+            { name: "EARTH: Igni", desc: "Covered by mountains and volcanos, making it one of the most life-threatening landscapes in the world." },
+            { name: "EARTH: Thunderbluff", desc: "Home to the discovery of lightning bending, which drove huge progress in innovation \u2014 namely torture devices." },
+            { name: "EARTH: Burning Vitality", desc: "Lush forests of vibrant foliage and fauna. Visible scars of past wars remain, but the land is relatively healthy. Travelers stay alert here." },
+            { name: "FIRE: Searing Pig", desc: "Mainly known for food production. Gritty and borderline savage, largely populated by nationalists and Fire Nation sympathizers." },
+            { name: "FIRE: Torchlight Vault", desc: "Rumored to record and store history. Difficult to find and harder to enter. Ember scribes have been known to peruse its collection." },
+            { name: "FIRE: Firestorm Palace", desc: "The capital of the world. Only the rich and powerful live here, including the rumored Phoenix King. Distributes currency, develops laws, and trains the military." },
+            { name: "WATER: Frostfire", desc: "Named after the lands of the Heated Springs. Healing geysers erupt across the land, giving rise to a specialized healing waterbending." },
+            { name: "WATER: Heated Springs", desc: "Named after the lands of the Frostfire. Vast, thick ice has resisted Fire Nation melting. Elite firebenders train here to push their limits." },
+            { name: "AIR: Ruins of Air", desc: "Remains of a once peaceful civilization." }
+          ],
+          characters: [
+            ch("Shina", "Level 5 \u00b7 True Neutral \u00b7 Human Lava Bender",
+              "A living legacy of Kyoshi, the last known Earth Kingdom avatar. An outcast teaching herself the rare, dangerous art of lava-bending. Exiled by her family for being a rebel, she was raised by friendly badger moles in a cave. After evil spirits drove her to a volcano's edge, a vision of Kyoshi and a fury of molten rock saved her \u2014 and she swore to take back these lands. She lives in that same volcano near Smolder.",
+              st(20, 13, 10, "15 (+2)", "8 (-1)", "15 (+2)", "8 (-1)", "15 (+2)", "8 (-1)"),
+              ["Molten Rock Armor (Combat/RP, 1 action, no cooldown): +2 AC to a friendly target (includes self).",
+               "Seismic Sense (Combat/RP, 1 action, short rest cooldown): Touch the ground to sense everything within a 1 mile radius, granting advantage on tracking-related perception rolls.",
+               "Lava Wave (Combat, 1 action, long rest cooldown): Hurl a wall of lava at a target. DEX saving throw of 15+ to resist; if struck, 5d20 damage."]),
+            ch("Michigan Galactus", "Level 5 \u00b7 Neutral Good \u00b7 Human Air Bender",
+              "A former Fire Nation Ember scribe who defected after the forbidden section of the Torchlight Vault confirmed his doubts. There he found the \"Mystic Arts of Ether\" \u2014 a book of airbending \u2014 and slipped away unnoticed. A nomad and tinkerer, he integrates airbending into crafted gadgets. He's in Smolder seeking the latest tech.",
+              st(5, 10, 10, "8 (-1)", "15 (+2)", "8 (-1)", "15 (+2)", "8 (-1)", "15 (+2)"),
+              ["Gust (Combat/RP, 1 action, 1 round cooldown): Release a gust pushing targets 1d10 feet away (DEX/STR save of 12+). Each round active adds another 1d10 feet and +1 to the save.",
+               "Air Scooter (Combat/RP, 1 bonus action, 1 round cooldown): Ride a ball of air; you don't touch the ground and base speed doubles. If hit, the ball dissipates (DEX save of 13+ to land properly).",
+               "Steady Breathing (Combat/RP, 1 action, short rest cooldown): Meditate to double the effectiveness of your next airbend within an hour. Out of combat only."]),
+            ch("Athari", "Level 5 \u00b7 Human Fire Bender",
+              "A member of the elite Ember squad as a Weaver, specialized in extortion and torture. Unlike most, he seeks middle ground between civilians and the military \u2014 likely due to his mixed-nation upbringing (Fire Nation father, Water Tribe mother). Stationed in Smolder, awaiting his next order from the Pyroguard Council.",
+              st(20, 14, 10, "8 (-1)", "15 (+2)", "8 (-1)", "15 (+2)", "15 (+2)", "8 (-1)"),
+              ["Scorched Earth (Combat/RP, 1 action, 1 round cooldown): Burn the ground around a target for 1d10/round. DEX save of 13+ for half damage.",
+               "Dragon Stance (Combat/RP, 1 bonus action, 2 round cooldown): Toggle stance; in Dragon Stance, attack physically up to 3 times per round but cannot firebend.",
+               "Immolation (Combat/RP, 1 action, short rest cooldown): Erupt into flame, dealing 1d20 to all within 10 feet while you take 1d10. Not while raining or windy."]),
+            ch("Gon", "Level 5 \u00b7 Human Water Bender",
+              "One of many waterbenders from Heated Springs \"commissioned\" by the Fire Nation to heal their military. He secretly recovered a blood-soaked booklet outlining blood bending from a captured old woman, keeping it hidden even from his family. Now an enslaved waterbender in Smolder, he protects and heals Ember squads.",
+              st(10, 8, 10, "8 (-1)", "8 (-1)", "15 (+2)", "15 (+2)", "15 (+2)", "8 (-1)"),
+              ["Healing Touch (Combat/RP, 1 action, no cooldown): Flow water into a wound to heal a target 1d10.",
+               "Drown (Combat/RP, 1 action, 1 round cooldown): Bend water around a target's head, cutting off oxygen. STR/DEX save of 13+ to resist; each round drowning deals 1d10 \u00d7 rounds drowning.",
+               "Forbidden Blood Bending (Combat/RP, 2 actions, long rest cooldown): Bend a target's body to your will. Expressly forbidden \u2014 nearby NPCs turn hostile or cower in fear."]),
+            ch("Boomey", "Level 5 \u00b7 Neutral Good \u00b7 Human Earth Bender",
+              "CEO of Cabbage Corp out of Smolder. He took over his father's cabbage business at 13, days after an Ember Trooper killed his father on a collections day. His family broke apart in the aftermath. Standing up to Fire Nation injustices has landed him in many fights. A prime example of former Earth Kingdom unyielding spirit \u2014 this beaten dog still has teeth.",
+              st(20, 10, 10, "15 (+2)", "8 (-1)", "15 (+2)", "15 (+2)", "8 (-1)", "8 (-1)"),
+              ["Inner Focus (Combat/RP, 1 action, short rest cooldown): Hone in on one target; all accuracy against them is doubled (roll at advantage).",
+               "Repressed Anger (Combat/RP, passive, no cooldown): Against Ember squads/Fire Nation, bending damage is doubled (2d10) but rolls to hit are at disadvantage.",
+               "Mental Fortitude (Combat/RP, passive, short rest cooldown): Reroll the next INT/WIS saving throw, taking the higher die."]),
+            ch("Ember Trooper", "Fire Nation military",
+              "Heavily armored military infantry trained to enforce Fire Nation laws without accountability. Their formidable steel armor masks their identity, distancing them from humanity.",
+              st(100, 10, 10, "10 (+0)", "10 (+0)", "10 (+0)", "10 (+0)", "10 (+0)", "10 (+0)"), []),
+            ch("Ember Weaver", "Fire Nation military",
+              "Lightly armored firebending specialists trained in extortion and torture. Their armor bears strange markings to instill fear and confusion.",
+              st(100, 10, 10, "10 (+0)", "10 (+0)", "10 (+0)", "10 (+0)", "10 (+0)", "10 (+0)"), []),
+            ch("Ember Scribe", "Fire Nation military",
+              "Lightly armored non-bender knowledgeable on Fire Nation law. Their royal, diplomatic armor projects a lawful image. Scribes lead patrols to collect taxes, dispatch squads, and interrogate locals for rumors of subversion.",
+              st(100, 10, 10, "10 (+0)", "10 (+0)", "10 (+0)", "10 (+0)", "10 (+0)", "10 (+0)"), []),
+            ch("Enslaved Bender", "Fire Nation captive",
+              "Beaten and taken to the brink, enslaved benders are the only non-fire benders pre-approved to bend other elements. Descendants of elite benders, taught early to obey \u2014 rebels are killed, the disobedient beaten, the compliant live relatively normal lives. Most wear a lightning-charged shock collar bent by Ember weavers.",
+              st(100, 10, 10, "10 (+0)", "10 (+0)", "10 (+0)", "10 (+0)", "10 (+0)", "10 (+0)"), []),
+            ch("Pyroguard Council", "Fire Nation command",
+              "Responsible for prioritizing and dispatching Ember squads to cities, plus their logistics \u2014 housing, heavy machinery, and travel.",
+              st(100, 10, 10, "10 (+0)", "10 (+0)", "10 (+0)", "10 (+0)", "10 (+0)", "10 (+0)"), []),
+            ch("Infernal Dynasty", "Fire Nation elite",
+              "Trusted advisors of the Phoenix King.",
+              st(100, 10, 10, "10 (+0)", "10 (+0)", "10 (+0)", "10 (+0)", "10 (+0)", "10 (+0)"), []),
+            ch("Phoenix King", "Fire Nation supreme leader",
+              "Supreme leader of the Fire Nation and, by extension, the world. Never seen outside the Infernal Dynasty, whispers throughout the land question his actual existence.",
+              st(100, 10, 10, "10 (+0)", "10 (+0)", "10 (+0)", "10 (+0)", "10 (+0)", "10 (+0)"), [])
+          ],
+          items: []
+        },
+        {
+          name: "Pitch Black",
+          desc: "Ruin has come to this land and you are the only ones who can save it.",
+          backstory:
+            "A perilous descent into madness, dealing with a prodigious number of threats to body and mind. Five hundred feet below the earth you will fight not only unimaginable foes, but famine, disease, and the stress of the ever-encroaching dark. Driven by a set of 9 predefined classes chosen by players.\n\n" +
+            "SETTING\n" +
+            "A dark gothic atmosphere. Corruption and monsters have overrun the once-idyllic estate of the players' late ancestor. The impoverished Hamlet must now withstand unthinkable nightmares. The ancestor himself caused this evil, meddling with dark forces in pursuit of immortality and unsealing a nightmarish power entombed below his mansion. Repentant, he ended his own life and bequeathed the Estate to you, urging that you purge it.\n\n" +
+            "SPECIAL RULES\n\n" +
+            "Stress Meter \u2014 In addition to health and mana, each character has a stress meter. Horrific events, stress abilities, or critical hits deal stress damage. At the stress threshold, characters suffer a class-based negative attribute (see each character's Personality/Psyche).\n\n" +
+            "Light Meter \u2014 While exploring the Ruins, Warrens, Weald, or Cove, torchlight diminishes and darkness takes over. Every turn in darkness (10 seconds) inflicts 10 stress damage.\n\n" +
+            "Hunger \u2014 At certain intervals, hunger checks are announced (cannot be skipped). With food, take the action to eat and regain 10 health. Without food, take 20% of max health as damage and 10 stress damage.",
+          areas: [
+            { name: "Hamlet", desc: "A quiet, decayed settlement on the Estate's grounds where a handful of people cling to a squalid yet relatively civilized existence." },
+            { name: "Ruins", desc: "A crumbling castle inhabited by cultists, necromancers, and undead. Plenty of treasures can be found there." },
+            { name: "Warrens", desc: "A maze of aqueducts and cellars inhabited by beasts and man-pigs. Plenty of food can be found there." },
+            { name: "Weald", desc: "A stagnant, overgrown forest inhabited by bandits and victims of parasitic fungus. Blight is contracted often there." },
+            { name: "Cove", desc: "Waterlogged caverns inhabited by fishmen, sea creatures, and undead. Most curios here apply buffs/debuffs or manipulate quirks." },
+            { name: "Courtyard", desc: "Vast, swamp-ridden ruins of a once splendid garden, infested by bloodsucking insect creatures. The light meter stays at Bloodlight \u2014 increased stress and decreased bleed resistance." },
+            { name: "Farmstead", desc: "A barren, exhausted farm ravaged by otherworldly creatures. The light meter changes between five states: Farmstead Miasma, Blazing, Haunting, Gleaming, and Splendorous." },
+            { name: "The Darkest Dungeon", desc: "The ancient, blood-drenched passages beneath the clifftop mansion, where eldritch evil creeps and the source of the corruption resides." }
+          ],
+          characters: [
+            ch("The Reformer (Crusader)", "Level 1 \u00b7 Lawful Good \u00b7 Human \u00b7 Enneagram 1",
+              "Principled, purposeful, self-controlled, and perfectionistic. A holy champion who smites the wicked. His armor restricts movement but affords great protection, letting him stand in the frontline. No matter the pressure, he finds strength to keep fighting and inspires others to fend off madness.",
+              st(33, 5, 1, "", "", "", "", "", ""),
+              ["Smite", "Zealous Accusation", "Stunning Blow", "Bulwark of Faith", "Battle Heal", "Holy Lance", "Inspiring Cry"]),
+            ch("The Helper (Vestal)", "Level 1 \u00b7 Lawful Good \u00b7 Human \u00b7 Enneagram 2",
+              "Demonstrative, generous, people-pleasing, and possessive. A warrior nun who channels zeal into healing, holy judgements, and dazzling light. A strong backbone who can also hold the front line with a mace bash.",
+              st(24, 0, 4, "", "", "", "", "", ""),
+              ["Mace Bash", "Judgement", "Dazzling Light", "Divine Grace", "Divine Comfort", "Illumination", "Hand of Light"]),
+            ch("The Achiever (Plague Doctor)", "Level 1 \u00b7 Chaotic Neutral \u00b7 Human \u00b7 Enneagram 3",
+              "Adaptive, excelling, driven, and image-conscious. A doctor and alchemist who hangs back, eating away at foes with stacking damage-over-time. Equally effective in support \u2014 blinding and confusing foes while enhancing survival with tonics and remedies.",
+              st(22, 0, 7, "", "", "", "", "", ""),
+              ["Noxious Blast", "Plague Grenade", "Blinding Gas", "Incision", "Battlefield Medicine", "Emboldening Vapours", "Disorienting Blast"]),
+            ch("The Individualist (Leper)", "Level 1 \u00b7 Lawful Neutral \u00b7 Human \u00b7 Enneagram 4",
+              "Expressive, dramatic, self-absorbed, and temperamental. He channels energy inward, gaining great strength and endurance but unable to comfort others. When his massive blade falls, death rings loud \u2014 though such force may be lightly evaded.",
+              st(35, 0, 2, "", "", "", "", "", ""),
+              ["Chop", "Hew", "Purge", "Revenge", "Withstand", "Solemnity", "Intimidate"]),
+            ch("The Investigator (Antiquarian)", "Level 1 \u00b7 Chaotic Neutral \u00b7 Human \u00b7 Enneagram 5",
+              "Perceptive, innovative, secretive, and isolated. A scholar not suited for combat, but an expert in self-preservation \u2014 making herself scarce or demanding protection. Her fulminating censer heals allies and toxifies attackers.",
+              st(17, 10, 5, "", "", "", "", "", ""),
+              ["Nervous Stab", "Festering Vapours", "Get Down!", "Flashpowder", "Fortifying Vapours", "Invigorating Vapours", "Protect Me"]),
+            ch("The Loyalist (Houndmaster)", "Level 1 \u00b7 Lawful Neutral \u00b7 Human \u00b7 Enneagram 6",
+              "Engaging, responsible, anxious, and suspicious. A tough, compassionate ex-lawman who works in tandem with his faithful wolfhound \u2014 harrying bleeds, gnashing teeth, and stunning blows \u2014 while supporting an ailing party.",
+              st(21, 10, 5, "", "", "", "", "", ""),
+              ["Hound's Rush", "Hound's Harry", "Target Whistle", "Cry Havoc", "Guard Dog", "Lick Wounds", "Blackjack"]),
+            ch("The Enthusiast (Jester)", "Level 1 \u00b7 Chaotic Neutral \u00b7 Human \u00b7 Enneagram 7",
+              "Spontaneous, versatile, distractible, and scattered. A maniacal minstrel with a sickle and lute. He bleeds out the back ranks, provides in-battle comfort with songs, and dances around party shufflers \u2014 turning a stressful camp into merriment.",
+              st(19, 15, 7, "", "", "", "", "", ""),
+              ["Dirk Stab", "Harvest", "Finale", "Solo", "Slice Off", "Battle Ballad", "Inspiring Tune"]),
+            ch("The Challenger (Hellion)", "Level 1 \u00b7 Chaotic Neutral \u00b7 Human \u00b7 Enneagram 8",
+              "Self-confident, decisive, willful, and confrontational. Wild and ruthless, she thrills to spilled blood. Her massive glaive grants reach and leaves lasting wounds, but some skills leave her exhausted and needing a turn to recharge.",
+              st(26, 10, 4, "", "", "", "", "", ""),
+              ["Wicked Hack", "Iron Swan", "Barbaric YAWP!", "If It Bleeds", "Breakthrough", "Adrenaline Rush", "Bleed Out"]),
+            ch("The Peacemaker (Man-at-Arms)", "Level 1 \u00b7 True Neutral \u00b7 Human \u00b7 Enneagram 9",
+              "Receptive, reassuring, agreeable, and complacent. A battle-scarred veteran whose defense makes him vital \u2014 reading enemy movements to draw fire and retaliate. His shouts issue commands or strike fear; at camp he instructs and bolsters the team.",
+              st(31, 5, 3, "", "", "", "", "", ""),
+              ["Crush", "Rampart", "Bellow", "Defender", "Retribution", "Command", "Bolster"]),
+            ch("Darkest Dungeon Enemy Template", "Reference",
+              "Use the Darkest Dungeon Enemies wiki for foe stat blocks and abilities (darkestdungeon.fandom.com/wiki/Enemies).",
+              null, [])
+          ],
+          items: [
+            { name: "Darkest Dungeon Item Template", cost: "", desc: "Use the Darkest Dungeon Items wiki for trinkets, provisions, and curios (darkestdungeon.fandom.com/wiki/Items)." }
+          ]
+        },
+        {
+          name: "Oblivion's Sanctuary",
+          desc: "Solve the mystery of disappearances in a town seemingly controlled by supernatural forces.",
+          backstory:
+            "This story is played out completely ad-hoc since it is highly dependent on the player characters.\n\n" +
+            "SPECIAL EVENTS\n\n" +
+            "Calling Lights \u2014 Sunlight pulls and concentrates in certain areas. After 5 minutes, the contrast becomes stark and the beams rapidly heat the lit areas. Dark areas whisper madness, beckoning each character's comfort. Each player makes an 18 CHA save or calls out for what comforts them: on a fail, they move 15 feet toward the darkness; otherwise an apparition of that comfort emerges \u2014 visible only to them, and immediately hostile.\n\n" +
+            "Lord of Clarity \u2014 Ghosts of citizens haunt the village but remain neutral, doing their living tasks. Each has a piece of their soul taken, keeping them as servants of their ghost lord, who feels guilt for their burden. Killing the lord returns the soul pieces so they can rest; alternatively, each citizen can be made aware and have their piece restored through a ritual. The pieces: everyday fear of being murdered; a parent's denial that a child died in a shipwreck; the sadness of fighting a deadly disease.\n\n" +
+            "Poet's Heart \u2014 A ragged bard sings \"Drops of Jupiter\" and asks who his heart speaks of. Guess wrong and he turns absurdly hostile; guess right and he awards a magical lute that turns hostile enemies neutral for a turn.\n\n" +
+            "Death's Door \u2014 A rigged chest in the upper rafts releases a toxic fume (DEX 19 save to avoid). If affected, the character sees a world of fire and brimstone; demons turn hostile (10 CHA save to avoid each hit). After 3 hits, they move to the castle edge and jump off.\n\n" +
+            "Drunken Angel \u2014 In the dining area, doors lock and golden chalices of infinite wine pour toward the characters' mouths. If wine reaches the mouth, they feel drunk and high: CHA +5, INT -5, immunity to mind effects, a golden glow, and wings that allow poor flight \u2014 but demons gain combat advantage on them.\n\n" +
+            "The Kill \u2014 On the first sleep, dreams turn to nightmares: characters are split among two opposing nations mid-battle, unknowingly attacking each other with their real stats. When one takes fatal damage, identities are revealed \u2014 the victor gains STR +5, DEX +5 and disadvantage on mental checks; the defeated wake with only 1 death save remaining.",
+          areas: [],
+          characters: [],
+          items: []
+        },
+        {
+          name: "Squid Games",
+          desc: "Once-careless children's games have become fatal. You and other participants must compete or work together to see another day.",
+          backstory:
+            "456 cash-strapped people battle each other in six games inspired by children's games for the chance to win 45.6 billion Korean won (around $38.4 million). The losers from each game face death.\n\n" +
+            "SPECIAL RULES\n\n" +
+            "Game Announcement \u2014 All of you are participants in a series of games testing mind and body. Six games over six days; whoever wins all six wins up to $40 million in cash.\n\n" +
+            "Participant Voting \u2014 After every mini game, staff offer a vote to cancel the games and send participants home.\n\n" +
+            "Participant Meals \u2014 After every mini game, staff provide small meals equal to the remaining participants. There are no rules against taking someone else's meal.\n\n" +
+            "Black Market Deals \u2014 A doctor participant works with 2 soldiers and 2 workers to sell organs on the black market. In exchange, the participant gains an advantage on upcoming mini games.\n\n" +
+            "One Lucky Day \u2014 If one person remains, they win and receive a bank card with the prize money.",
+          areas: [
+            { name: "Participant Holding", desc: "A gymnasium-like room where players eat and sleep between games. 5-story bunk beds for each player, two large doors to the rest of the facility, a large monitor for remaining players and votes, and doors to gendered bathrooms." },
+            { name: "[Mini Game] Red Light, Green Light", desc: "Contestants move toward a finish line near a giant robotic doll, freezing when it speaks. Those who move during the silence are eliminated and shot. [450 players left] 120 yards, 1 minute, 3 STR or DEX saves for the spotter (3 or less = trip, saved by the person behind)." },
+            { name: "[Mini Game] Dalgona Candy Challenge", desc: "Carve a shape from honeycomb candy with a needle pin without breaking it. Break the outline and you're eliminated. [250 players left] DEX save varying by shape: 5+ easy, 10+ medium, 15+ hard." },
+            { name: "[Mini Game] Tug of War", desc: "Teams play tug of war on an elevated platform; the losing team falls to their deaths as the rope is cut. [100 players left] 10 groups of 10, 1d10 + STR mods per person, must win 3 in a row to pull a team off." },
+            { name: "[Mini Game] Marbles", desc: "Players pair up and compete to win all 10 of the other's marbles; the loser is shot. [50 players left] Player characters may match with each other or with an NPC." },
+            { name: "[Mini Game] Stepping Stone Bridge", desc: "Walk across a bridge of glass panels at deadly height \u2014 some tempered, some weak. [20 players left] Identical-looking panel pairs (one weak, one strong) for 20 steps." },
+            { name: "[Mini Game] The Squid Game", desc: "Two sides combat each other within a squid-shaped grid; the attacker must tap the squid's head while the defense tries to push them out of bounds. [2-6 players left] Touch 3 parts of the squid's head without being pushed out." }
+          ],
+          characters: [
+            ch("Workers \u25ef", "Level 3 \u00b7 Neutral Evil \u00b7 Human",
+              "The \"civilians\" of the guards. They cannot speak without a Manager's permission, move beyond their post, or use firearms. Their role is menial labor: transporting and cremating the deceased, maintaining the facility, and distributing food.",
+              st(100, 10, 10, "10 (+0)", "10 (+0)", "10 (+0)", "10 (+0)", "10 (+0)", "10 (+0)"), []),
+            ch("Soldiers \u25b3", "Level 5 \u00b7 Neutral Evil \u00b7 Human",
+              "Act on Managers' orders, often assigned to oversee eliminations. They terminate eliminated players, execute rule-breakers, keep players in line between games, and act as bodyguards.",
+              st(300, 10, 10, "10 (+0)", "10 (+0)", "10 (+0)", "10 (+0)", "10 (+0)", "10 (+0)"),
+              ["MP5 (1 action, no cooldown): 5d20 damage. DEX save of 15+ for half.",
+               "Revolver (1 action, no cooldown): 2d20 damage. DEX save of 15+ for half.",
+               "Reload (1/2 action, no cooldown): Refill current weapon with ammo."]),
+            ch("Managers \u25a1", "Level 7 \u00b7 Lawful Evil \u00b7 Human",
+              "Responsible for organizing, monitoring, and enforcing the games \u2014 giving orders to Soldiers, disciplining guards, and making on-the-spot decisions. They speak more freely and act as ambassadors of the games.",
+              st(200, 10, 10, "10 (+0)", "10 (+0)", "10 (+0)", "10 (+0)", "10 (+0)", "10 (+0)"),
+              ["Radio (1 action, 1 turn cooldown): Call in 2 soldier backups that arrive next turn.",
+               "Revolver (1 action, no cooldown): 2d20 damage. DEX save of 15+ for half.",
+               "Reload (1/2 action, no cooldown): Refill current weapon with ammo."]),
+            ch("The Front Man", "Level 10 \u00b7 Lawful Evil \u00b7 Human",
+              "Observes the games through monitoring screens and steps in when situations get out of control \u2014 such as executing exposed staff. He answers to the host, carries out their orders, and ensures the VIPs enjoy the show.",
+              st(400, 15, 20, "12 (+1)", "14 (+2)", "10 (+0)", "14 (+2)", "14 (+2)", "10 (+0)"), []),
+            ch("The VIPs", "Level 10 \u00b7 Chaotic Evil \u00b7 Human",
+              "Rich men who observe the games as spectators, wearing golden animal masks (lion, bull, panther, elk, falcon, bear). They place bets on players to make more money.",
+              st(100, 10, 5, "8 (-1)", "8 (-1)", "8 (-1)", "8 (-1)", "8 (-1)", "16 (+3)"), [])
+          ],
+          items: []
+        },
+        {
+          name: "Universal Collision",
+          desc: "Assume the role of a famous character or couple in an on-the-fly adventure.",
+          backstory:
+            "This story is played out completely ad-hoc since it is highly dependent on the player characters.\n\n" +
+            "UNIVERSAL COLLISION\n\n" +
+            "Personality Quiz Character Creation \u2014 The gimmick of this one-shot is that you must choose an individual character from the OpenPsychometrics character quiz (openpsychometrics.org/tests/characters). To join as a couple, use the couples quiz (openpsychometrics.org/tests/characters/couples).",
+          areas: [],
+          characters: [],
+          items: []
+        }
+      ];
+
+      function statBlock(s) {
+        if (!s) return "";
+        var rows = [];
+        Object.keys(s).forEach(function (k) {
+          var v = s[k];
+          if (v === "" || v == null) return;
+          rows.push('<div class="ind"><div class="k">' + esc(k) + '</div><div class="v">' + esc(String(v)) + "</div></div>");
+        });
+        return rows.length ? '<div class="indicators" style="margin:.5rem 0">' + rows.join("") + "</div>" : "";
+      }
+      function card(inner) { return '<div style="border:1px solid var(--rule);border-radius:4px;padding:.7rem;margin:.5rem 0">' + inner + "</div>"; }
+      function para(t) { return '<p style="white-space:pre-wrap;margin:.3rem 0">' + esc(t) + "</p>"; }
+
+      b.innerHTML =
+        '<p class="app-lede">Pick a tabletop adventure, then browse its story, areas, characters, and items.</p>' +
+        '<div class="field"><label>Adventure</label><select id="os-pick">' +
+        adventures.map(function (a, i) { return '<option value="' + i + '">' + esc(a.name) + "</option>"; }).join("") +
+        '</select></div>' +
+        '<div class="tabs" id="os-tabs"></div>' +
+        '<div id="os-panel"></div>';
+      var pick = b.querySelector("#os-pick"), tabsEl = b.querySelector("#os-tabs"), panel = b.querySelector("#os-panel");
+      var cur = 0, tab = "story";
+
+      function tabsFor(a) {
+        var t = [["story", "Story"]];
+        if (a.areas && a.areas.length) t.push(["areas", "Areas"]);
+        if (a.characters && a.characters.length) t.push(["characters", "Characters"]);
+        if (a.items && a.items.length) t.push(["items", "Items"]);
+        return t;
+      }
+      function renderPanel() {
+        var a = adventures[cur];
+        if (tab === "areas") {
+          panel.innerHTML = a.areas.map(function (x) { return card('<h4 style="margin:.1rem 0">' + esc(x.name) + "</h4>" + (x.desc ? para(x.desc) : "")); }).join("");
+        } else if (tab === "characters") {
+          panel.innerHTML = a.characters.map(function (c) {
+            return card('<h4 style="margin:.1rem 0">' + esc(c.name) + "</h4>" +
+              (c.sub ? '<div class="note" style="margin:.1rem 0">' + esc(c.sub) + "</div>" : "") +
+              (c.desc ? para(c.desc) : "") + statBlock(c.stats) +
+              (c.abilities && c.abilities.length ? "<ul>" + c.abilities.map(function (ab) { return '<li style="white-space:pre-wrap;margin:.2rem 0">' + esc(ab) + "</li>"; }).join("") + "</ul>" : ""));
+          }).join("");
+        } else if (tab === "items") {
+          panel.innerHTML = a.items.map(function (i) {
+            return card('<h4 style="margin:.1rem 0">' + esc(i.name) + (i.cost ? ' <span class="note">(' + esc(i.cost) + " gil)</span>" : "") + "</h4>" + (i.desc ? para(i.desc) : ""));
+          }).join("");
+        } else {
+          panel.innerHTML = '<p class="app-lede" style="margin-top:0">' + esc(a.desc) + "</p>" + para(a.backstory);
+        }
+      }
+      function renderTabs() {
+        var a = adventures[cur], t = tabsFor(a);
+        if (!t.some(function (x) { return x[0] === tab; })) tab = "story";
+        tabsEl.innerHTML = t.map(function (x) { return '<button class="btn" data-t="' + x[0] + '"' + (x[0] === tab ? ' aria-pressed="true"' : "") + ">" + x[1] + "</button>"; }).join("");
+        tabsEl.querySelectorAll("[data-t]").forEach(function (btn) {
+          btn.addEventListener("click", function () { tab = btn.getAttribute("data-t"); renderTabs(); renderPanel(); });
+        });
+      }
+      pick.addEventListener("change", function () { cur = Number(pick.value); tab = "story"; renderTabs(); renderPanel(); });
+      renderTabs(); renderPanel();
+    }
+  });
+
+  /* ---- Reference: Elder Scrolls Blades ---- */
+  app({
+    id: "elderscrolls", title: "elderscrolls", cat: "Games",
+    desc: "Best weapon + element pairings against enemies in Elder Scrolls: Blades.",
+    render: function (b) {
+      var rows = [
+        ["Physical", "Slashing", "Frost", ["Ancient Dragons", "Bears", "Dragons", "Dremora Raiders", "Dremora Warlocks", "Nether Liches", "Wolves"], ["Goblin Casters", "Spiders"]],
+        ["Physical", "Bashing", "Fire", ["Goblin Casters", "Goblin Warriors", "Skeletons", "Trolls"], ["Nether Liches", "Skeevers", "Spriggans", "Wights", "Wispmothers", "Wisps"]],
+        ["Physical", "Cleaving", "Fire", ["Outcasts", "Spiders", "Spriggans", "Warmasters", "Wights"], ["Nether Liches", "Skeevers", "Trolls", "Wispmothers", "Wisps"]],
+        ["Elemental", "Bashing", "Poison", ["Bandits", "Mercenaries", "Necromancers", "Thalmor Agents", "Warmasters"], ["N/A"]],
+        ["Elemental", "Cleaving or Slashing", "Shock", ["Ancient Dragons", "Bears", "Outcasts", "Skeletons", "Wolves"], ["N/A"]]
+      ];
+      b.innerHTML =
+        '<p class="app-lede">The ideal equipment to handle the game\u2019s various enemies.</p>' +
+        '<table><thead><tr><th>Primary Damage</th><th>Physical Type</th><th>Element</th><th>Primary Enemies</th><th>Secondary Enemies</th></tr></thead><tbody>' +
+        rows.map(function (r) {
+          return "<tr><th>" + r[0] + "</th><td>" + r[1] + "</td><td>" + r[2] + "</td><td><ul>" +
+            r[3].map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul></td><td>" +
+            (r[4][0] === "N/A" ? "N/A" : "<ul>" + r[4].map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>") + "</td></tr>";
+        }).join("") + "</tbody></table>" +
+        '<p class="note">Data from LevelCodex\u2019s <a href="https://www.levelcodex.com/elder-scrolls-blades/" target="_blank" rel="noopener">Elder Scrolls: Blades Game Guide</a>. Choices maximize enemy weaknesses and minimize resistances.</p>' +
+        '<p style="text-align:center">\u2694\ufe0f <a title="Wares for Coin" href="https://itch.io/games/free/genre-adventure/html5" target="_blank" rel="noopener">\uD83D\uDCB0</a></p>';
+    }
+  });
+
+  /* ---- Reference: Hades boons ---- */
+  app({
+    id: "hades", title: "hades", cat: "Games",
+    desc: "Which gods' boons pair best with each weapon ability in Hades.",
+    render: function (b) {
+      var data = [
+        ["Attack", "Athena (deflect) or Ares (doom) for reliable single-target damage."],
+        ["Special", "Aphrodite (weak) or Zeus (chain) to soften and spread."],
+        ["Cast", "Artemis (crit) or Zeus (blitz) for burst on bloodstone."],
+        ["Dash", "Athena (deflect) for survivability; Poseidon (knockback) to reposition."],
+        ["Call", "Poseidon or Zeus for big AoE room-clears; Ares for a doom nuke."]
+      ];
+      var gods = {
+        Zeus: "Lightning that chains between foes \u2014 great for crowds.",
+        Poseidon: "Knockback + wall-slam damage; superb crowd control.",
+        Athena: "Deflect shields you and returns damage.",
+        Aphrodite: "Weak reduces enemy damage; strong early defense.",
+        Ares: "Doom delivers a delayed burst on each hit.",
+        Artemis: "Critical hits for spiky single-target damage.",
+        Dionysus: "Festive Fog stacks poison over time."
+      };
+      b.innerHTML =
+        '<p class="app-lede">Boon pairings for each ability, plus a quick god cheat-sheet.</p>' +
+        '<table><thead><tr><th>Ability</th><th>Recommended boons</th></tr></thead><tbody>' +
+        data.map(function (r) { return "<tr><th>" + r[0] + "</th><td>" + r[1] + "</td></tr>"; }).join("") + "</tbody></table>" +
+        '<h3 style="font-size:1rem;margin:.8rem 0 .3rem">Gods at a glance</h3><div class="indicators">' +
+        Object.keys(gods).map(function (g) { return '<div class="ind"><div class="v">' + g + '</div><div class="k" style="text-transform:none;letter-spacing:0">' + esc(gods[g]) + "</div></div>"; }).join("") +
+        "</div><p class='note'>Recommendations are general guidance and assume default Aspect builds.</p>";
+    }
+  });
+
+  /* ---- Reference: PMP quick reference ---- */
+  app({
+    id: "pmpref", title: "pmpref", cat: "Tools",
+    desc: "A condensed PMP study sheet: process groups, knowledge areas, and formulas.",
+    render: function (b) {
+      var areas = [
+        ["Integration", "Knits every process and task into one project with defined goals and deliverables."],
+        ["Scope", "Keeps everyone aligned on what is (and isn\u2019t) included to prevent scope creep."],
+        ["Schedule", "Manages time, task adjustments, and how resources are allocated over the project."],
+        ["Cost", "Keeps spend reasonable and continuously evaluated to avoid end-of-project surprises."],
+        ["Quality", "Sets expectations and quality control so you deliver great work every time."],
+        ["Resource", "Works with the team\u2019s bandwidth, strengths, weaknesses, and synergy."],
+        ["Communications", "Defines who needs to know what, and when \u2014 avoiding over/under communication."],
+        ["Risk", "Identifies major risks and mitigation plans so surprises are manageable."],
+        ["Procurement", "Plans which tasks/services go to outside contractors and the legal paperwork."],
+        ["Stakeholder", "Manages everyone with a stake \u2014 requesters, team, suppliers, customers, the public."]
+      ];
+      var formulas = [
+        ["CV \u2014 Cost Variance", "EV \u2212 AC"], ["SV \u2014 Schedule Variance", "EV \u2212 PV"],
+        ["CPI \u2014 Cost Performance Index", "EV / AC"], ["SPI \u2014 Schedule Performance Index", "EV / PV"],
+        ["EAC \u2014 Estimate At Completion", "BAC / CPI"], ["ETC \u2014 Estimate To Complete", "EAC \u2212 AC"],
+        ["VAC \u2014 Variance At Completion", "BAC \u2212 EAC"], ["TCPI \u2014 To-Complete Index", "(BAC \u2212 EV) / (BAC \u2212 AC)"]
+      ];
+      b.innerHTML =
+        '<p class="app-lede">Key concepts to know before taking the PMP exam.</p>' +
+        '<h3 style="font-size:1rem;margin:.2rem 0 .3rem">Process Groups</h3>' +
+        '<p>Initiating &rarr; Planning &rarr; Executing &rarr; Monitoring &amp; Controlling &rarr; Closing</p>' +
+        '<h3 style="font-size:1rem;margin:.8rem 0 .3rem">Knowledge Areas</h3>' +
+        '<table><tbody>' + areas.map(function (a) { return "<tr><th style='white-space:nowrap'>" + a[0] + "</th><td>" + a[1] + "</td></tr>"; }).join("") + "</tbody></table>" +
+        '<h3 style="font-size:1rem;margin:.8rem 0 .3rem">Core Formulas</h3>' +
+        '<table><thead><tr><th>Metric</th><th>Formula</th></tr></thead><tbody>' +
+        formulas.map(function (f) { return "<tr><th>" + f[0] + "</th><td class='result'>" + f[1] + "</td></tr>"; }).join("") + "</tbody></table>" +
+        '<p class="note">Based on the PMBOK\u00ae Guide. See <a href="https://www.project-management-prepcast.com/" target="_blank" rel="noopener">PM PrepCast</a> for study tools.</p>';
+    }
+  });
+
+  /* ---- Visual: Strobe ---- */
+  app({
+    id: "strobe", title: "strobe", cat: "Tools",
+    desc: "A configurable color strobe effect. Photosensitivity warning inside.",
+    render: function (b) {
+      b.innerHTML =
+        '<p class="app-lede">Rapidly cycles colors for a strobe effect.</p>' +
+        '<div class="warn">\u26a0 Seizure warning: flashing colors. Not for those with photosensitive epilepsy.</div>' +
+        '<div class="swatch" id="st-stage"></div>' +
+        '<div class="row"><div class="field"><label>Speed (ms)</label><input type="range" min="50" max="1000" step="50" value="300" id="st-speed"></div></div>' +
+        '<div class="btn-row"><button class="btn" id="st-toggle">Start strobe</button></div>';
+      var stage = b.querySelector("#st-stage"), speed = b.querySelector("#st-speed"), toggle = b.querySelector("#st-toggle");
+      var iv = null;
+      function rand() { return "#" + Math.floor(Math.random() * 16777215).toString(16).padStart(6, "0"); }
+      function start() { stop(); iv = setInterval(function () { stage.style.background = rand(); }, Number(speed.value)); toggle.textContent = "Stop strobe"; }
+      function stop() { if (iv) { clearInterval(iv); iv = null; } toggle.textContent = "Start strobe"; }
+      toggle.addEventListener("click", function () { iv ? stop() : start(); });
+      speed.addEventListener("input", function () { if (iv) start(); });
+      return function cleanup() { stop(); };
+    }
+  });
+
+  /* ---- Maps: Explore the Rails ---- */
+  app({
+    id: "explorerails", title: "explorerails", cat: "Tools",
+    desc: "Map of opportunities and points of interest near NJTransit train stops.",
+    render: function (b) {
+      b.innerHTML =
+        '<p class="app-lede">See what opportunities are at NJTransit train stops.</p>' +
+        '<iframe src="https://www.google.com/maps/d/embed?mid=1Zkw1Fsu3nPigqZwWKh0dBe4Wf7f6G3wU" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="NJTransit opportunities map"></iframe>' +
+        '<p class="note">For reference: <a href="https://www.njtransit.com/pdf/rail/Rail_System_Map.pdf" target="_blank" rel="noopener">NJTransit System Map (PDF)</a></p>';
+    }
+  });
+
+  /* ============================ render gallery ============================ */
+  var grid = document.getElementById("grid");
+  var filtersEl = document.getElementById("filters");
+  var countEl = document.getElementById("count");
+  var modal = document.getElementById("appModal");
+  var appTitle = document.getElementById("appTitle");
+  var appBody = document.getElementById("appBody");
+  var currentCleanup = null;
+
+  // sort + build cards
+  apps.sort(function (a, z) { return a.title.localeCompare(z.title); });
+  apps.forEach(function (a) {
+    var card = h('<button class="card" data-id="' + a.id + '" data-cat="' + a.cat + '">' +
+      '<span class="cat">' + a.cat + '</span><h3>' + esc(a.title) + '</h3><p class="desc">' + esc(a.desc) + "</p></button>");
+    card.addEventListener("click", function () { openApp(a.id); });
+    grid.appendChild(card);
+  });
+
+  // filter chips
+  var cats = ["All"].concat(apps.map(function (a) { return a.cat; }).filter(function (v, i, s) { return s.indexOf(v) === i; }).sort());
+  var active = "All";
+  cats.forEach(function (c) {
+    var chip = h('<button class="chip" aria-pressed="' + (c === "All") + '">' + c + "</button>");
+    chip.addEventListener("click", function () {
+      active = c;
+      filtersEl.querySelectorAll(".chip").forEach(function (x) { x.setAttribute("aria-pressed", x.textContent === c); });
+      applyFilter();
+    });
+    filtersEl.appendChild(chip);
+  });
+  function applyFilter() {
+    var shown = 0;
+    grid.querySelectorAll(".card").forEach(function (card) {
+      var ok = active === "All" || card.getAttribute("data-cat") === active;
+      card.classList.toggle("is-hidden", !ok); if (ok) shown++;
+    });
+    countEl.textContent = "// " + shown + " snippet" + (shown === 1 ? "" : "s");
+  }
+  applyFilter();
+
+  /* ============================ modal engine ============================ */
+  function openApp(id) {
+    var a = apps.find(function (x) { return x.id === id; });
+    if (!a) return;
+    if (currentCleanup) { try { currentCleanup(); } catch (e) {} currentCleanup = null; }
+    appTitle.textContent = a.title;
+    appBody.innerHTML = "";
+    appBody.scrollTop = 0;
+    currentCleanup = a.render(appBody) || null;
+    if (!modal.open) modal.showModal();
+    if (history.replaceState) history.replaceState(null, "", "#" + id);
+  }
+  function closeApp() {
+    if (currentCleanup) { try { currentCleanup(); } catch (e) {} currentCleanup = null; }
+    appBody.innerHTML = "";
+    if (modal.open) modal.close();
+    if (history.replaceState) history.replaceState(null, "", location.pathname + location.search);
+  }
+  document.getElementById("appClose").addEventListener("click", closeApp);
+  modal.addEventListener("close", function () {
+    if (currentCleanup) { try { currentCleanup(); } catch (e) {} currentCleanup = null; }
+    appBody.innerHTML = "";
+  });
+  modal.addEventListener("click", function (e) {
+    var r = modal.getBoundingClientRect();
+    if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) closeApp();
+  });
+
+  // deep-link support (#snippetid auto-opens)
+  function openFromHash() {
+    var id = location.hash.replace(/^#/, "");
+    if (id && apps.some(function (a) { return a.id === id; })) openApp(id);
+  }
+  window.addEventListener("hashchange", openFromHash);
+  openFromHash();
+  </script>
+</body>
+</html>

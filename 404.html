@@ -8,36 +8,767 @@
 
     <!-- *** Social spiders *** -->
     <!-- Search Engine -->
-    <meta name="description" content="Dominic's personal website that storytells his upbringing, attaches his resume, and showcases various web development projects.">
+    <meta name="description" content="Page not found on Dominic Cerchio's personal website.">
     <meta name="image" content="https://dominiccerchio.com/home/img/logo/blue/android-chrome-512x512.png">
     <!-- Schema.org for Google -->
-    <meta itemprop="name" content="Dominic's Homepage">
-    <meta itemprop="description" content="Dominic's personal website that storytells his upbringing, attaches his resume, and showcases various web development projects.">
+    <meta itemprop="name" content="404 | dominiccerchio">
+    <meta itemprop="description" content="Page not found on Dominic Cerchio's personal website.">
     <meta itemprop="image" content="https://dominiccerchio.com/home/img/logo/blue/android-chrome-512x512.png">
     <!-- Open Graph general (Facebook, Pinterest & Google+) -->
-    <meta name="og:title" content="Dominic's Homepage">
-    <meta name="og:description" content="Dominic's personal website that storytells his upbringing, attaches his resume, and showcases various web development projects.">
+    <meta name="og:title" content="404 | dominiccerchio">
+    <meta name="og:description" content="Page not found on Dominic Cerchio's personal website.">
     <meta name="og:image" content="https://dominiccerchio.com/home/img/logo/blue/android-chrome-512x512.png">
     <meta name="og:url" content="https://dominiccerchio.com/">
     <meta name="og:site_name" content="dominiccerchio">
     <meta name="og:locale" content="en_US">
     <meta name="og:type" content="website">
 
-    <!-- Favicon & page title -->
-    <link rel="icon" href="https://dominiccerchio.com/home/img/logo/blue/favicon-32x32.png">
-    <title>dominiccerchio</title>
-
+    <!-- Favicon (inline, no external request) & page title -->
+    <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='6'%20fill='%23111'/%3E%3Ctext%20x='16'%20y='22'%20font-size='14'%20text-anchor='middle'%20fill='%2300e676'%20font-family='monospace'%3E404%3C/text%3E%3C/svg%3E">
     <title>404 | dominiccerchio</title>
 
-    <!-- Bootstrap core CSS -->
-    <link href="https://dominiccerchio.com/vendor/bootstrap/bootstrap-5.1.3-dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+      /* =========================================================
+         SHARED SCAFFOLD
+         ========================================================= */
+      *, *::before, *::after { box-sizing: border-box; }
+
+      html, body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #000;
+        color: #fff;
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      }
+
+      #app {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+
+      a.home {
+        color: inherit;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        cursor: pointer;
+      }
+
+      /* Generic reusable button */
+      .btn {
+        display: inline-block;
+        border: 0;
+        cursor: pointer;
+        font: inherit;
+        padding: 0.65em 1.4em;
+        border-radius: 4px;
+        background: #ffc107;
+        color: #111;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-decoration: none;
+      }
+      .btn:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+
+      /* =========================================================
+         1. SPACE
+         ========================================================= */
+      .theme-space { background: radial-gradient(ellipse at 50% 40%, #0b1437 0%, #02030a 70%, #000 100%); }
+      .theme-space .stars,
+      .theme-space .stars2 {
+        position: absolute; inset: 0; pointer-events: none;
+        background-repeat: repeat;
+      }
+      .theme-space .stars {
+        background-image:
+          radial-gradient(1px 1px at 20px 30px, #fff, transparent),
+          radial-gradient(1px 1px at 130px 80px, #cfe3ff, transparent),
+          radial-gradient(1.5px 1.5px at 70px 160px, #fff, transparent),
+          radial-gradient(1px 1px at 200px 50px, #fff, transparent),
+          radial-gradient(1px 1px at 250px 200px, #bcd, transparent);
+        background-size: 300px 300px;
+        animation: drift 120s linear infinite;
+      }
+      .theme-space .stars2 {
+        background-image:
+          radial-gradient(1px 1px at 50px 120px, #fff, transparent),
+          radial-gradient(2px 2px at 180px 30px, #fff, transparent),
+          radial-gradient(1px 1px at 240px 140px, #9fb6ff, transparent);
+        background-size: 260px 260px;
+        opacity: .7;
+        animation: drift 200s linear infinite reverse;
+      }
+      @keyframes drift { to { background-position: 300px 300px; } }
+      .theme-space .earth {
+        position: relative;
+        width: min(46vmin, 320px); height: min(46vmin, 320px);
+        border-radius: 50%;
+        background:
+          radial-gradient(circle at 32% 30%, rgba(255,255,255,.25), transparent 40%),
+          radial-gradient(circle at 70% 75%, #0b3d2e 0 18%, transparent 19%),
+          radial-gradient(circle at 35% 68%, #14633f 0 14%, transparent 15%),
+          radial-gradient(circle at 60% 35%, #1c7a4a 0 16%, transparent 17%),
+          radial-gradient(circle at 50% 50%, #1d6fb8 0%, #0c3f73 70%, #062445 100%);
+        box-shadow: inset -22px -18px 50px rgba(0,0,0,.75), 0 0 50px rgba(60,130,255,.35);
+        animation: float 5s ease-in-out infinite, spin-earth 26s linear infinite;
+      }
+      @keyframes spin-earth { to { background-position: 320px 0,0 0,0 0,0 0,0 0; } }
+      .theme-space .info { position: absolute; bottom: 7%; left: 0; right: 0; padding: 0 6vw; }
+      .theme-space h1 { margin: 0; font-size: clamp(64px, 16vmin, 150px);
+        text-shadow: 0 1px 0 #ccc,0 2px 0 #bbb,0 4px 6px rgba(0,0,0,.4),0 0 18px rgba(80,150,255,.4); }
+      .theme-space p { margin: .4em auto; max-width: 36ch; }
+
+      @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-16px); } }
+
+      /* =========================================================
+         2. STAR WARS
+         ========================================================= */
+      .theme-starwars { background: linear-gradient(#caa46a 0%, #e7c98f 45%, #d8b06f 60%, #c79552 100%); color:#fff; }
+      .theme-starwars .scene { position: relative; width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap: 4vmin; overflow:hidden; }
+      .theme-starwars .suns { position:absolute; top:8%; right:12%; }
+      .theme-starwars .sun { width: 14vmin; height:14vmin; border-radius:50%; background: radial-gradient(circle,#fff7e0,#ffd27a 60%,#ff9d3c); box-shadow:0 0 8vmin #ffd98a; }
+      .theme-starwars .sun.small { position:absolute; top:5vmin; left:9vmin; width:8vmin; height:8vmin; }
+      .theme-starwars h1 {
+        margin:0; font-size: clamp(72px, 20vmin, 200px); font-weight: 900; letter-spacing: .06em;
+        color:#feda4a; text-shadow: 0 0 14px rgba(0,0,0,.35), 0 6px 0 #b58c1d;
+        transform: perspective(360px) rotateX(26deg); transform-origin: 50% 100%;
+      }
+      .theme-starwars .droids { display:flex; align-items:flex-end; gap: 5vmin; height: 26vmin; }
+      .theme-starwars .threepio { width: 8vmin; height: 22vmin; border-radius: 40% 40% 30% 30%;
+        background: linear-gradient(#ffe27a,#caa31e); position:relative; box-shadow: inset -1vmin 0 2vmin rgba(0,0,0,.35); }
+      .theme-starwars .threepio::before { content:""; position:absolute; top:1.5vmin; left:50%; transform:translateX(-50%);
+        width:3.4vmin; height:3.4vmin; border-radius:50%; background:#1a1a1a; box-shadow:0 0 0 .6vmin #ffe27a; }
+      .theme-starwars .artoo { width: 9vmin; height: 18vmin; position:relative; align-self:flex-end; }
+      .theme-starwars .artoo .dome { position:absolute; top:0; left:0; right:0; height:5vmin; border-radius:50% 50% 0 0; background:linear-gradient(#f4f4f4,#c9ced6); }
+      .theme-starwars .artoo .body { position:absolute; top:4vmin; left:0; right:0; bottom:0; border-radius:1vmin; background:linear-gradient(#eee,#b9bfc8); }
+      .theme-starwars .artoo .eye { position:absolute; top:1.4vmin; left:50%; transform:translateX(-50%); width:2.4vmin; height:2.4vmin; border-radius:50%; background:#2b6cb0; box-shadow:0 0 1vmin #63b3ed; }
+      .theme-starwars .artoo .panel { position:absolute; top:7vmin; left:1.4vmin; width:2.4vmin; height:2.4vmin; background:#3784d6; box-shadow:3vmin 0 #d64545; }
+      .theme-starwars p { margin:0; max-width: 40ch; padding: 0 6vw; color:#3a2a10; font-weight:600; }
+
+      /* =========================================================
+         3. MATRIX
+         ========================================================= */
+      .theme-matrix { background:#050a06; font-family: "Courier New", monospace; }
+      .theme-matrix .rain { position:absolute; inset:0; overflow:hidden; pointer-events:none; opacity:.5; }
+      .theme-matrix .rain span { position:absolute; top:-20%; color:#19c503; font-size:18px; white-space:pre; text-shadow:0 0 6px #19c503;
+        animation: fall linear infinite; }
+      @keyframes fall { to { transform: translateY(130vh); } }
+      .theme-matrix .center { position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; gap:5vmin; }
+      .theme-matrix h1 { margin:0; font-size: clamp(70px,18vmin,140px); color:#caffce; text-shadow:0 0 18px #19c503; }
+      .theme-matrix .scramble { min-height:2em; font-size: clamp(16px,2.6vmin,26px); color:#eafff0; }
+      .theme-matrix .dud { color:#3c7a45; }
+      .theme-matrix .cube-wrap { perspective: 800px; }
+      .theme-matrix .cube { position:relative; width:60px; height:60px; transform-style:preserve-3d; animation:spin-cube 8s infinite linear; }
+      .theme-matrix .cube div { position:absolute; width:60px; height:60px; border:1px solid #1ec503; color:#1ec503;
+        box-shadow: inset 0 0 3px 3px rgba(30,197,3,.5); text-align:center; line-height:60px; font-weight:bold; }
+      .theme-matrix .front  { transform: translateZ(30px); }
+      .theme-matrix .back   { transform: translateZ(-30px) rotateY(180deg); }
+      .theme-matrix .right  { transform: rotateY(90deg) translateZ(30px); font-size:200%; }
+      .theme-matrix .left   { transform: rotateY(-90deg) translateZ(30px); font-size:200%; }
+      .theme-matrix .top    { transform: rotateX(90deg) translateZ(30px); }
+      .theme-matrix .bottom { transform: rotateX(-90deg) translateZ(30px); }
+      @keyframes spin-cube { from { transform: rotateX(-20deg) rotateY(0); } to { transform: rotateX(-20deg) rotateY(360deg); } }
+      .theme-matrix .home { color:#caffce; }
+
+      /* =========================================================
+         4. TERMINAL / CRT
+         ========================================================= */
+      .theme-terminal { background: radial-gradient(ellipse at center,#081208 0%,#050a05 75%); color:#3dff7a;
+        font-family: "Courier New", monospace; text-shadow:0 0 4px rgba(61,255,122,.55); }
+      .theme-terminal::before { content:""; position:fixed; inset:0; pointer-events:none; z-index:50; mix-blend-mode:multiply;
+        background: repeating-linear-gradient(to bottom, rgba(0,0,0,0) 0 2px, rgba(0,0,0,.28) 3px 4px); }
+      .theme-terminal::after { content:""; position:fixed; inset:0; pointer-events:none; z-index:49;
+        background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.55) 100%); animation: tflicker 6s infinite; }
+      @keyframes tflicker { 0%,100%{opacity:.92} 48%{opacity:.97} 50%{opacity:.85} }
+      .theme-terminal .win { width:min(680px,86vw); text-align:left; padding: 4vmin; }
+      .theme-terminal .line { margin:.2em 0; white-space:pre-wrap; }
+      .theme-terminal .err { color:#ff6b6b; text-shadow:0 0 6px rgba(255,107,107,.6); }
+      .theme-terminal .big { font-size: clamp(56px,14vmin,120px); letter-spacing:.1em; margin:.1em 0; }
+      .theme-terminal .cursor { display:inline-block; width:.6ch; height:1.1em; vertical-align:-.15em; background:#3dff7a; animation: blink 1s steps(1) infinite; box-shadow:0 0 8px #3dff7a; }
+      @keyframes blink { 50% { opacity:0; } }
+
+      /* =========================================================
+         5. VAPORWAVE
+         ========================================================= */
+      .theme-vaporwave { background: linear-gradient(#2b0a4a 0%, #6a1170 40%, #c81d77 70%, #ff7a59 100%); overflow:hidden; }
+      .theme-vaporwave .sun { position:absolute; top:14%; left:50%; transform:translateX(-50%); width:42vmin; height:42vmin; border-radius:50%;
+        background: linear-gradient(#fff36b 0%, #ff5da2 60%, #ff2d95 100%);
+        -webkit-mask: repeating-linear-gradient(#000 0 7%, transparent 7% 9%); mask: repeating-linear-gradient(#000 0 7%, transparent 7% 9%);
+        filter: drop-shadow(0 0 40px rgba(255,80,160,.6)); }
+      .theme-vaporwave .grid { position:absolute; left:-50%; right:-50%; bottom:0; height:55%;
+        background-image: linear-gradient(rgba(0,255,247,.7) 2px, transparent 2px), linear-gradient(90deg, rgba(0,255,247,.7) 2px, transparent 2px);
+        background-size: 7vmin 7vmin; transform: perspective(35vmin) rotateX(74deg); transform-origin: bottom; animation: grid-move 1.4s linear infinite; }
+      @keyframes grid-move { to { background-position: 0 7vmin; } }
+      .theme-vaporwave h1 { position:relative; z-index:2; margin:0; font-size: clamp(80px,22vmin,220px); font-weight:900; font-style:italic;
+        color:#fff; text-shadow: 4px 4px 0 #00fff7, -4px -4px 0 #ff2d95; letter-spacing:.02em; }
+      .theme-vaporwave .tag { position:absolute; z-index:2; bottom:8%; left:0; right:0; color:#e8d7ff; letter-spacing:.5em; text-transform:uppercase; font-size: clamp(11px,1.8vmin,16px); }
+
+      /* =========================================================
+         6. ARCADE
+         ========================================================= */
+      .theme-arcade { background:#0a0a16; font-family: "Courier New", monospace; color:#fff; image-rendering: pixelated; }
+      .theme-arcade .box { display:flex; flex-direction:column; align-items:center; gap: 4vmin; }
+      .theme-arcade .go { font-size: clamp(40px,10vmin,90px); font-weight:900; letter-spacing:.12em; color:#ff3b3b;
+        text-shadow: 4px 4px 0 #7a0000, -2px -2px 0 #ffd1d1; }
+      .theme-arcade .code { font-size: clamp(70px,18vmin,150px); font-weight:900; color:#ffe600; letter-spacing:.1em;
+        text-shadow: 5px 5px 0 #8a7d00; }
+      .theme-arcade .ghost { width: 16vmin; height: 14vmin; position:relative; background:#ff4fd8; border-radius: 50% 50% 0 0;
+        box-shadow: 0 0 0 0 transparent; animation: bob 1.2s ease-in-out infinite; }
+      .theme-arcade .ghost::before, .theme-arcade .ghost::after { content:""; position:absolute; top:38%; width:3.6vmin; height:3.6vmin; background:#fff; border-radius:50%; }
+      .theme-arcade .ghost::before { left:18%; box-shadow: 1.4vmin 0 #2a2aff; }
+      .theme-arcade .ghost::after { right:18%; box-shadow: -1.4vmin 0 #2a2aff; }
+      .theme-arcade .feet { width:16vmin; height:3vmin; background:
+        radial-gradient(circle at 12.5% 0, transparent 1.5vmin, #ff4fd8 1.5vmin) 0 0/4vmin 100% repeat-x; }
+      @keyframes bob { 50% { transform: translateY(-1.2vmin); } }
+      .theme-arcade .coin { color:#fff; letter-spacing:.25em; font-size: clamp(13px,2.4vmin,20px); animation: blink 1s steps(1) infinite; }
+      .theme-arcade .home { color:#ffe600; }
+
+      /* =========================================================
+         7. GLITCH
+         ========================================================= */
+      .theme-glitch { background:#070708; color:#fff; }
+      .theme-glitch .stack { display:flex; flex-direction:column; align-items:center; gap:3vmin; }
+      .theme-glitch .g { position:relative; font-size: clamp(80px,24vmin,260px); font-weight:900; letter-spacing:.04em; }
+      .theme-glitch .g::before, .theme-glitch .g::after { content: attr(data-text); position:absolute; left:0; top:0; width:100%; }
+      .theme-glitch .g::before { color:#00fff7; animation: glitch-a 2.2s infinite steps(2); clip-path: inset(0 0 55% 0); }
+      .theme-glitch .g::after  { color:#ff003c; animation: glitch-b 2.6s infinite steps(2); clip-path: inset(55% 0 0 0); }
+      @keyframes glitch-a { 0%,100%{transform:translate(0)} 20%{transform:translate(-5px,-2px)} 40%{transform:translate(4px,2px)} 60%{transform:translate(-3px,1px)} }
+      @keyframes glitch-b { 0%,100%{transform:translate(0)} 25%{transform:translate(5px,2px)} 45%{transform:translate(-4px,-1px)} 65%{transform:translate(3px,-2px)} }
+      .theme-glitch .sub { letter-spacing:.5em; text-transform:uppercase; color:#9aa; font-size: clamp(12px,2vmin,18px); animation: jitter .15s infinite; }
+      @keyframes jitter { 50% { transform: translateX(2px); } }
+      .theme-glitch::after { content:""; position:fixed; inset:0; pointer-events:none;
+        background: repeating-linear-gradient(to bottom, rgba(255,255,255,0) 0 2px, rgba(255,255,255,.04) 2px 3px); }
+
+      /* =========================================================
+         8. OCEAN
+         ========================================================= */
+      .theme-ocean { background: linear-gradient(#1a6fa3 0%, #0a3c63 45%, #05223b 75%, #020f1d 100%); overflow:hidden; }
+      .theme-ocean .ray { position:absolute; top:-20%; width: 18vmin; height:150%; background: linear-gradient(rgba(180,235,255,.18), transparent);
+        transform: skewX(-12deg); filter: blur(4px); }
+      .theme-ocean .bubble { position:absolute; bottom:-12vmin; border-radius:50%; border:1px solid rgba(255,255,255,.45);
+        background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.5), rgba(255,255,255,.05)); animation: rise linear infinite; }
+      @keyframes rise { to { transform: translateY(-120vh) translateX(4vmin); opacity:0; } }
+      .theme-ocean .center { position:relative; z-index:3; color:#dff3ff; }
+      .theme-ocean h1 { margin:0; font-size: clamp(70px,18vmin,160px); text-shadow:0 0 24px rgba(120,200,255,.6); }
+      .theme-ocean p { margin:.4em auto; max-width:32ch; color:#bfe2f5; }
+
+      /* =========================================================
+         9. BLUEPRINT
+         ========================================================= */
+      .theme-blueprint { background:#0d4dad;
+        background-image: linear-gradient(rgba(255,255,255,.18) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.18) 1px, transparent 1px),
+          linear-gradient(rgba(255,255,255,.07) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.07) 1px, transparent 1px);
+        background-size: 8vmin 8vmin, 8vmin 8vmin, 1.6vmin 1.6vmin, 1.6vmin 1.6vmin;
+        color:#eaf2ff; font-family: "Courier New", monospace; }
+      .theme-blueprint .sheet { position:relative; padding: 8vmin 9vmin; }
+      .theme-blueprint h1 { margin:0; font-size: clamp(80px,22vmin,220px); font-weight:700; letter-spacing:.05em; }
+      .theme-blueprint .dim { position:absolute; left:0; right:0; bottom:3vmin; display:flex; align-items:center; gap:1vmin; color:#cfe0ff; font-size: clamp(11px,1.8vmin,15px); }
+      .theme-blueprint .dim::before, .theme-blueprint .dim::after { content:""; height:1px; background:#cfe0ff; flex:1; }
+      .theme-blueprint .stamp { position:absolute; top:3vmin; right:3vmin; border:3px solid #ff5a5a; color:#ff5a5a; padding:.4em .8em; transform:rotate(8deg);
+        font-weight:700; letter-spacing:.15em; opacity:.85; }
+      .theme-blueprint .meta { margin-top:1.5em; color:#bcd2ff; font-size: clamp(11px,1.8vmin,15px); letter-spacing:.1em; }
+      .theme-blueprint .home { color:#fff; }
+
+      /* =========================================================
+         10. BSOD
+         ========================================================= */
+      .theme-bsod { background:#0a78d4; color:#fff; font-family: "Segoe UI", system-ui, sans-serif; }
+      .theme-bsod .panel { width:min(760px,86vw); text-align:left; padding: 6vmin; }
+      .theme-bsod .face { font-size: clamp(70px,16vmin,140px); font-weight:300; line-height:1; }
+      .theme-bsod p { font-size: clamp(15px,2.6vmin,24px); font-weight:300; line-height:1.5; }
+      .theme-bsod .pct { font-size: clamp(15px,2.6vmin,24px); }
+      .theme-bsod .small { margin-top:2em; font-size: clamp(11px,1.8vmin,15px); opacity:.9; display:flex; gap:1.4em; align-items:flex-start; }
+      .theme-bsod .qr { width: 14vmin; height:14vmin; flex:0 0 auto;
+        background:
+          conic-gradient(#fff 0) 0 0/100% 100%, /* placeholder solid */
+          linear-gradient(#fff,#fff);
+        background:#fff; position:relative; }
+      .theme-bsod .qr::before { content:""; position:absolute; inset:1.2vmin;
+        background-image: repeating-linear-gradient(#0a78d4 0 1.2vmin, #fff 1.2vmin 2.4vmin), repeating-linear-gradient(90deg,#0a78d4 0 1.2vmin,#fff 1.2vmin 2.4vmin);
+        background-blend-mode: difference; }
+      .theme-bsod .home { color:#fff; }
+
+      /* =========================================================
+         11. COSMIC HORROR
+         ========================================================= */
+      .theme-horror { background: radial-gradient(ellipse at center, #15001c 0%, #07000a 70%, #000 100%); color:#c9b8d4; }
+      .theme-horror .tentacle { position:absolute; bottom:-10%; width: 8vmin; height: 70vmin; border-radius:50% 50% 0 0 / 30% 30% 0 0;
+        background: linear-gradient(rgba(60,10,80,.0), rgba(80,20,110,.5)); transform-origin:bottom; animation: sway 9s ease-in-out infinite; filter: blur(2px); }
+      @keyframes sway { 0%,100%{ transform: rotate(-6deg) scaleY(1);} 50%{ transform: rotate(6deg) scaleY(1.05);} }
+      .theme-horror .eye { position:absolute; width:8vmin; height:8vmin; border-radius:50%;
+        background: radial-gradient(circle at 50% 50%, #ffec6b 0 14%, #b33 20%, #300 55%, transparent 60%); opacity:.0; animation: open 11s ease-in-out infinite; }
+      @keyframes open { 0%,80%,100%{opacity:0; transform:scale(.6);} 88%,94%{opacity:.85; transform:scale(1);} }
+      .theme-horror .center { position:relative; z-index:3; }
+      .theme-horror h1 { margin:0; font-size: clamp(70px,18vmin,160px); color:#e8d6f2; text-shadow:0 0 30px rgba(180,80,220,.6); animation: hflicker 4s infinite; }
+      @keyframes hflicker { 0%,100%{opacity:1} 47%{opacity:.85} 49%{opacity:.4} 51%{opacity:.9} }
+      .theme-horror p { margin:.5em auto; max-width:34ch; letter-spacing:.12em; }
+
+      /* =========================================================
+         12. FILM NOIR
+         ========================================================= */
+      .theme-noir { background:#0c0c0d; color:#e8e8e8; font-family: Georgia, "Times New Roman", serif; }
+      .theme-noir .blinds { position:absolute; inset:0; pointer-events:none;
+        background: repeating-linear-gradient(115deg, rgba(255,255,255,.07) 0 18px, transparent 18px 48px); }
+      .theme-noir .card { position:relative; z-index:2; width:min(640px,86vw); text-align:left; padding:6vmin; }
+      .theme-noir h1 { margin:0 0 .2em; font-size: clamp(70px,18vmin,150px); letter-spacing:.06em; }
+      .theme-noir .type { font-family: "Courier New", monospace; font-size: clamp(15px,2.6vmin,22px); white-space:nowrap; overflow:hidden; border-right:.5em solid #e8e8e8;
+        width:0; animation: typing 3.5s steps(38) 1 forwards, caret .8s steps(1) infinite; }
+      @keyframes typing { to { width: 30ch; } }
+      @keyframes caret { 50% { border-color: transparent; } }
+      .theme-noir p { color:#b9b9b9; font-style:italic; max-width:42ch; }
+      .theme-noir .home { color:#e8e8e8; }
+
+      /* =========================================================
+         13. BRUTALIST
+         ========================================================= */
+      .theme-brutalist { background:#fff; color:#000; font-family: "Helvetica Neue", Arial, sans-serif; }
+      .theme-brutalist .wrap { position:relative; width:100%; height:100%; }
+      .theme-brutalist .huge { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); margin:0;
+        font-size: 56vw; font-weight:900; line-height:.8; letter-spacing:-.04em; }
+      .theme-brutalist .tl { position:absolute; top:4vmin; left:4vmin; font-weight:700; text-transform:uppercase; letter-spacing:.1em; }
+      .theme-brutalist .br { position:absolute; bottom:4vmin; right:4vmin; text-align:right; text-transform:uppercase; letter-spacing:.1em; font-weight:700; }
+      .theme-brutalist .bl { position:absolute; bottom:4vmin; left:4vmin; max-width:40ch; border-top:4px solid #000; padding-top:1vmin; }
+      .theme-brutalist .home { color:#000; }
+
+      /* =========================================================
+         14. LAVA LAMP
+         ========================================================= */
+      .theme-lavalamp { background: linear-gradient(#3a0d4a 0%, #7a1457 50%, #c23a2e 100%); overflow:hidden; }
+      .theme-lavalamp .blob { position:absolute; border-radius:50%;
+        background: radial-gradient(circle at 35% 30%, #ffd36b, #ff7a3c 55%, #e23d6b); filter: blur(2px); opacity:.92;
+        animation: blob-rise ease-in-out infinite; }
+      @keyframes blob-rise {
+        0%   { transform: translateY(10vh) scale(1); border-radius:50% 50% 48% 52%/52% 48% 50% 50%; }
+        50%  { transform: translateY(-55vh) scale(1.25); border-radius:46% 54% 55% 45%/55% 45% 52% 48%; }
+        100% { transform: translateY(10vh) scale(1); border-radius:50% 50% 48% 52%/52% 48% 50% 50%; }
+      }
+      .theme-lavalamp h1 { position:relative; z-index:3; margin:0; font-size: clamp(80px,22vmin,200px); font-weight:800; color:#fff;
+        mix-blend-mode: overlay; text-shadow:0 0 30px rgba(255,200,120,.5); }
+      .theme-lavalamp .tag { position:absolute; z-index:3; bottom:8%; left:0; right:0; color:#ffe3cf; letter-spacing:.4em; text-transform:uppercase; font-size:clamp(11px,1.8vmin,15px); }
+
+      /* =========================================================
+         15. HYPERSPACE
+         ========================================================= */
+      .theme-hyperspace { background:#000; overflow:hidden; }
+      .theme-hyperspace .streak { position:absolute; top:50%; left:50%; width:2px; height:2px; background:#fff;
+        transform-origin: 0 0; animation: warp linear infinite; }
+      @keyframes warp { from { transform: rotate(var(--a)) translateX(0) scaleX(1); opacity:0; }
+        10% { opacity:1; } to { transform: rotate(var(--a)) translateX(75vmax) scaleX(60); opacity:0; } }
+      .theme-hyperspace .center { position:relative; z-index:3; }
+      .theme-hyperspace h1 { margin:0; font-size: clamp(70px,18vmin,160px); font-weight:800; color:#fff; text-shadow:0 0 30px rgba(120,170,255,.8); }
+      .theme-hyperspace p { color:#9fb6ff; letter-spacing:.3em; text-transform:uppercase; font-size:clamp(11px,1.8vmin,15px); }
+
+      /* =========================================================
+         16. SOLARPUNK
+         ========================================================= */
+      .theme-solarpunk { background: linear-gradient(#fdf6da 0%, #eaf6cf 55%, #d2efb6 100%); color:#2c4a1e; font-family: "Segoe UI", system-ui, sans-serif; }
+      .theme-solarpunk .sun { position:absolute; top:10%; left:50%; transform:translateX(-50%); width:30vmin; height:30vmin; border-radius:50%;
+        background: radial-gradient(circle,#fff6c2,#ffd95e 60%,#ffb43c); box-shadow:0 0 12vmin #ffe79a; }
+      .theme-solarpunk .vine { position:absolute; bottom:0; width:5vmin; height: 60vmin; background:linear-gradient(transparent,#3f7d2b); border-radius:3vmin; }
+      .theme-solarpunk .leaf { position:absolute; width:6vmin; height:4vmin; background:#4f9e35; border-radius:0 80% 0 80%;
+        box-shadow: inset 0 0 1vmin rgba(0,0,0,.15); animation: sway-leaf 5s ease-in-out infinite; }
+      @keyframes sway-leaf { 0%,100%{transform:rotate(var(--r,0deg));} 50%{transform:rotate(calc(var(--r,0deg) + 8deg));} }
+      .theme-solarpunk .center { position:relative; z-index:3; }
+      .theme-solarpunk h1 { margin:0; font-size: clamp(80px,20vmin,200px); font-weight:800; color:#33611f; }
+      .theme-solarpunk p { margin:.4em auto; max-width:34ch; color:#3c5a28; }
+      .theme-solarpunk .home { color:#2c7a1e; }
+
+      /* =========================================================
+         REDUCED MOTION
+         ========================================================= */
+      @media (prefers-reduced-motion: reduce) {
+        * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; }
+        .theme-arcade .coin, .theme-terminal .cursor, .theme-noir .type { animation: none !important; }
+        .theme-noir .type { width: 30ch; border-right: none; }
+      }
+    </style>
   </head>
   <body>
-    <!-- Vendor JS -->
-    <script src="https://dominiccerchio.com/vendor/jquery/js/jquery-3.4.1.min.js"></script>
-    <script src="https://dominiccerchio.com/vendor/bootstrap/bootstrap-5.1.3-dist/js/bootstrap.min.js"></script>
+    <div id="app"></div>
 
-  	<!-- Custom JS -->
-  	<script src="https://dominiccerchio.com/home/js/404.js"></script>
+    <script>
+      "use strict";
+
+      var HOME = "https://dominiccerchio.com/"; // return-home target for a 404 page
+
+      function homeLink(text) {
+        return '<a class="home" href="' + HOME + '">' + text + '</a>';
+      }
+
+      /* ----- shared helper: text scramble (matrix) ----- */
+      function TextScramble(el) {
+        this.el = el;
+        this.chars = "!<>-_\\/[]{}\u2014=+*^?#________";
+        this.update = this.update.bind(this);
+      }
+      TextScramble.prototype.setText = function (newText) {
+        var self = this;
+        var oldText = this.el.innerText;
+        var length = Math.max(oldText.length, newText.length);
+        var promise = new Promise(function (resolve) { self.resolve = resolve; });
+        this.queue = [];
+        for (var i = 0; i < length; i++) {
+          var from = oldText[i] || "";
+          var to = newText[i] || "";
+          var start = Math.floor(Math.random() * 40);
+          var end = start + Math.floor(Math.random() * 40);
+          this.queue.push({ from: from, to: to, start: start, end: end });
+        }
+        cancelAnimationFrame(this.frameRequest);
+        this.frame = 0;
+        this.update();
+        return promise;
+      };
+      TextScramble.prototype.update = function () {
+        var output = "";
+        var complete = 0;
+        for (var i = 0, n = this.queue.length; i < n; i++) {
+          var q = this.queue[i];
+          if (this.frame >= q.end) { complete++; output += q.to; }
+          else if (this.frame >= q.start) {
+            if (!q.char || Math.random() < 0.28) { q.char = this.randomChar(); }
+            output += '<span class="dud">' + q.char + "</span>";
+          } else { output += q.from; }
+        }
+        this.el.innerHTML = output;
+        if (complete === this.queue.length) { this.resolve(); }
+        else { this.frameRequest = requestAnimationFrame(this.update); this.frame++; }
+      };
+      TextScramble.prototype.randomChar = function () {
+        return this.chars[Math.floor(Math.random() * this.chars.length)];
+      };
+
+      /* ================= THEME REGISTRY ================= */
+      var THEMES = {
+
+        space: {
+          build: function () {
+            return '' +
+              '<div class="stars"></div><div class="stars2"></div>' +
+              '<div class="earth"></div>' +
+              '<div class="info">' +
+                '<h1>404</h1>' +
+                '<p>Actual live footage of trying to find the page you wanted&hellip; it\'s not looking so good.</p>' +
+                '<p>Return to ' + homeLink("Earth") + '?</p>' +
+              '</div>';
+          }
+        },
+
+        starwars: {
+          build: function () {
+            return '' +
+              '<div class="scene">' +
+                '<div class="suns"><div class="sun"></div><div class="sun small"></div></div>' +
+                '<h1>404</h1>' +
+                '<div class="droids">' +
+                  '<div class="threepio"></div>' +
+                  '<div class="artoo"><div class="dome"></div><div class="body"></div><div class="eye"></div><div class="panel"></div></div>' +
+                '</div>' +
+                '<p>These aren\'t the pages you\'re looking for.</p>' +
+                '<a class="btn home" href="' + HOME + '">Move Along</a>' +
+              '</div>';
+          }
+        },
+
+        matrix: {
+          build: function () {
+            return '' +
+              '<div class="rain"></div>' +
+              '<div class="center">' +
+                '<h1>404</h1>' +
+                '<div class="scramble">Wake up&hellip;</div>' +
+                '<div class="cube-wrap"><div class="cube">' +
+                  '<div class="front">404</div><div class="back">404</div>' +
+                  '<div class="right">&#8962;</div><div class="left">&#8962;</div>' +
+                  '<div class="top"></div><div class="bottom"></div>' +
+                '</div></div>' +
+                '<p>' + homeLink("Take the blue pill") + '</p>' +
+              '</div>';
+          },
+          init: function (app) {
+            // digital rain
+            var rain = app.querySelector(".rain");
+            var glyphs = "01\u30A2\u30AB\u30B5\u30BF\u30CA\u30CF\u30DE\u30E4\u30E9\u30EF";
+            var cols = Math.min(40, Math.floor(window.innerWidth / 22));
+            for (var c = 0; c < cols; c++) {
+              var s = document.createElement("span");
+              var len = 8 + Math.floor(Math.random() * 18);
+              var txt = "";
+              for (var k = 0; k < len; k++) { txt += glyphs[Math.floor(Math.random() * glyphs.length)] + "\n"; }
+              s.textContent = txt;
+              s.style.left = (c / cols * 100) + "%";
+              s.style.animationDuration = (4 + Math.random() * 6) + "s";
+              s.style.animationDelay = (-Math.random() * 8) + "s";
+              rain.appendChild(s);
+            }
+            // scramble
+            var el = app.querySelector(".scramble");
+            var fx = new TextScramble(el);
+            var phrases = ["Wake up\u2026", "the page you seek", "was never here", "follow the white rabbit", "404 not found"];
+            var counter = 0;
+            (function next() {
+              fx.setText(phrases[counter]).then(function () { setTimeout(next, 1400); });
+              counter = (counter + 1) % phrases.length;
+            })();
+          }
+        },
+
+        terminal: {
+          build: function () {
+            return '' +
+              '<div class="win">' +
+                '<div class="line">guest@dominiccerchio:~$ locate /page</div>' +
+                '<div class="line err">locate: error code 404 &mdash; resource not found</div>' +
+                '<div class="big">404</div>' +
+                '<div class="line">The file you requested does not exist on this server.</div>' +
+                '<div class="line">guest@dominiccerchio:~$ cd ' + homeLink("~") + '<span class="cursor"></span></div>' +
+              '</div>';
+          }
+        },
+
+        vaporwave: {
+          build: function () {
+            return '' +
+              '<div class="sun"></div><div class="grid"></div>' +
+              '<h1>404</h1>' +
+              '<div class="tag">signal lost &middot; ' + homeLink("return home") + '</div>';
+          }
+        },
+
+        arcade: {
+          build: function () {
+            return '' +
+              '<div class="box">' +
+                '<div class="go">GAME OVER</div>' +
+                '<div class="ghost"><div class="feet"></div></div>' +
+                '<div class="code">404</div>' +
+                '<div class="coin">INSERT COIN TO CONTINUE</div>' +
+                '<div>' + homeLink("&laquo; back to start") + '</div>' +
+              '</div>';
+          }
+        },
+
+        glitch: {
+          build: function () {
+            return '' +
+              '<div class="stack">' +
+                '<div class="g" data-text="404">404</div>' +
+                '<div class="sub">signal lost</div>' +
+                '<div class="sub">' + homeLink("re-establish connection") + '</div>' +
+              '</div>';
+          }
+        },
+
+        ocean: {
+          build: function () {
+            return '' +
+              '<div class="rays"></div>' +
+              '<div class="center">' +
+                '<h1>404</h1>' +
+                '<p>This page is lost at sea.</p>' +
+                '<p>Swim back to ' + homeLink("the surface") + '.</p>' +
+              '</div>';
+          },
+          init: function (app) {
+            for (var r = 0; r < 4; r++) {
+              var ray = document.createElement("div");
+              ray.className = "ray";
+              ray.style.left = (10 + r * 24) + "%";
+              app.appendChild(ray);
+            }
+            for (var b = 0; b < 26; b++) {
+              var d = document.createElement("div");
+              d.className = "bubble";
+              var size = 4 + Math.random() * 22;
+              d.style.width = size + "px";
+              d.style.height = size + "px";
+              d.style.left = (Math.random() * 100) + "%";
+              d.style.animationDuration = (6 + Math.random() * 10) + "s";
+              d.style.animationDelay = (-Math.random() * 12) + "s";
+              app.appendChild(d);
+            }
+          }
+        },
+
+        blueprint: {
+          build: function () {
+            return '' +
+              '<div class="sheet">' +
+                '<div class="stamp">NOT FOUND</div>' +
+                '<h1>404</h1>' +
+                '<div class="meta">DRAWING NO. 404 &middot; REV. &mdash; &middot; SHEET 1 OF 1</div>' +
+                '<div class="meta">The requested component is missing from this assembly.</div>' +
+                '<div class="meta">RETURN PATH: ' + homeLink("/ HOME") + '</div>' +
+                '<div class="dim">404.00 mm</div>' +
+              '</div>';
+          }
+        },
+
+        bsod: {
+          build: function () {
+            return '' +
+              '<div class="panel">' +
+                '<div class="face">:(</div>' +
+                '<p>Your page ran into a problem and couldn\'t be found. We\'re not collecting anything, we just couldn\'t locate it.</p>' +
+                '<p class="pct"><span class="num">0</span>% complete</p>' +
+                '<div class="small">' +
+                  '<div class="qr"></div>' +
+                  '<div>For more information about this issue, visit ' + homeLink("dominiccerchio.com") + '<br>Stop code: HTTP_PAGE_NOT_FOUND_404</div>' +
+                '</div>' +
+              '</div>';
+          },
+          init: function (app) {
+            var num = app.querySelector(".num");
+            var pct = 0;
+            var t = setInterval(function () {
+              pct += Math.floor(Math.random() * 8) + 1;
+              if (pct >= 100) { pct = 100; clearInterval(t); }
+              num.textContent = pct;
+            }, 400);
+          }
+        },
+
+        horror: {
+          build: function () {
+            return '' +
+              '<div class="center">' +
+                '<h1>404</h1>' +
+                '<p>This page was never meant to be found.</p>' +
+                '<p>Turn ' + homeLink("back") + ' while you still can.</p>' +
+              '</div>';
+          },
+          init: function (app) {
+            for (var i = 0; i < 6; i++) {
+              var t = document.createElement("div");
+              t.className = "tentacle";
+              t.style.left = (4 + i * 17) + "%";
+              t.style.animationDelay = (-Math.random() * 9) + "s";
+              t.style.height = (50 + Math.random() * 40) + "vmin";
+              app.appendChild(t);
+            }
+            var eye = document.createElement("div");
+            eye.className = "eye";
+            eye.style.top = "22%"; eye.style.left = "60%";
+            app.appendChild(eye);
+          }
+        },
+
+        noir: {
+          build: function () {
+            return '' +
+              '<div class="blinds"></div>' +
+              '<div class="card">' +
+                '<h1>404</h1>' +
+                '<div class="type">The page went missing&hellip;</div>' +
+                '<p>Another dead end. The page skipped town and left no forwarding address. Time to head ' + homeLink("home") + ', detective.</p>' +
+              '</div>';
+          }
+        },
+
+        brutalist: {
+          build: function () {
+            return '' +
+              '<div class="wrap">' +
+                '<div class="tl">Error</div>' +
+                '<h1 class="huge">404</h1>' +
+                '<div class="bl">The page does not exist. No styling will bring it back.</div>' +
+                '<div class="br">' + homeLink("Home &rarr;") + '</div>' +
+              '</div>';
+          }
+        },
+
+        lavalamp: {
+          build: function () {
+            return '<h1>404</h1><div class="tag">page not found &middot; ' + homeLink("go home") + '</div>';
+          },
+          init: function (app) {
+            var n = 7;
+            for (var i = 0; i < n; i++) {
+              var b = document.createElement("div");
+              b.className = "blob";
+              var size = 14 + Math.random() * 26;
+              b.style.width = size + "vmin";
+              b.style.height = size + "vmin";
+              b.style.left = (Math.random() * 90) + "%";
+              b.style.animationDuration = (8 + Math.random() * 8) + "s";
+              b.style.animationDelay = (-Math.random() * 10) + "s";
+              app.insertBefore(b, app.firstChild);
+            }
+          }
+        },
+
+        hyperspace: {
+          build: function () {
+            return '' +
+              '<div class="center">' +
+                '<h1>404</h1>' +
+                '<p>Wrong jump &middot; ' + homeLink("punch it home") + '</p>' +
+              '</div>';
+          },
+          init: function (app) {
+            for (var i = 0; i < 90; i++) {
+              var s = document.createElement("div");
+              s.className = "streak";
+              s.style.setProperty("--a", (Math.random() * 360) + "deg");
+              s.style.animationDuration = (0.6 + Math.random() * 1.6) + "s";
+              s.style.animationDelay = (-Math.random() * 2) + "s";
+              app.insertBefore(s, app.firstChild);
+            }
+          }
+        },
+
+        solarpunk: {
+          build: function () {
+            return '' +
+              '<div class="sun"></div>' +
+              '<div class="center">' +
+                '<h1>404</h1>' +
+                '<p>Nature reclaimed this page.</p>' +
+                '<p>Wander back to ' + homeLink("the garden") + '.</p>' +
+              '</div>';
+          },
+          init: function (app) {
+            var positions = [3, 12, 80, 90, 50];
+            for (var v = 0; v < positions.length; v++) {
+              var vine = document.createElement("div");
+              vine.className = "vine";
+              vine.style.left = positions[v] + "%";
+              vine.style.height = (40 + Math.random() * 35) + "vmin";
+              app.appendChild(vine);
+            }
+            for (var l = 0; l < 16; l++) {
+              var leaf = document.createElement("div");
+              leaf.className = "leaf";
+              leaf.style.left = (Math.random() * 100) + "%";
+              leaf.style.bottom = (Math.random() * 55) + "vmin";
+              leaf.style.setProperty("--r", (Math.random() * 360) + "deg");
+              leaf.style.animationDelay = (-Math.random() * 5) + "s";
+              app.appendChild(leaf);
+            }
+          }
+        }
+
+      };
+
+      /* ================= BOOT ================= */
+      (function () {
+        var ids = Object.keys(THEMES);
+        var params = new URLSearchParams(location.search);
+        var pick = params.get("theme");
+        if (!pick || !THEMES[pick]) {
+          pick = ids[Math.floor(Math.random() * ids.length)];
+        }
+        document.body.classList.add("theme-" + pick);
+        var app = document.getElementById("app");
+        app.innerHTML = THEMES[pick].build();
+        if (THEMES[pick].init) { THEMES[pick].init(app); }
+      })();
+    </script>
   </body>
 </html>

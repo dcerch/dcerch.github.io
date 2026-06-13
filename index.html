@@ -1,114 +1,369 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <!-- *** Browser *** -->
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Dominic Cerchio — Program Manager in Data & AI. Personal site.">
+  <title>dominiccerchio</title>
+  <style>
+    :root {
+      --bg: #050a05;
+      --bg-2: #081208;
+      --phosphor: #3dff7a;
+      --phosphor-dim: #1f8f43;
+      --phosphor-glow: rgba(61, 255, 122, 0.55);
+      --amber: #ffcf6a;
+      --magenta: #f012be;
+      --rule: rgba(61, 255, 122, 0.25);
+    }
 
-    <!-- *** Social spiders *** -->
-    <!-- Search Engine -->
-    <meta name="description" content="Dominic's personal website that storytells his upbringing, attaches his resume, and showcases various web development projects.">
-    <meta name="image" content="https://dominiccerchio.com/home/img/logo/blue/android-chrome-512x512.png">
-    <!-- Schema.org for Google -->
-    <meta itemprop="name" content="Dominic's Homepage">
-    <meta itemprop="description" content="Dominic's personal website that storytells his upbringing, attaches his resume, and showcases various web development projects.">
-    <meta itemprop="image" content="https://dominiccerchio.com/home/img/logo/blue/android-chrome-512x512.png">
-    <!-- Open Graph general (Facebook, Pinterest & Google+) -->
-    <meta name="og:title" content="Dominic's Homepage">
-    <meta name="og:description" content="Dominic's personal website that storytells his upbringing, attaches his resume, and showcases various web development projects.">
-    <meta name="og:image" content="https://dominiccerchio.com/home/img/logo/blue/android-chrome-512x512.png">
-    <meta name="og:url" content="https://dominiccerchio.com/">
-    <meta name="og:site_name" content="dominiccerchio">
-    <meta name="og:locale" content="en_US">
-    <meta name="og:type" content="website">
+    * { box-sizing: border-box; }
 
-    <!-- Favicon & page title -->
-    <link rel="icon" href="home/img/logo/blue/favicon-32x32.png">
-    <title>dominiccerchio</title>
+    html, body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(ellipse at center, var(--bg-2) 0%, var(--bg) 75%);
+      color: var(--phosphor);
+      font-family: "Courier New", "DejaVu Sans Mono", monospace;
+      font-size: 16px;
+      line-height: 1.6;
+      text-shadow: 0 0 4px var(--phosphor-glow);
+    }
 
-    <!-- Bootstrap core CSS -->
-    <link href="vendor/bootstrap/bootstrap-5.3.0-alpha3-dist/css/bootstrap.min.css" rel="stylesheet">
+    /* CRT scanlines + flicker overlay */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0) 0px,
+        rgba(0, 0, 0, 0) 2px,
+        rgba(0, 0, 0, 0.28) 3px,
+        rgba(0, 0, 0, 0.28) 4px
+      );
+      z-index: 9999;
+      mix-blend-mode: multiply;
+    }
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.55) 100%);
+      z-index: 9998;
+      animation: flicker 6s infinite;
+    }
+    @keyframes flicker {
+      0%, 100% { opacity: 0.92; }
+      48% { opacity: 0.96; }
+      50% { opacity: 0.82; }
+      52% { opacity: 0.97; }
+    }
 
-    <!-- Shooting Stars CSS -->
-    <link href="home/css/background.css" rel="stylesheet">
-  </head>
-  <body>
-    <section class="container d-flex flex-column min-vh-100 justify-content-center align-items-center">
-      <div class="card text-center mt-5">
-        <div class="card-header">
-          <ul class="nav nav-pills card-header-pills nav-fill flex-column flex-sm-row">
-            <li class="nav-item">
-              <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#aboutme">About Me</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="https://www.linkedin.com/in/dcerch/" target="_blank">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-linkedin" viewBox="0 0 16 16">
-                  <path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854zm4.943 12.248V6.169H2.542v7.225zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248S2.4 3.226 2.4 3.934c0 .694.521 1.248 1.327 1.248zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016l.016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225z"/>
-                </svg>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="projects/index.html">Projects</a>
-            </li>
-          </ul>
-        </div>
-        <div class="card-body m-5">
-          <h1 class="display-2">Dominic Cerchio</h1>
-          <p class="fw-light fst-italic fs-3" id="slogan"></p>
-        </div>
-        <div class="card-footer text-muted">
+    main {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.25rem;
+    }
+
+    .window {
+      width: min(720px, 100%);
+      border: 1px solid var(--phosphor-dim);
+      border-radius: 6px;
+      background: rgba(8, 18, 8, 0.6);
+      box-shadow: 0 0 22px rgba(61, 255, 122, 0.18), inset 0 0 60px rgba(61, 255, 122, 0.04);
+      overflow: hidden;
+    }
+
+    .titlebar {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.5rem 0.85rem;
+      border-bottom: 1px solid var(--rule);
+      background: rgba(61, 255, 122, 0.06);
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+    }
+    .dot { width: 11px; height: 11px; border-radius: 50%; border: 1px solid var(--phosphor-dim); }
+    .dot.r { background: #ff5f56; }
+    .dot.y { background: var(--amber); }
+    .dot.g { background: var(--phosphor); }
+    .titlebar .path { margin-left: auto; color: var(--phosphor-dim); }
+
+    .screen { padding: 1.75rem 1.5rem 1.4rem; }
+
+    .prompt { color: var(--phosphor-dim); }
+    .prompt::before { content: "dominic@home:~$ "; color: var(--phosphor-dim); }
+
+    h1 {
+      margin: 0.4rem 0 0.1rem;
+      font-size: clamp(1.9rem, 7vw, 3.1rem);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+    h1::after {
+      content: "_";
+      animation: blink 1.05s steps(1) infinite;
+      color: var(--phosphor);
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    #slogan {
+      margin: 0.2rem 0 1.4rem;
+      font-style: italic;
+      color: var(--amber);
+      text-shadow: 0 0 5px rgba(255, 207, 106, 0.5);
+      min-height: 1.6em;
+    }
+    #slogan a { color: var(--magenta); text-decoration: none; text-shadow: 0 0 6px rgba(240,18,190,0.6); }
+
+    nav { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 1.5rem; }
+    nav button, nav a {
+      font: inherit;
+      cursor: pointer;
+      color: var(--phosphor);
+      background: transparent;
+      border: 1px solid var(--phosphor-dim);
+      border-radius: 4px;
+      padding: 0.4rem 0.85rem;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+    }
+    nav button:hover, nav a:hover {
+      background: rgba(61, 255, 122, 0.12);
+      box-shadow: 0 0 12px var(--phosphor-glow);
+    }
+    nav button:active, nav a:active { transform: translateY(1px); }
+    nav button::before { content: "> "; color: var(--phosphor-dim); }
+
+    .section {
+      border-top: 1px dashed var(--rule);
+      padding-top: 1.1rem;
+      margin-top: 0.4rem;
+    }
+    .section h2 {
+      font-size: 0.85rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--phosphor-dim);
+      margin: 0 0 0.6rem;
+    }
+    .section p { margin: 0 0 0.8rem; color: #bdf5cd; }
+    .badge {
+      display: inline-block;
+      border: 1px dashed var(--amber);
+      color: var(--amber);
+      padding: 0.15rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+    }
+
+    footer {
+      margin-top: 1.4rem;
+      text-align: center;
+    }
+    #footersymbols {
+      cursor: pointer;
+      font-size: 1.4rem;
+      letter-spacing: 0.35rem;
+      color: var(--phosphor);
+      user-select: none;
+      display: inline-block;
+      transition: opacity 1s ease;
+    }
+
+    /* Dialog */
+    dialog {
+      width: min(640px, 92vw);
+      border: 1px solid var(--phosphor-dim);
+      border-radius: 6px;
+      background: rgba(6, 14, 6, 0.97);
+      color: var(--phosphor);
+      box-shadow: 0 0 40px rgba(61, 255, 122, 0.25);
+      padding: 0;
+    }
+    dialog::backdrop { background: rgba(0, 0, 0, 0.75); }
+    .dlg-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.85rem 1.1rem;
+      border-bottom: 1px solid var(--rule);
+    }
+    .dlg-head h3 { margin: 0; font-size: 1rem; letter-spacing: 0.1em; }
+    .dlg-close {
+      font: inherit; cursor: pointer; color: var(--phosphor);
+      background: transparent; border: 1px solid var(--phosphor-dim);
+      border-radius: 4px; padding: 0.1rem 0.55rem;
+    }
+    .dlg-close:hover { background: rgba(61,255,122,0.12); }
+    .dlg-body { padding: 1.2rem; }
+    .dlg-body p { color: #bdf5cd; margin: 0 0 0.9rem; }
+    .dlg-body a { color: var(--amber); }
+
+    @media (prefers-reduced-motion: reduce) {
+      body::after { animation: none; }
+      h1::after { animation: none; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="window">
+      <div class="titlebar">
+        <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+        <span class="path">~/dominiccerchio</span>
+      </div>
+      <div class="screen">
+        <div class="prompt">whoami</div>
+        <h1>Dominic Cerchio</h1>
+        <p id="slogan"></p>
+
+        <nav>
+          <button id="aboutBtn">About Me</button>
+          <a href="toolbox.html">Toolbox</a>
+          <a href="apps.html">Apps</a>
+          <a href="https://www.linkedin.com/in/dcerch/" target="_blank" rel="noopener">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+              <path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854zm4.943 12.248V6.169H2.542v7.225zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248S2.4 3.226 2.4 3.934c0 .694.521 1.248 1.327 1.248zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016l.016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225z"/>
+            </svg>
+            LinkedIn
+          </a>
+        </nav>
+
+        <section class="section" id="about" hidden>
+          <h2>// about_me</h2>
+          <p>My love for technology started at home. My dad handed me the keys to an old Dell Dimension — CRT monitor, dial-up, and endless curiosity — and my oldest brother taught me to build my own PC and showed me what software could really do. That early support from family and friends shaped everything that came after.</p>
+          <p>Studying IT sharpened the discipline and creativity I bring to technology, science, and art. Along the way I found what I care about most: using technology to help people — whether that's automating the tedious parts of how a company runs or building accessible tools that connect and teach.</p>
+          <p>Today I'm a Program Manager working in the Data &amp; AI space.</p>
+        </section>
+
+        <footer>
           <small id="footersymbols" title="c u r i o s i t y is the lust of the mind"></small>
-        </div>
+        </footer>
       </div>
-    </section>
+    </div>
+  </main>
 
-    <article>
-      <div class="modal fade" id="aboutme" tabindex="-1" aria-labelledby="aboutModal" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">About Me</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body p-5 text-center">
-              <p class="card-text">Technology is a huge part of my life and it all started with my family. My father showed me all the different wonders that an old Dell Dimension with a CRT monitor and internet connection can provide. My eldest brother deserves recognition for the introduction to technology opportunities such as System Engineering (by teaching me how to build my own computer) and Software Development (by showing me the different tools and their possibilities). I am grateful for the support not just from my father and brother but also the rest of my family and friends.</p>
-              <p class="card-text">Higher education provided me discipline and creativity in technology, science and art. During my time in academia, I found my passion for helping others through technology - anything from simplifying/automating companies operational processes to building accessible tools that connect and educate individuals.</p>
-              <p class="card-text">I'm currently employed as a Program Manager in the Data & AI space.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </article>
+  <dialog id="memories">
+    <div class="dlg-head">
+      <h3>Remembrance</h3>
+      <button class="dlg-close" data-close>esc</button>
+    </div>
+    <div class="dlg-body" style="text-align:center;">
+      <p><a href="https://www.pinkelfuneralhome.com/obituaries/Dominick-Cerchio/" target="_blank" rel="noopener">Grandpa</a>, <a href="https://www.pinkelfuneralhome.com/obituaries/Marie-Cerchio/" target="_blank" rel="noopener">Grandma</a>, <a href="https://www.echovita.com/us/obituaries/nj/ridgewood/james-allocco-12278123" target="_blank" rel="noopener">Uncle Jim</a></p>
+    </div>
+  </dialog>
 
-    <article>
-      <div class="modal fade" id="memories" tabindex="-1" aria-labelledby="memoriesModal" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Remembrance</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body text-center">
-              <p><a href="https://www.pinkelfuneralhome.com/obituaries/Dominick-Cerchio/">Grandpa</a>, <a href="https://www.pinkelfuneralhome.com/obituaries/Marie-Cerchio/">Grandma</a>, <a href="https://www.echovita.com/us/obituaries/nj/ridgewood/james-allocco-12278123">Uncle Jim</a></p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </article>
+  <script>
+    "use strict";
 
-    <article>
-      <div class="bg"></div>
-      <div class="bg bg2"></div>
-      <div class="bg bg3"></div>
-    </article>
+    /* ---------- Slogans ---------- */
+    var slogans = [
+      "Action Gets Results","Against All Odds","All Is Well","All Y'all","Always Add Value",
+      "Appreciate The Moment","Aspire To Inspire","Be A Boss","Be A Giver","Be Here Now",
+      "Be Obsessively Grateful","Be The Change","Because I Can","Believe In Yourself","Bravery In Fear",
+      "Can't Stop Now","Change Is Good","Choose To Shine","Collect Beautiful Moments","Connect With Nature",
+      "Conquer From Within","Count Your Blessings","Decisiveness In Doubt","Design Your Life","Develop Your Strength",
+      "Do Amazing Things","Do It Now","Do Your Best","Don't Set Limitations","Don't Be Afraid",
+      "Dream, Believe, Achieve","Dreams Come True","Embrace The Journey","Enjoy Every Moment","Every Moment Matters",
+      "Feed Your Soul","Focus And Win","Genius Is Patience","Get Enough Sleep","Get Fresh Air",
+      "Give Real Value","Go All Out","Go For It","Good Vibes Only","Happiness Is Success",
+      "Health Is Wealth","Hit The Goals","Inches Make Champions","Innovation With Imagination","It Is Possible",
+      "Just Do It","Keep It Cool","Keep Moving Forward","Keep On Shining","Know Thy Self",
+      "Knowledge Is Power","Learn From Yesterday","Learn Something New","Let It Go","Life Won't Wait",
+      "Listen. Practice. Improve.","Live And Learn","Live For Others","Live In Possibility","Live Your Potential",
+      "Loyalty Is Royalty","Maintain Your Integrity","Make It Happen","Never Give Up","Never Look Back",
+      "Never Too Late","Nobody Is Perfect","Now Or Never","Organize Your Life","Persistence In Everything",
+      "Prove Them Wrong","Pursue Your Passion","Recovery Is Possible","Remember To Live","Roll With It",
+      "See The Good","Seize The Day","Shine Your Light","Simplify Your Life","Speak The Truth",
+      "Stay The Course","Stop Underestimating Yourself","Success Breeds Success","Success Is Yours","Take Action Now",
+      "Take The Risk","Try Something New","Use Your Wings","Volunteer Your Time","Winners Never Quit",
+      "You Are Capable","You Are Enough","You Got This",
+      '<a href="#" data-memories>\u2665 In Loving Memory \u2665</a>'
+    ];
 
-  	<!-- Bootstrap JS -->
-    <script src="vendor/bootstrap/bootstrap-5.3.0-alpha3-dist/js/bootstrap.min.js"></script>
+    var sloganEl = document.getElementById("slogan");
+    var footerEl = document.getElementById("footersymbols");
+    var memoriesDlg = document.getElementById("memories");
 
-  	<!-- Custom JS -->
-  	<script src="home/js/slogan.js"></script>
-  	<script src="home/js/randomsymbol.js"></script>
-  	<script src="home/js/konami.js"></script>
-  </body>
+    sloganEl.innerHTML = slogans[Math.floor(Math.random() * slogans.length)];
+
+    /* ---------- Random Unicode symbols (Miscellaneous Symbols block) ---------- */
+    function randomSymbol() {
+      var min = 9728, max = 9983;
+      return "&#" + (Math.floor(Math.random() * (max - min + 1)) + min) + ";";
+    }
+    var symbolMarkup = "";
+    for (var i = 0; i < 10; i++) { symbolMarkup += randomSymbol(); }
+    footerEl.innerHTML = symbolMarkup;
+
+    /* ---------- Modal helpers (native <dialog>) ---------- */
+    function openMemories() {
+      if (typeof memoriesDlg.showModal === "function") { memoriesDlg.showModal(); }
+    }
+    memoriesDlg.querySelector("[data-close]").addEventListener("click", function () { memoriesDlg.close(); });
+    memoriesDlg.addEventListener("click", function (e) {
+      var r = memoriesDlg.getBoundingClientRect();
+      if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) {
+        memoriesDlg.close();
+      }
+    });
+    document.addEventListener("click", function (e) {
+      var t = e.target.closest("[data-memories]");
+      if (t) { e.preventDefault(); openMemories(); }
+    });
+
+    /* ---------- Section toggles ---------- */
+    function toggleSection(id) {
+      var el = document.getElementById(id);
+      var show = el.hidden;
+      el.hidden = !show;
+      if (show) { el.scrollIntoView({ behavior: "smooth", block: "nearest" }); }
+    }
+    document.getElementById("aboutBtn").addEventListener("click", function () { toggleSection("about"); });
+
+    /* ---------- Easter egg 1: type "curiosity" ---------- */
+    var typed = "";
+    var secret = "curiosity";
+    document.addEventListener("keypress", function (e) {
+      typed = (typed + String.fromCharCode(e.keyCode || e.which)).slice(-secret.length).toLowerCase();
+      if (typed === secret) {
+        var original = footerEl.innerHTML;
+        footerEl.style.opacity = "0";
+        setTimeout(function () {
+          footerEl.innerHTML = "You decide to click the symbols.";
+          footerEl.style.opacity = "1";
+        }, 1200);
+        setTimeout(function () { footerEl.style.opacity = "0"; }, 4200);
+        setTimeout(function () {
+          footerEl.innerHTML = original;
+          footerEl.style.opacity = "1";
+        }, 5400);
+        typed = "";
+      }
+    });
+
+    /* ---------- Easter egg 2: click symbols 10x -> Khajiit ---------- */
+    var clicks = 0;
+    footerEl.addEventListener("click", function () {
+      clicks++;
+      if (clicks > 10) {
+        sloganEl.innerHTML = 'Khajiit has wares, if you have <a href="toolbox.html#elderscrolls">\uD83D\uDCB0</a>';
+      }
+    });
+  </script>
+</body>
 </html>
