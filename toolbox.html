@@ -193,6 +193,12 @@
 
     @media (prefers-reduced-motion: reduce) { body::after { animation: none; } }
     @media (max-width: 640px) { .screen { padding: 1.25rem 1rem; } .dlg-body { padding: 1rem; } }
+
+    /* ---- Embed mode (toolbox.html?embed=1#id): used by the 3D house's junk drawer ---- */
+    body.embed main { display: none; }
+    body.embed dialog#appModal { width: 100vw; max-width: 100vw; height: 100vh; max-height: 100vh; margin: 0; border: 0; border-radius: 0; box-shadow: none; }
+    body.embed .dlg-head { display: none; }
+    body.embed .dlg-body { max-height: 100vh; height: 100vh; }
   </style>
 </head>
 <body>
@@ -1500,6 +1506,12 @@
   });
 
   // deep-link support (#snippetid auto-opens)
+  var EMBED = /[?&]embed=1\b/.test(location.search);
+  if (EMBED) {
+    document.body.classList.add("embed");
+    // closing the snippet inside the house's window tells the parent to close its window too
+    modal.addEventListener("close", function () { if (window.parent !== window) window.parent.postMessage({ type: "nav-close" }, location.origin); });
+  }
   function openFromHash() {
     var id = location.hash.replace(/^#/, "");
     if (id && apps.some(function (a) { return a.id === id; })) openApp(id);

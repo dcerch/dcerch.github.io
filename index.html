@@ -2,368 +2,105 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Dominic Cerchio — Program Manager in Data & AI. Personal site.">
-  <title>dominiccerchio</title>
-  <style>
-    :root {
-      --bg: #050a05;
-      --bg-2: #081208;
-      --phosphor: #3dff7a;
-      --phosphor-dim: #1f8f43;
-      --phosphor-glow: rgba(61, 255, 122, 0.55);
-      --amber: #ffcf6a;
-      --magenta: #f012be;
-      --rule: rgba(61, 255, 122, 0.25);
-    }
-
-    * { box-sizing: border-box; }
-
-    html, body {
-      margin: 0;
-      min-height: 100vh;
-      background: radial-gradient(ellipse at center, var(--bg-2) 0%, var(--bg) 75%);
-      color: var(--phosphor);
-      font-family: "Courier New", "DejaVu Sans Mono", monospace;
-      font-size: 16px;
-      line-height: 1.6;
-      text-shadow: 0 0 4px var(--phosphor-glow);
-    }
-
-    /* CRT scanlines + flicker overlay */
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      background: repeating-linear-gradient(
-        to bottom,
-        rgba(0, 0, 0, 0) 0px,
-        rgba(0, 0, 0, 0) 2px,
-        rgba(0, 0, 0, 0.28) 3px,
-        rgba(0, 0, 0, 0.28) 4px
-      );
-      z-index: 9999;
-      mix-blend-mode: multiply;
-    }
-    body::after {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.55) 100%);
-      z-index: 9998;
-      animation: flicker 6s infinite;
-    }
-    @keyframes flicker {
-      0%, 100% { opacity: 0.92; }
-      48% { opacity: 0.96; }
-      50% { opacity: 0.82; }
-      52% { opacity: 0.97; }
-    }
-
-    main {
-      position: relative;
-      z-index: 1;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem 1.25rem;
-    }
-
-    .window {
-      width: min(720px, 100%);
-      border: 1px solid var(--phosphor-dim);
-      border-radius: 6px;
-      background: rgba(8, 18, 8, 0.6);
-      box-shadow: 0 0 22px rgba(61, 255, 122, 0.18), inset 0 0 60px rgba(61, 255, 122, 0.04);
-      overflow: hidden;
-    }
-
-    .titlebar {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      padding: 0.5rem 0.85rem;
-      border-bottom: 1px solid var(--rule);
-      background: rgba(61, 255, 122, 0.06);
-      font-size: 0.8rem;
-      letter-spacing: 0.05em;
-    }
-    .dot { width: 11px; height: 11px; border-radius: 50%; border: 1px solid var(--phosphor-dim); }
-    .dot.r { background: #ff5f56; }
-    .dot.y { background: var(--amber); }
-    .dot.g { background: var(--phosphor); }
-    .titlebar .path { margin-left: auto; color: var(--phosphor-dim); }
-
-    .screen { padding: 1.75rem 1.5rem 1.4rem; }
-
-    .prompt { color: var(--phosphor-dim); }
-    .prompt::before { content: "dominic@home:~$ "; color: var(--phosphor-dim); }
-
-    h1 {
-      margin: 0.4rem 0 0.1rem;
-      font-size: clamp(1.9rem, 7vw, 3.1rem);
-      font-weight: 700;
-      letter-spacing: 0.04em;
-    }
-    h1::after {
-      content: "_";
-      animation: blink 1.05s steps(1) infinite;
-      color: var(--phosphor);
-    }
-    @keyframes blink { 50% { opacity: 0; } }
-
-    #slogan {
-      margin: 0.2rem 0 1.4rem;
-      font-style: italic;
-      color: var(--amber);
-      text-shadow: 0 0 5px rgba(255, 207, 106, 0.5);
-      min-height: 1.6em;
-    }
-    #slogan a { color: var(--magenta); text-decoration: none; text-shadow: 0 0 6px rgba(240,18,190,0.6); }
-
-    nav { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 1.5rem; }
-    nav button, nav a {
-      font: inherit;
-      cursor: pointer;
-      color: var(--phosphor);
-      background: transparent;
-      border: 1px solid var(--phosphor-dim);
-      border-radius: 4px;
-      padding: 0.4rem 0.85rem;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
-    }
-    nav button:hover, nav a:hover {
-      background: rgba(61, 255, 122, 0.12);
-      box-shadow: 0 0 12px var(--phosphor-glow);
-    }
-    nav button:active, nav a:active { transform: translateY(1px); }
-    nav button::before { content: "> "; color: var(--phosphor-dim); }
-
-    .section {
-      border-top: 1px dashed var(--rule);
-      padding-top: 1.1rem;
-      margin-top: 0.4rem;
-    }
-    .section h2 {
-      font-size: 0.85rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--phosphor-dim);
-      margin: 0 0 0.6rem;
-    }
-    .section p { margin: 0 0 0.8rem; color: #bdf5cd; }
-    .badge {
-      display: inline-block;
-      border: 1px dashed var(--amber);
-      color: var(--amber);
-      padding: 0.15rem 0.6rem;
-      border-radius: 4px;
-      font-size: 0.85rem;
-      letter-spacing: 0.1em;
-    }
-
-    footer {
-      margin-top: 1.4rem;
-      text-align: center;
-    }
-    #footersymbols {
-      cursor: pointer;
-      font-size: 1.4rem;
-      letter-spacing: 0.35rem;
-      color: var(--phosphor);
-      user-select: none;
-      display: inline-block;
-      transition: opacity 1s ease;
-    }
-
-    /* Dialog */
-    dialog {
-      width: min(640px, 92vw);
-      border: 1px solid var(--phosphor-dim);
-      border-radius: 6px;
-      background: rgba(6, 14, 6, 0.97);
-      color: var(--phosphor);
-      box-shadow: 0 0 40px rgba(61, 255, 122, 0.25);
-      padding: 0;
-    }
-    dialog::backdrop { background: rgba(0, 0, 0, 0.75); }
-    .dlg-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.85rem 1.1rem;
-      border-bottom: 1px solid var(--rule);
-    }
-    .dlg-head h3 { margin: 0; font-size: 1rem; letter-spacing: 0.1em; }
-    .dlg-close {
-      font: inherit; cursor: pointer; color: var(--phosphor);
-      background: transparent; border: 1px solid var(--phosphor-dim);
-      border-radius: 4px; padding: 0.1rem 0.55rem;
-    }
-    .dlg-close:hover { background: rgba(61,255,122,0.12); }
-    .dlg-body { padding: 1.2rem; }
-    .dlg-body p { color: #bdf5cd; margin: 0 0 0.9rem; }
-    .dlg-body a { color: var(--amber); }
-
-    @media (prefers-reduced-motion: reduce) {
-      body::after { animation: none; }
-      h1::after { animation: none; }
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>dominiccerchio — Navigator</title>
+  <meta name="description" content="Dominic Cerchio's personal site: a 3D, explorable house inspired by 1990s Packard Bell Navigator. Click around to find his apps, tools, accomplishments, and a secret or two.">
+  <meta property="og:title" content="dominiccerchio — Navigator">
+  <meta property="og:description" content="A 3D house you can explore, inspired by 90s Packard Bell Navigator. Apps, tools, and a hidden ARG.">
+  <meta property="og:url" content="https://dominiccerchio.com/">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#14306e">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
+  <link rel="stylesheet" href="css/navigator.css">
+  <script type="importmap">
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js" } }
+  </script>
 </head>
 <body>
-  <main>
-    <div class="window">
-      <div class="titlebar">
-        <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
-        <span class="path">~/dominiccerchio</span>
+  <canvas id="scene" aria-label="A 3D house you can explore. Use the Menu button for a list of everything inside."></canvas>
+
+  <!-- ===================== Navigator top bar ===================== -->
+  <header id="topbar" class="chrome">
+    <button id="mapBtn" class="tile house" title="Map of the house" aria-label="Map of the house">
+      <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M4 20 L20 6 L36 20 L32 20 L32 34 L8 34 L8 20 Z" fill="#f2e2b8" stroke="#3a2a1a" stroke-width="2"/><path d="M2 21 L20 5 L38 21" fill="none" stroke="#2d6a3a" stroke-width="4" stroke-linecap="round"/><rect x="17" y="23" width="7" height="11" fill="#7a2a14"/><rect x="11" y="22" width="5" height="5" fill="#9fd8ff" stroke="#3a2a1a"/><rect x="26" y="22" width="5" height="5" fill="#9fd8ff" stroke="#3a2a1a"/></svg>
+    </button>
+    <div class="brand"><b>Navigator</b><span id="roomName">Living Room</span></div>
+    <nav class="tiles" aria-label="Rooms and tools">
+      <button class="tile" data-room="living" title="Living Room (1)" aria-label="Living Room">🛋️</button>
+      <button class="tile" data-room="kitchen" title="Kitchen (2)" aria-label="Kitchen">🍳</button>
+      <button class="tile" data-room="den" title="Den (3)" aria-label="Den">🏆</button>
+      <button class="tile" data-room="rec" title="Rec Room (4)" aria-label="Rec Room">🕹️</button>
+      <span class="sep"></span>
+      <button class="tile" id="journalBtn" title="Journal" aria-label="Journal" data-count="1">📓</button>
+      <button class="tile" id="soundBtn" title="Sound">🔊</button>
+      <button class="tile" id="helpBtn" title="Help" aria-label="Help">❓</button>
+      <a class="tile exit" href="terminal.html" title="Exit to the classic terminal site" aria-label="Exit to the classic terminal site">EXIT</a>
+    </nav>
+  </header>
+
+  <!-- ===================== Status bar ===================== -->
+  <footer id="statusbar" class="chrome">
+    <button id="infoBtn" class="infoguide" title="InfoGuide" aria-label="InfoGuide help"><span>i</span></button>
+    <p id="statusText" aria-live="polite">The Living Room, where the family keeps its favorite things.</p>
+    <button id="menuBtn" class="menubtn" title="Everything in the house">Menu</button>
+  </footer>
+
+  <div id="tooltip" hidden></div>
+  <div id="toast" hidden role="status"></div>
+  <div id="mapLabels" hidden></div>
+
+  <aside id="drawerPanel" hidden aria-label="Junk drawer contents">
+    <div class="dp-head"><b>🧰 Junk drawer</b><button id="drawerClose" class="nbtn small">Close drawer</button></div>
+    <div id="drawerList"></div>
+  </aside>
+
+  <!-- ===================== Window (Win95-style) ===================== -->
+  <div id="scrim" hidden></div>
+  <section id="win" hidden role="dialog" aria-modal="true" aria-labelledby="winTitle">
+    <div class="titlebar"><span id="winTitle"></span>
+      <span class="tb-btns"><a id="winExternal" class="tb" href="#" target="_blank" rel="noopener" title="Open in a new tab" hidden>↗</a><button id="winClose" class="tb" aria-label="Close">✕</button></span>
+    </div>
+    <div id="winBody"></div>
+  </section>
+
+  <!-- ===================== Boot sequence ===================== -->
+  <div id="boot" data-stage="win">
+    <div class="boot-win"><p>Starting Windows 95...</p></div>
+    <div class="boot-splash">
+      <div class="logo">
+        <span class="logo-name">dominiccerchio</span>
+        <svg class="compass" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="44" fill="#fff" stroke="#c9a54a" stroke-width="5"/><path d="M50 8 L58 50 L50 92 L42 50 Z" fill="#b5121b"/><path d="M8 50 L50 42 L92 50 L50 58 Z" fill="#1a2a6a"/><circle cx="50" cy="50" r="6" fill="#c9a54a"/></svg>
+        <span class="logo-nav">Navigator</span>
       </div>
-      <div class="screen">
-        <div class="prompt">whoami</div>
-        <h1>Dominic Cerchio</h1>
-        <p id="slogan"></p>
-
-        <nav>
-          <button id="aboutBtn">About Me</button>
-          <a href="toolbox.html">Toolbox</a>
-          <a href="apps.html">Apps</a>
-          <a href="https://www.linkedin.com/in/dcerch/" target="_blank" rel="noopener">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
-              <path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854zm4.943 12.248V6.169H2.542v7.225zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248S2.4 3.226 2.4 3.934c0 .694.521 1.248 1.327 1.248zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016l.016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225z"/>
-            </svg>
-            LinkedIn
-          </a>
-        </nav>
-
-        <section class="section" id="about" hidden>
-          <h2>// about_me</h2>
-          <p>My love for technology started at home. My dad handed me the keys to an old Dell Dimension — CRT monitor, dial-up, and endless curiosity — and my oldest brother taught me to build my own PC and showed me what software could really do. That early support from family and friends shaped everything that came after.</p>
-          <p>Studying IT sharpened the discipline and creativity I bring to technology, science, and art. Along the way I found what I care about most: using technology to help people — whether that's automating the tedious parts of how a company runs or building accessible tools that connect and teach.</p>
-          <p>Today I'm a Program Manager working in the Data &amp; AI space.</p>
-        </section>
-
-        <footer>
-          <small id="footersymbols" title="c u r i o s i t y is the lust of the mind"></small>
-        </footer>
+      <p class="version">Version 3.5 · Home Edition</p>
+      <div class="progress"><span id="bootBar"></span></div>
+      <p id="bootStatus">Loading the house…</p>
+      <div class="boot-actions">
+        <button id="enterBtn" class="bigbtn"><span class="num">1</span> Enter the House</button>
+        <a class="bigbtn alt" href="terminal.html"><span class="num">2</span> Classic Terminal</a>
       </div>
+      <button id="skipBtn" class="skip">skip ▸</button>
+      <p class="fineprint">A fan-made homage to the 1990s Packard Bell Navigator shell. Best with sound on 🔊</p>
     </div>
-  </main>
+  </div>
 
-  <dialog id="memories">
-    <div class="dlg-head">
-      <h3>Remembrance</h3>
-      <button class="dlg-close" data-close>esc</button>
-    </div>
-    <div class="dlg-body" style="text-align:center;">
-      <p><a href="https://www.pinkelfuneralhome.com/obituaries/Dominick-Cerchio/" target="_blank" rel="noopener">Grandpa</a>, <a href="https://www.pinkelfuneralhome.com/obituaries/Marie-Cerchio/" target="_blank" rel="noopener">Grandma</a>, <a href="https://www.echovita.com/us/obituaries/nj/ridgewood/james-allocco-12278123" target="_blank" rel="noopener">Uncle Jim</a></p>
-    </div>
-  </dialog>
+  <!-- ===================== No-WebGL / no-JS fallback ===================== -->
+  <div id="fallback">
+    <h1>dominiccerchio</h1>
+    <p>This site is a 3D house you can explore. If it isn't loading, here's everything inside:</p>
+    <ul>
+      <li><a href="apps.html">Apps</a> — Ranked Choice Voting, Secret Santa, Kojima Name Generator, Lost at Sea, Everybody is John, The Archive</li>
+      <li><a href="toolbox.html">Toolbox</a> — the junk drawer of little web tools</li>
+      <li><a href="terminal.html">Classic terminal site</a></li>
+      <li><a href="https://www.linkedin.com/in/dcerch/">LinkedIn</a></li>
+    </ul>
+  </div>
+  <noscript><style>#boot{display:none}#fallback{display:block}</style></noscript>
 
   <script>
-    "use strict";
-
-    /* ---------- Slogans ---------- */
-    var slogans = [
-      "Action Gets Results","Against All Odds","All Is Well","All Y'all","Always Add Value",
-      "Appreciate The Moment","Aspire To Inspire","Be A Boss","Be A Giver","Be Here Now",
-      "Be Obsessively Grateful","Be The Change","Because I Can","Believe In Yourself","Bravery In Fear",
-      "Can't Stop Now","Change Is Good","Choose To Shine","Collect Beautiful Moments","Connect With Nature",
-      "Conquer From Within","Count Your Blessings","Decisiveness In Doubt","Design Your Life","Develop Your Strength",
-      "Do Amazing Things","Do It Now","Do Your Best","Don't Set Limitations","Don't Be Afraid",
-      "Dream, Believe, Achieve","Dreams Come True","Embrace The Journey","Enjoy Every Moment","Every Moment Matters",
-      "Feed Your Soul","Focus And Win","Genius Is Patience","Get Enough Sleep","Get Fresh Air",
-      "Give Real Value","Go All Out","Go For It","Good Vibes Only","Happiness Is Success",
-      "Health Is Wealth","Hit The Goals","Inches Make Champions","Innovation With Imagination","It Is Possible",
-      "Just Do It","Keep It Cool","Keep Moving Forward","Keep On Shining","Know Thy Self",
-      "Knowledge Is Power","Learn From Yesterday","Learn Something New","Let It Go","Life Won't Wait",
-      "Listen. Practice. Improve.","Live And Learn","Live For Others","Live In Possibility","Live Your Potential",
-      "Loyalty Is Royalty","Maintain Your Integrity","Make It Happen","Never Give Up","Never Look Back",
-      "Never Too Late","Nobody Is Perfect","Now Or Never","Organize Your Life","Persistence In Everything",
-      "Prove Them Wrong","Pursue Your Passion","Recovery Is Possible","Remember To Live","Roll With It",
-      "See The Good","Seize The Day","Shine Your Light","Simplify Your Life","Speak The Truth",
-      "Stay The Course","Stop Underestimating Yourself","Success Breeds Success","Success Is Yours","Take Action Now",
-      "Take The Risk","Try Something New","Use Your Wings","Volunteer Your Time","Winners Never Quit",
-      "You Are Capable","You Are Enough","You Got This",
-      '<a href="#" data-memories>\u2665 In Loving Memory \u2665</a>'
-    ];
-
-    var sloganEl = document.getElementById("slogan");
-    var footerEl = document.getElementById("footersymbols");
-    var memoriesDlg = document.getElementById("memories");
-
-    sloganEl.innerHTML = slogans[Math.floor(Math.random() * slogans.length)];
-
-    /* ---------- Random Unicode symbols (Miscellaneous Symbols block) ---------- */
-    function randomSymbol() {
-      var min = 9728, max = 9983;
-      return "&#" + (Math.floor(Math.random() * (max - min + 1)) + min) + ";";
-    }
-    var symbolMarkup = "";
-    for (var i = 0; i < 10; i++) { symbolMarkup += randomSymbol(); }
-    footerEl.innerHTML = symbolMarkup;
-
-    /* ---------- Modal helpers (native <dialog>) ---------- */
-    function openMemories() {
-      if (typeof memoriesDlg.showModal === "function") { memoriesDlg.showModal(); }
-    }
-    memoriesDlg.querySelector("[data-close]").addEventListener("click", function () { memoriesDlg.close(); });
-    memoriesDlg.addEventListener("click", function (e) {
-      var r = memoriesDlg.getBoundingClientRect();
-      if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) {
-        memoriesDlg.close();
-      }
-    });
-    document.addEventListener("click", function (e) {
-      var t = e.target.closest("[data-memories]");
-      if (t) { e.preventDefault(); openMemories(); }
-    });
-
-    /* ---------- Section toggles ---------- */
-    function toggleSection(id) {
-      var el = document.getElementById(id);
-      var show = el.hidden;
-      el.hidden = !show;
-      if (show) { el.scrollIntoView({ behavior: "smooth", block: "nearest" }); }
-    }
-    document.getElementById("aboutBtn").addEventListener("click", function () { toggleSection("about"); });
-
-    /* ---------- Easter egg 1: type "curiosity" ---------- */
-    var typed = "";
-    var secret = "curiosity";
-    document.addEventListener("keypress", function (e) {
-      typed = (typed + String.fromCharCode(e.keyCode || e.which)).slice(-secret.length).toLowerCase();
-      if (typed === secret) {
-        var original = footerEl.innerHTML;
-        footerEl.style.opacity = "0";
-        setTimeout(function () {
-          footerEl.innerHTML = "You decide to click the symbols.";
-          footerEl.style.opacity = "1";
-        }, 1200);
-        setTimeout(function () { footerEl.style.opacity = "0"; }, 4200);
-        setTimeout(function () {
-          footerEl.innerHTML = original;
-          footerEl.style.opacity = "1";
-        }, 5400);
-        typed = "";
-      }
-    });
-
-    /* ---------- Easter egg 2: click symbols 10x -> Khajiit ---------- */
-    var clicks = 0;
-    footerEl.addEventListener("click", function () {
-      clicks++;
-      if (clicks > 10) {
-        sloganEl.innerHTML = 'Khajiit has wares, if you have <a href="toolbox.html#elderscrolls">\uD83D\uDCB0</a>';
-      }
-    });
+    // If the 3D engine can't load (offline CDN, old browser), show the plain directory instead.
+    setTimeout(function () { if (!window.__navReady) document.body.classList.add("no-webgl"); }, 15000);
   </script>
+  <script type="module" src="js/main.js"></script>
 </body>
 </html>
