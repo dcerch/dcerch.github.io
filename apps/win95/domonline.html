@@ -306,14 +306,68 @@ const BOTLINES = [
   ["PixelPrincess", "who else got 'press any key' and looked for the ANY key"], ["WebmasterSteve", "sign my guestbook!!!"],
   ["ModemKid95", "28.8 gang"], ["xXSk8rXx", "brb dinner"], ["NavigatorFan", "there's something weird about the house when you type curiosity..."]
 ];
+// The Lobby understands a little small talk. Rules are checked top to bottom; {me} is your screen name, {bot} the speaker.
 const REPLIES = [
-  [/\b(hi|hey|hello|sup|yo)\b/i, ["hiya!", "heyyy", "welcome to the lobby!"]], [/a\/s\/l|asl/i, ["no thanks lol", "nice try"]],
-  [/dom/i, ["dom built this whole computer lol", "dom's away, he's probably fixing the wallpaper again"]],
-  [/navigator|house/i, ["the Navigator house is double-click on the desktop", "go to the Info Center, the red i explains everything"]],
-  [/doom/i, ["DOOM is in the Games folder. iddqd"]], [/mail|email/i, ["you have mail! (it's from dom)"]],
-  [/\?$/, ["good question", "idk try Ask Jeeves", "hmm"]], [/lol|haha/i, ["lol", "rofl"]]
+  [/\b(gtg|g2g|got ?to go|gotta go|bye+|cya|see (ya|you)|later|good ?night|gn|logging off|signing off)\b/i, ["bye {me}!", "cya {me}!", "later!! :)", "nooo don't go", "bye! don't let the modem bite", "my mom says gtg too lol"], 2],
+  [/\bbrb\b|be right back/i, ["k", "we'll be here", "hurry back", "ok {me}"]],
+  [/^(re|wb|i'?m back|back)\b/i, ["wb {me}!", "welcome back!", "wb! you missed nothing lol"]],
+  [/what'?s? ?(up|new|going on|good)|wh?a+s+u+p+|^sup\b|\bwyd\b|what (are|r) (you|u|ya'?ll|y'?all) (doing|up to)|hows? (it|everything) going|how'?s life/i,
+    ["not much, just downloading a picture of a cat. 4 minutes left", "nm u?", "chillin. my mom's on the other line so i might get kicked", "playing Myst. still stuck. always stuck", "eating Dunkaroos and chatting with u", "waiting for this JPEG to load lol", "nothin much, watching TGIF reruns", "trying to beat minesweeper on expert. not going well", "not much {me}, what's up with you?"], 2],
+  [/how (are|r) (you|u|ya|y'?all)|how u doin|\bhru\b|how have you been|you ok\b/i, ["good! u?", "pretty good, it's a 28.8 kind of day", "great, i got a new mousepad", "tired, stayed up playing DOOM", "can't complain! well i can, but i won't", "good {me}! how r u?"], 2],
+  [/^(i'?m |im )?(good|great|fine|ok|okay|alright|pretty good|not bad|awesome|doing (good|great|well)|chillin|nm|nothing much|not much)\b/i, ["cool cool", "nice!", "same here", "glad to hear it {me}", "that's good :)"]],
+  [/\b(hi|hey+|hello+|hiya|howdy|yo|greetings|heya|hai|ello)\b/i, ["hey {me}!", "hiya {me} :)", "welcome to the lobby {me}", "{me}!!! hi", "heyyy", "hi! pull up a beanbag"], 2],
+  [/a\/s\/l|\basl\b/i, ["nice try", "this is a family lobby lol", "we don't do that here {me}", "OnlineHost is watching..."]],
+  [/what'?s? (is )?(your|ur|yer) name|who (are|r) (you|u)|who'?s (here|this)/i, ["{bot}. it says it right there lol", "i'm {bot}! it's a long story", "{bot}, nice to meet you {me}", "everyone calls me {bot}. even my mom"]],
+  [/where (are|r) (you|u) from|where (do|d) (you|u) live|\bwhere u at\b|what state/i, ["ohio!", "new jersey, what exit? lol", "the internet", "my parents' basement", "a town with one stoplight. you?", "cali! well, a computer in cali"]],
+  [/how old|what age|\bage\b/i, ["old enough to remember 2400 baud", "13 and a half", "older than the internet, younger than my dad's computer", "a lady never tells"]],
+  [/\b(bored|boring|nothing to do)\b/i, ["try pinball, it's in the Games folder", "same. wanna play hearts?", "go poke around the Navigator house", "IE has a time machine, go look at Space Jam", "minesweeper. always minesweeper"]],
+  [/\b(music|song|songs|band|listen|cd|radio|mix ?tape)\b/i, ["the Macarena is on the radio AGAIN", "i'm burning a mix CD, any requests?", "No Doubt is the best band ever, fight me", "Hampster Dance on repeat, no regrets", "my discman skips every time i walk"]],
+  [/\b(game|games|play|playing|myst|minesweeper|freecell|solitaire|pinball|hearts|nintendo|n64|playstation|sega)\b/i, ["minesweeper on expert under 200 seconds or you're not real", "freecell game #11982 is impossible, don't even try", "Myst is just a slideshow of being lost", "N64 kids rise up", "pinball in the Games folder is so good", "have u tried ski? don't go past 2000m..."]],
+  [/\b(movie|movies|tv|watch|watching|show|cartoon|x-?files|friends|seinfeld)\b/i, ["Space Jam was a masterpiece", "TGIF tonight!!", "did you see Toy Story? the toys are ALIVE", "i taped the X-Files, no spoilers", "anyone else stay up for Nick at Nite?"]],
+  [/\b(hungry|food|eat|eating|pizza|snack|dinner|lunch|breakfast|cereal)\b/i, ["Bagel Bites time", "BOOK IT stars = free pizza", "Dunkaroos > everything", "my mom made meatloaf. brb crying", "Lunchables are fancy food"]],
+  [/\b(school|homework|class|teacher|test|exam|work|job|boss|office)\b/i, ["ugh homework. i'm 'researching' on Encarta", "my boss thinks i'm working right now lol", "is it summer yet", "i did my report on penguins. thanks Encarta"]],
+  [/\b(weather|rain|raining|snow|snowing|sunny|hot|cold)\b/i, ["snow day!!! no school", "it's raining, perfect internet weather", "the weather channel says it's nice out. i'm staying in anyway"]],
+  [/\b(computer|pc|modem|internet|ram|mhz|cd-?rom|windows|pentium|megs?|baud|dial)\b/i, ["i have a pentium 75 with 8MB of RAM. flexing", "my modem is 28.8 but it feels like 14.4", "we just got a CD-ROM drive!!", "DON'T PICK UP THE PHONE", "i defragged my hard drive and watched it the whole time"]],
+  [/\b(lag|laggy|slow|loading)\b/i, ["it's the modem", "someone picked up the phone", "lag is a lifestyle", "still faster than my school computer"]],
+  [/\b(joke|funny|make me laugh)\b/i, ["why did the computer go to the doctor? it had a virus. (sorry)", "what do you call a computer that sings? a Dell lol", "how many programmers to change a lightbulb? none, that's a hardware problem", "knock knock. (who's there?) modem. (modem who?) MODEM THE LAWN ALREADY"]],
+  [/\b(thanks|thank you|thx|ty|tysm)\b/i, ["np!", "anytime {me}", "you're welcome :)", "no prob"]],
+  [/\b(sad|upset|bad day|tired|sleepy|sick|ugh)\b/i, ["aw *hugs*", "sending good vibes thru the phone line", "want a dancing baby gif? it helps", "hope ur day gets better {me}"]],
+  [/\b(stupid|dumb|shut up|hate|sucks|loser)\b/i, ["rude!!", "OnlineHost could kick u for that lol", "chill {me}", "be excellent to each other"]],
+  [/\b(y2k|future|2000|millennium)\b/i, ["Y2K is gonna end the world. i'm stocking up on canned peas", "in the future we'll all have flying cars", "2000 is gonna be SO futuristic"]],
+  [/\b(anyone|anybody|any1|is (anyone|anybody) (here|there))\b|^hello\?+$/i, ["yep we're here!", "8 people in here lol", "present!", "*waves*"]],
+  [/\b(love|like) (you|u|this)\b|\bily\b/i, ["aww", "<3", "this lobby is the best", "group hug"]],
+  [/\b(cool|awesome|rad|sweet|nice|neat|tight|dope)\b/i, ["totally rad", "da bomb", "sweet", "way cool", "radical"]],
+  [/\b(lol|lmao|rofl|haha+|hehe+|lmfao)\b/i, ["lol", "rofl", "hehe", ":-)", "LOL"]],
+  [/[:;]-?[)pd]/i, [":)", ";-)", ":-D", "(^_^)"]],
+  [/\bdom\b|dominic/i, ["dom built this whole computer lol", "dom's away, he's probably fixing the wallpaper again", "dom says hi! (he told me to say that)"]],
+  [/navigator|house|kidspace/i, ["the Navigator house is on the desktop, double-click it", "click the red i in Navigator, it explains everything", "KidSpace is upstairs, take your shoes off"]],
+  [/\bdoom\b/i, ["DOOM is in the Games folder. iddqd", "rip and tear!!"]], [/mail|email/i, ["you have mail! (it's from dom)", "check the Inbox, dom left notes"]],
+  [/^(yes|yeah|yep|yup|ya|sure|no|nope|nah|maybe|idk|k|ok)\W*$/i, ["ok", "fair", "hmm ok", "lol k", "gotcha"]]
 ];
-let chatT = 0, chatOn = false;
+const FALLBACK_Q = ["good question {me}", "idk ask Jeeves", "hmm, no clue", "probably? lol", "ask WebmasterSteve, he knows everything", "50/50", "great question. next question", "i was gonna ask the same thing"];
+const FALLBACK = ["lol true", "same", "word", "for real", "ha", "cool cool", "{me} you're funny", "i was just thinking that", "totally", "hmm interesting", "ok {me} :)", "ya", "^ this"];
+let chatT = 0, chatOn = false, lastBot = "";
+const pick = a => a[Math.floor(Math.random() * a.length)];
+function speaker(text) {
+  const named = BOTS.find(b => text.toLowerCase().includes(b.toLowerCase().replace(/[^a-z]/g, "").slice(0, 6)));
+  if (named) return named;
+  let b; do { b = pick(BOTS); } while (b === lastBot && BOTS.length > 1);
+  return b;
+}
+function respond(v) {
+  const me = $("#who").textContent;
+  const rule = REPLIES.find(([re]) => re.test(v));
+  let lines;
+  if (rule) lines = rule[1];
+  else if (/\?\s*$/.test(v) || /^(what|why|how|who|where|when|do|does|can|is|are|should|would|will)\b/i.test(v)) lines = FALLBACK_Q;
+  else lines = FALLBACK;
+  if (v.length > 5 && v === v.toUpperCase() && /[A-Z]/.test(v)) lines = ["why are we yelling lol", "caps lock is cruise control for cool", "INDOOR VOICE {me}"];
+  const say1 = (who, delay) => setTimeout(() => { if (!chatOn) return; lastBot = who; addLine(who, pick(lines).replace(/\{me\}/g, me).replace(/\{bot\}/g, who)); }, delay);
+  const first = speaker(v), d = 800 + Math.random() * 1200;
+  say1(first, d);
+  // popular topics get a second voice
+  if ((rule && rule[2]) || Math.random() < 0.18) { let second; do { second = pick(BOTS); } while (second === first); say1(second, d + 1200 + Math.random() * 1500); }
+}
 function addLine(who, text, cls = "") {
   const log = $("#log"); const d = document.createElement("div"); d.className = cls;
   d.innerHTML = cls === "host" ? esc(text) : `<b>${esc(who)}:</b> ${esc(text)}`;
@@ -332,8 +386,9 @@ $("#chatX").addEventListener("click", stopChat);
 $("#chatForm").addEventListener("submit", e => {
   e.preventDefault(); const v = $("#say").value.trim(); if (!v) return; $("#say").value = "";
   addLine($("#who").textContent, v, "me");
-  const r = REPLIES.find(([re]) => re.test(v));
-  if (r) setTimeout(() => addLine(BOTS[Math.floor(Math.random() * BOTS.length)], r[1][Math.floor(Math.random() * r[1].length)]), 900 + Math.random() * 1500);
+  // give the room a beat to answer before the next random chatter
+  clearTimeout(chatT); chatT = setTimeout(function loop() { if (!chatOn) return; const l = pick(BOTLINES); addLine(l[0], l[1]); chatT = setTimeout(loop, 3500 + Math.random() * 5000); }, 6000 + Math.random() * 3000);
+  respond(v);
 });
 
 // ------------------------------------------------------------ menus

@@ -14,157 +14,143 @@ const shade = (hex, k) => {
   return `rgb(${f(n >> 16)},${f((n >> 8) & 255)},${f(n & 255)})`;
 };
 
+// Cartoon style: flat colours, chunky dark outlines, big round heads, bean eyes.
+const INK = "#2b1a12";
+function ink(g, path, fill, w) {
+  g.fillStyle = fill; path(); g.fill();
+  g.strokeStyle = INK; g.lineWidth = w; g.lineJoin = "round"; g.lineCap = "round"; path(); g.stroke();
+}
 function drawPerson(g, p, cx, headY, r, bottom) {
-  const y0 = headY + 1.2 * r;                      // shoulder line
-  const sw = (p.kid ? 1.5 : p.row === "front" ? 1.95 : 1.75) * r;             // half shoulder width
-  const hairDark = shade(p.hair, 0.72);
+  const lw = Math.max(3, 0.075 * r);
+  const y0 = headY + 0.95 * r;                                   // shoulder line (short neck, big head)
+  const sw = (p.kid ? 1.15 : p.row === "front" ? 1.45 : 1.3) * r;  // half shoulder width
+  const hairCol = p.hair;
 
-  // long / volume hair falls behind the shoulders
+  // long / volume hair sits behind everything
   if (p.hairStyle === "long" || p.hairStyle === "volume") {
-    const w = p.hairStyle === "volume" ? 1.45 : 1.18, len = p.hairStyle === "volume" ? 1.55 : 2.15;
-    const hg = g.createLinearGradient(cx, headY - r, cx, headY + len * r);
-    hg.addColorStop(0, p.hair); hg.addColorStop(1, hairDark);
-    g.fillStyle = hg; g.beginPath();
-    g.moveTo(cx - w * r, headY);
-    g.bezierCurveTo(cx - w * r, headY - 1.5 * r, cx + w * r, headY - 1.5 * r, cx + w * r, headY);
-    g.bezierCurveTo(cx + (w + 0.15) * r, headY + len * 0.6 * r, cx + (w + 0.05) * r, headY + len * r, cx + 0.7 * r, headY + len * r);
-    g.lineTo(cx - 0.7 * r, headY + len * r);
-    g.bezierCurveTo(cx - (w + 0.05) * r, headY + len * r, cx - (w + 0.15) * r, headY + len * 0.6 * r, cx - w * r, headY);
-    g.fill();
+    const w = p.hairStyle === "volume" ? 1.25 : 1.08, len = p.hairStyle === "volume" ? 1.0 : 1.75;
+    ink(g, () => {
+      g.beginPath(); g.moveTo(cx - w * r, headY - 0.1 * r);
+      g.bezierCurveTo(cx - w * r, headY - 1.45 * r, cx + w * r, headY - 1.45 * r, cx + w * r, headY - 0.1 * r);
+      g.quadraticCurveTo(cx + (w + 0.1) * r, headY + len * r, cx + 0.75 * r, headY + len * r);
+      g.lineTo(cx - 0.75 * r, headY + len * r);
+      g.quadraticCurveTo(cx - (w + 0.1) * r, headY + len * r, cx - w * r, headY - 0.1 * r); g.closePath();
+    }, hairCol, lw);
   }
 
-  // torso with sleeves
-  const body = g.createLinearGradient(cx - sw, 0, cx + sw, 0);
-  body.addColorStop(0, shade(p.shirt, 0.62)); body.addColorStop(0.35, p.shirt); body.addColorStop(0.65, p.shirt); body.addColorStop(1, shade(p.shirt, 0.55));
+  // body: a soft rounded block
   const torso = () => {
     g.beginPath();
-    g.moveTo(cx - 0.45 * r, y0 - 0.12 * r);
-    g.bezierCurveTo(cx - 1.1 * r, y0 - 0.05 * r, cx - sw, y0 + 0.05 * r, cx - sw - 0.05 * r, y0 + 0.7 * r);
-    g.lineTo(cx - sw - 0.25 * r, bottom);
-    g.lineTo(cx + sw + 0.25 * r, bottom);
-    g.lineTo(cx + sw + 0.05 * r, y0 + 0.7 * r);
-    g.bezierCurveTo(cx + sw, y0 + 0.05 * r, cx + 1.1 * r, y0 - 0.05 * r, cx + 0.45 * r, y0 - 0.12 * r);
+    g.moveTo(cx - 0.5 * r, y0 - 0.05 * r);
+    g.quadraticCurveTo(cx - sw, y0 - 0.02 * r, cx - sw, y0 + 0.6 * r);
+    g.lineTo(cx - sw - 0.08 * r, bottom + 20);
+    g.lineTo(cx + sw + 0.08 * r, bottom + 20);
+    g.lineTo(cx + sw, y0 + 0.6 * r);
+    g.quadraticCurveTo(cx + sw, y0 - 0.02 * r, cx + 0.5 * r, y0 - 0.05 * r);
     g.closePath();
   };
-  g.fillStyle = body; torso(); g.fill();
-  // arm creases
-  g.strokeStyle = shade(p.shirt, 0.6); g.lineWidth = 0.06 * r; g.lineCap = "round";
-  [-1, 1].forEach(s => { g.beginPath(); g.moveTo(cx + s * (sw - 0.45 * r), y0 + 0.55 * r); g.quadraticCurveTo(cx + s * (sw - 0.55 * r), y0 + 1.6 * r, cx + s * (sw - 0.4 * r), bottom); g.stroke(); });
-
-  // clothing details
+  ink(g, torso, p.shirt, lw);
   g.save(); torso(); g.clip();
   if (p.top === "stripes") {
-    [0.9, 1.35].forEach((dy, i) => { g.fillStyle = i ? "#f2c14e" : "#e7e1d3"; g.fillRect(cx - sw - 0.3 * r, y0 + dy * r, 2 * sw + 0.6 * r, 0.22 * r); });
+    [0.75, 1.15].forEach((dy, i) => { g.fillStyle = i ? "#f2c14e" : "#f4efe2"; g.fillRect(cx - sw - r, y0 + dy * r, 2 * sw + 2 * r, 0.22 * r); });
   } else if (p.top === "flannel") {
-    g.globalAlpha = 0.28; g.fillStyle = "#3a1a0a";
-    for (let x = -3; x <= 3; x++) g.fillRect(cx + x * 0.55 * r, y0, 0.16 * r, bottom - y0);
-    for (let y = 0; y < 6; y++) g.fillRect(cx - sw - 0.3 * r, y0 + 0.3 * r + y * 0.55 * r, 2 * sw + 0.6 * r, 0.16 * r);
-    g.globalAlpha = 1;
+    g.fillStyle = "rgba(60,20,5,0.28)";
+    for (let x = -3; x <= 3; x++) g.fillRect(cx + x * 0.5 * r - 0.08 * r, y0, 0.16 * r, bottom - y0 + 30);
+    for (let y = 0; y < 6; y++) g.fillRect(cx - sw - r, y0 + 0.35 * r + y * 0.5 * r, 2 * sw + 2 * r, 0.16 * r);
   } else if (p.top === "sweater") {
-    g.strokeStyle = "rgba(255,255,255,0.16)"; g.lineWidth = 0.05 * r;
-    for (let x = -4; x <= 4; x++) { g.beginPath(); g.moveTo(cx + x * 0.4 * r, y0 + 0.9 * r); g.lineTo(cx + x * 0.4 * r, bottom); g.stroke(); }
-    g.fillStyle = "rgba(255,255,255,0.13)"; g.fillRect(cx - sw, y0 + 0.75 * r, 2 * sw, 0.12 * r);
+    g.fillStyle = "rgba(255,255,255,0.18)";
+    for (let k = -3; k <= 3; k++) { g.beginPath(); g.moveTo(cx + k * 0.42 * r, y0 + 0.75 * r); g.lineTo(cx + k * 0.42 * r + 0.14 * r, y0 + 0.95 * r); g.lineTo(cx + k * 0.42 * r, y0 + 1.15 * r); g.lineTo(cx + k * 0.42 * r - 0.14 * r, y0 + 0.95 * r); g.fill(); }
   }
+  // a simple arm line on each side
+  g.strokeStyle = INK; g.lineWidth = lw * 0.7;
+  [-1, 1].forEach(s => { g.beginPath(); g.moveTo(cx + s * (sw - 0.32 * r), y0 + 0.7 * r); g.quadraticCurveTo(cx + s * (sw - 0.38 * r), y0 + 1.4 * r, cx + s * (sw - 0.3 * r), bottom + 20); g.stroke(); });
   g.restore();
 
-  // neck
-  const neckW = (p.kid ? 0.42 : 0.5) * r;
-  g.fillStyle = shade(p.skin, 0.86); g.fillRect(cx - neckW, headY + 0.55 * r, 2 * neckW, 0.75 * r);
   // collars
   if (p.top === "turtleneck") {
-    g.fillStyle = shade(p.shirt, 0.9); roundRectP(g, cx - 0.62 * r, headY + 0.85 * r, 1.24 * r, 0.5 * r, 0.18 * r); g.fill();
-    g.strokeStyle = shade(p.shirt, 0.7); g.lineWidth = 0.04 * r;
-    for (let i = 1; i < 3; i++) { g.beginPath(); g.moveTo(cx - 0.6 * r, headY + (0.85 + i * 0.15) * r); g.lineTo(cx + 0.6 * r, headY + (0.85 + i * 0.15) * r); g.stroke(); }
-  } else if (p.top === "polo" || p.top === "flannel") {
-    g.fillStyle = p.top === "polo" ? "#f4f1ea" : shade(p.shirt, 1.15);
-    [-1, 1].forEach(s => { g.beginPath(); g.moveTo(cx, y0 + 0.25 * r); g.lineTo(cx + s * 0.62 * r, y0 - 0.2 * r); g.lineTo(cx + s * 0.42 * r, y0 + 0.42 * r); g.closePath(); g.fill(); });
-    g.fillStyle = shade(p.shirt, 0.7); g.beginPath(); g.arc(cx, y0 + 0.55 * r, 0.05 * r, 0, 7); g.arc(cx, y0 + 0.85 * r, 0.05 * r, 0, 7); g.fill();
-  } else {
-    g.fillStyle = shade(p.shirt, 0.78); g.beginPath(); g.ellipse(cx, y0 - 0.02 * r, 0.62 * r, 0.24 * r, 0, 0, Math.PI); g.fill();
-    if (p.top === "sweater") { g.fillStyle = "#f4f1ea"; [-1, 1].forEach(s => { g.beginPath(); g.moveTo(cx, y0 + 0.1 * r); g.lineTo(cx + s * 0.4 * r, y0 - 0.18 * r); g.lineTo(cx + s * 0.18 * r, y0 + 0.22 * r); g.closePath(); g.fill(); }); }
+    ink(g, () => { roundRectP(g, cx - 0.5 * r, y0 - 0.32 * r, r, 0.42 * r, 0.16 * r); }, shade(p.shirt, 1.12), lw);
+  } else if (p.top === "polo" || p.top === "flannel" || p.top === "sweater") {
+    const col = p.top === "flannel" ? shade(p.shirt, 1.2) : "#fbf8f0";
+    [-1, 1].forEach(s => ink(g, () => { g.beginPath(); g.moveTo(cx, y0 + 0.22 * r); g.lineTo(cx + s * 0.55 * r, y0 - 0.12 * r); g.lineTo(cx + s * 0.38 * r, y0 + 0.36 * r); g.closePath(); }, col, lw * 0.8));
   }
 
-  // ears + face
-  g.fillStyle = shade(p.skin, 0.92);
-  g.beginPath(); g.ellipse(cx - 0.9 * r, headY + 0.05 * r, 0.17 * r, 0.26 * r, 0, 0, 7); g.ellipse(cx + 0.9 * r, headY + 0.05 * r, 0.17 * r, 0.26 * r, 0, 0, 7); g.fill();
-  const face = g.createRadialGradient(cx - 0.25 * r, headY - 0.3 * r, 0.1 * r, cx, headY, 1.15 * r);
-  face.addColorStop(0, shade(p.skin, 1.06)); face.addColorStop(1, shade(p.skin, 0.88));
-  g.fillStyle = face; g.beginPath();
-  g.moveTo(cx - 0.88 * r, headY - 0.2 * r);
-  g.bezierCurveTo(cx - 0.9 * r, headY - 1.25 * r, cx + 0.9 * r, headY - 1.25 * r, cx + 0.88 * r, headY - 0.2 * r);
-  g.bezierCurveTo(cx + 0.86 * r, headY + 0.55 * r, cx + 0.45 * r, headY + 1.0 * r, cx, headY + 1.02 * r);
-  g.bezierCurveTo(cx - 0.45 * r, headY + 1.0 * r, cx - 0.86 * r, headY + 0.55 * r, cx - 0.88 * r, headY - 0.2 * r);
-  g.fill();
+  // ears + head (a big, slightly squashed circle)
+  [-1, 1].forEach(s => ink(g, () => { g.beginPath(); g.ellipse(cx + s * 0.92 * r, headY + 0.05 * r, 0.18 * r, 0.24 * r, 0, 0, 7); }, p.skin, lw));
+  ink(g, () => { g.beginPath(); g.ellipse(cx, headY - 0.05 * r, 0.95 * r, 0.98 * r, 0, 0, 7); }, p.skin, lw);
 
-  // features
-  g.fillStyle = "rgba(240,110,110,0.22)"; g.beginPath(); g.ellipse(cx - 0.5 * r, headY + 0.32 * r, 0.2 * r, 0.13 * r, 0, 0, 7); g.ellipse(cx + 0.5 * r, headY + 0.32 * r, 0.2 * r, 0.13 * r, 0, 0, 7); g.fill();
-  g.strokeStyle = shade(p.hair, 0.8); g.lineWidth = 0.08 * r; g.lineCap = "round";
-  [-1, 1].forEach(s => { g.beginPath(); g.moveTo(cx + s * 0.18 * r, headY - 0.3 * r); g.quadraticCurveTo(cx + s * 0.38 * r, headY - 0.42 * r, cx + s * 0.58 * r, headY - 0.3 * r); g.stroke(); });
+  // rosy cheeks
+  g.fillStyle = "rgba(255,120,120,0.35)";
+  [-1, 1].forEach(s => { g.beginPath(); g.arc(cx + s * 0.55 * r, headY + 0.3 * r, 0.16 * r, 0, 7); g.fill(); });
+  // bean eyes with a sparkle
   [-1, 1].forEach(s => {
-    g.fillStyle = "#fff"; g.beginPath(); g.ellipse(cx + s * 0.37 * r, headY - 0.06 * r, 0.15 * r, 0.1 * r, 0, 0, 7); g.fill();
-    g.fillStyle = "#3a2516"; g.beginPath(); g.arc(cx + s * 0.37 * r, headY - 0.06 * r, 0.085 * r, 0, 7); g.fill();
-    g.fillStyle = "#fff"; g.beginPath(); g.arc(cx + s * 0.37 * r + 0.03 * r, headY - 0.09 * r, 0.025 * r, 0, 7); g.fill();
+    g.fillStyle = INK; g.beginPath(); g.ellipse(cx + s * 0.34 * r, headY - 0.02 * r, 0.11 * r, 0.16 * r, 0, 0, 7); g.fill();
+    g.fillStyle = "#fff"; g.beginPath(); g.arc(cx + s * 0.34 * r + 0.035 * r, headY - 0.08 * r, 0.04 * r, 0, 7); g.fill();
   });
-  g.strokeStyle = shade(p.skin, 0.72); g.lineWidth = 0.05 * r;
-  g.beginPath(); g.moveTo(cx - 0.02 * r, headY - 0.02 * r); g.quadraticCurveTo(cx - 0.14 * r, headY + 0.3 * r, cx + 0.06 * r, headY + 0.33 * r); g.stroke();
-  // smile with teeth
-  g.fillStyle = "#7a2b2b"; g.beginPath(); g.moveTo(cx - 0.32 * r, headY + 0.52 * r); g.quadraticCurveTo(cx, headY + 0.86 * r, cx + 0.32 * r, headY + 0.52 * r); g.quadraticCurveTo(cx, headY + 0.62 * r, cx - 0.32 * r, headY + 0.52 * r); g.fill();
-  g.fillStyle = "#fbf6ee"; g.beginPath(); g.moveTo(cx - 0.26 * r, headY + 0.55 * r); g.quadraticCurveTo(cx, headY + 0.66 * r, cx + 0.26 * r, headY + 0.55 * r); g.quadraticCurveTo(cx, headY + 0.7 * r, cx - 0.26 * r, headY + 0.55 * r); g.fill();
+  // eyebrows: little arcs
+  g.strokeStyle = shade(p.hair, 0.6); g.lineWidth = lw * 0.8;
+  [-1, 1].forEach(s => { g.beginPath(); g.arc(cx + s * 0.34 * r, headY - 0.18 * r, 0.16 * r, Math.PI * 1.2, Math.PI * 1.8); g.stroke(); });
+  // tiny nose and a big open grin
+  g.strokeStyle = INK; g.lineWidth = lw * 0.7;
+  g.beginPath(); g.arc(cx, headY + 0.18 * r, 0.07 * r, 0.2 * Math.PI, 0.8 * Math.PI); g.stroke();
+  ink(g, () => { g.beginPath(); g.moveTo(cx - 0.3 * r, headY + 0.4 * r); g.quadraticCurveTo(cx, headY + 0.42 * r, cx + 0.3 * r, headY + 0.4 * r); g.quadraticCurveTo(cx + 0.24 * r, headY + 0.78 * r, cx, headY + 0.78 * r); g.quadraticCurveTo(cx - 0.24 * r, headY + 0.78 * r, cx - 0.3 * r, headY + 0.4 * r); g.closePath(); }, "#8a2b2b", lw * 0.8);
+  g.fillStyle = "#ff8a8a"; g.beginPath(); g.ellipse(cx, headY + 0.68 * r, 0.13 * r, 0.07 * r, 0, 0, 7); g.fill();
+  g.fillStyle = "#fff"; g.fillRect(cx - 0.2 * r, headY + 0.43 * r, 0.4 * r, 0.09 * r);
 
   if (p.glasses) {
-    g.strokeStyle = "#5a3b22"; g.lineWidth = 0.06 * r;
-    [-1, 1].forEach(s => { roundRectP(g, cx + s * 0.37 * r - 0.27 * r, headY - 0.27 * r, 0.54 * r, 0.42 * r, 0.12 * r); g.stroke(); });
-    g.beginPath(); g.moveTo(cx - 0.1 * r, headY - 0.1 * r); g.lineTo(cx + 0.1 * r, headY - 0.1 * r); g.stroke();
-    g.fillStyle = "rgba(255,255,255,0.12)"; [-1, 1].forEach(s => { roundRectP(g, cx + s * 0.37 * r - 0.25 * r, headY - 0.25 * r, 0.5 * r, 0.38 * r, 0.1 * r); g.fill(); });
+    g.strokeStyle = INK; g.lineWidth = lw * 0.9;
+    [-1, 1].forEach(s => { g.beginPath(); g.arc(cx + s * 0.36 * r, headY - 0.02 * r, 0.25 * r, 0, 7); g.stroke(); });
+    g.beginPath(); g.moveTo(cx - 0.11 * r, headY - 0.06 * r); g.quadraticCurveTo(cx, headY - 0.14 * r, cx + 0.11 * r, headY - 0.06 * r); g.stroke();
   }
 
-  // hair (front)
-  const hg = g.createLinearGradient(cx, headY - 1.2 * r, cx, headY);
-  hg.addColorStop(0, shade(p.hair, 1.18)); hg.addColorStop(1, p.hair);
-  g.fillStyle = hg; g.beginPath();
-  const top = (bulge = 1) => { g.moveTo(cx - 0.95 * r, headY - 0.1 * r); g.bezierCurveTo(cx - 1.0 * r * bulge, headY - 1.45 * r * bulge, cx + 1.0 * r * bulge, headY - 1.45 * r * bulge, cx + 0.95 * r, headY - 0.1 * r); };
-  switch (p.hairStyle) {
-    case "bowl":
-      top(1.02); g.lineTo(cx + 0.9 * r, headY - 0.32 * r); g.lineTo(cx - 0.9 * r, headY - 0.32 * r); g.closePath(); g.fill();
-      g.strokeStyle = hairDark; g.lineWidth = 0.03 * r; for (let i = -6; i <= 6; i++) { g.beginPath(); g.moveTo(cx + i * 0.13 * r, headY - 0.34 * r); g.lineTo(cx + i * 0.12 * r, headY - 0.6 * r); g.stroke(); }
-      break;
-    case "curtains":
-      top(1.05); g.lineTo(cx + 0.85 * r, headY - 0.25 * r);
-      g.quadraticCurveTo(cx + 0.35 * r, headY - 0.45 * r, cx + 0.04 * r, headY - 0.85 * r);
-      g.quadraticCurveTo(cx - 0.35 * r, headY - 0.45 * r, cx - 0.85 * r, headY - 0.25 * r); g.closePath(); g.fill();
-      break;
-    case "gray":
-      g.moveTo(cx - 0.95 * r, headY - 0.05 * r); g.bezierCurveTo(cx - 1.0 * r, headY - 1.35 * r, cx + 1.0 * r, headY - 1.35 * r, cx + 0.95 * r, headY - 0.05 * r);
-      g.lineTo(cx + 0.82 * r, headY - 0.5 * r); g.quadraticCurveTo(cx + 0.55 * r, headY - 0.8 * r, cx + 0.2 * r, headY - 0.78 * r);
-      g.quadraticCurveTo(cx - 0.2 * r, headY - 0.95 * r, cx - 0.82 * r, headY - 0.5 * r); g.closePath(); g.fill();
-      break;
-    case "volume":
-      g.moveTo(cx - 1.1 * r, headY + 0.2 * r); g.bezierCurveTo(cx - 1.45 * r, headY - 1.7 * r, cx + 1.45 * r, headY - 1.7 * r, cx + 1.1 * r, headY + 0.2 * r);
-      g.quadraticCurveTo(cx + 0.95 * r, headY - 0.45 * r, cx + 0.35 * r, headY - 0.62 * r);
-      g.quadraticCurveTo(cx - 0.4 * r, headY - 0.75 * r, cx - 0.85 * r, headY - 0.3 * r);
-      g.quadraticCurveTo(cx - 0.95 * r, headY - 0.1 * r, cx - 1.1 * r, headY + 0.2 * r); g.fill();
-      g.strokeStyle = shade(p.hair, 1.22); g.lineWidth = 0.045 * r;
-      [[-0.75, -0.75, 0.9], [-0.35, -1.05, 0.5], [0.3, -1.05, 2.6], [0.72, -0.72, 2.2]].forEach(([dx, dy, a0]) => { g.beginPath(); g.arc(cx + dx * r, headY + dy * r, 0.2 * r, a0, a0 + 2.2); g.stroke(); });
-      break;
-    case "long":
-      top(1.03); g.lineTo(cx + 0.9 * r, headY - 0.2 * r);
-      g.quadraticCurveTo(cx + 0.55 * r, headY - 0.5 * r, cx - 0.2 * r, headY - 0.62 * r);
-      g.quadraticCurveTo(cx - 0.7 * r, headY - 0.5 * r, cx - 0.9 * r, headY - 0.2 * r); g.closePath(); g.fill();
-      break;
-    default: // short with a side part
-      top(1.0); g.lineTo(cx + 0.88 * r, headY - 0.4 * r);
-      g.quadraticCurveTo(cx + 0.3 * r, headY - 0.62 * r, cx - 0.3 * r, headY - 0.78 * r);
-      g.quadraticCurveTo(cx - 0.72 * r, headY - 0.62 * r, cx - 0.88 * r, headY - 0.4 * r); g.closePath(); g.fill();
-      g.strokeStyle = shade(p.hair, 1.4); g.lineWidth = 0.04 * r; g.beginPath(); g.moveTo(cx - 0.35 * r, headY - 1.05 * r); g.quadraticCurveTo(cx - 0.2 * r, headY - 0.9 * r, cx - 0.3 * r, headY - 0.78 * r); g.stroke();
-  }
-  // soft hair sheen
-  g.fillStyle = "rgba(255,255,255,0.10)"; g.beginPath(); g.ellipse(cx - 0.3 * r, headY - 0.95 * r, 0.35 * r, 0.12 * r, -0.4, 0, 7); g.fill();
+  // hair on top
+  const top = () => {
+    switch (p.hairStyle) {
+      case "bowl":
+        g.beginPath(); g.moveTo(cx - 1.0 * r, headY - 0.1 * r);
+        g.bezierCurveTo(cx - 1.05 * r, headY - 1.4 * r, cx + 1.05 * r, headY - 1.4 * r, cx + 1.0 * r, headY - 0.1 * r);
+        g.lineTo(cx + 0.8 * r, headY - 0.38 * r); g.lineTo(cx - 0.8 * r, headY - 0.38 * r); g.closePath(); break;
+      case "curtains":
+        g.beginPath(); g.moveTo(cx - 0.98 * r, headY - 0.05 * r);
+        g.bezierCurveTo(cx - 1.05 * r, headY - 1.42 * r, cx + 1.05 * r, headY - 1.42 * r, cx + 0.98 * r, headY - 0.05 * r);
+        g.quadraticCurveTo(cx + 0.55 * r, headY - 0.35 * r, cx + 0.05 * r, headY - 0.75 * r);
+        g.quadraticCurveTo(cx - 0.45 * r, headY - 0.35 * r, cx - 0.98 * r, headY - 0.05 * r); g.closePath(); break;
+      case "gray":
+        g.beginPath(); g.moveTo(cx - 0.98 * r, headY - 0.05 * r);
+        g.bezierCurveTo(cx - 1.0 * r, headY - 0.75 * r, cx - 0.75 * r, headY - 0.85 * r, cx - 0.55 * r, headY - 0.8 * r);
+        g.quadraticCurveTo(cx - 0.75 * r, headY - 0.45 * r, cx - 0.8 * r, headY - 0.05 * r); g.closePath();
+        g.moveTo(cx + 0.98 * r, headY - 0.05 * r);
+        g.bezierCurveTo(cx + 1.0 * r, headY - 0.75 * r, cx + 0.75 * r, headY - 0.85 * r, cx + 0.55 * r, headY - 0.8 * r);
+        g.quadraticCurveTo(cx + 0.75 * r, headY - 0.45 * r, cx + 0.8 * r, headY - 0.05 * r); g.closePath();
+        g.moveTo(cx - 0.5 * r, headY - 0.88 * r); g.quadraticCurveTo(cx, headY - 1.12 * r, cx + 0.5 * r, headY - 0.88 * r); g.quadraticCurveTo(cx, headY - 0.98 * r, cx - 0.5 * r, headY - 0.88 * r); g.closePath(); break;
+      case "volume":
+        g.beginPath(); g.moveTo(cx - 1.15 * r, headY + 0.1 * r);
+        g.bezierCurveTo(cx - 1.5 * r, headY - 1.75 * r, cx + 1.5 * r, headY - 1.75 * r, cx + 1.15 * r, headY + 0.1 * r);
+        g.quadraticCurveTo(cx + 0.9 * r, headY - 0.5 * r, cx + 0.2 * r, headY - 0.62 * r);
+        g.quadraticCurveTo(cx - 0.6 * r, headY - 0.62 * r, cx - 1.15 * r, headY + 0.1 * r); g.closePath(); break;
+      case "long":
+        g.beginPath(); g.moveTo(cx - 1.02 * r, headY);
+        g.bezierCurveTo(cx - 1.05 * r, headY - 1.42 * r, cx + 1.05 * r, headY - 1.42 * r, cx + 1.02 * r, headY);
+        g.quadraticCurveTo(cx + 0.7 * r, headY - 0.5 * r, cx - 0.15 * r, headY - 0.6 * r);
+        g.quadraticCurveTo(cx - 0.7 * r, headY - 0.45 * r, cx - 1.02 * r, headY); g.closePath(); break;
+      default: // short with a side part and a little cowlick
+        g.beginPath(); g.moveTo(cx - 0.98 * r, headY - 0.2 * r);
+        g.bezierCurveTo(cx - 1.05 * r, headY - 1.4 * r, cx + 1.05 * r, headY - 1.4 * r, cx + 0.98 * r, headY - 0.2 * r);
+        g.quadraticCurveTo(cx + 0.4 * r, headY - 0.55 * r, cx - 0.3 * r, headY - 0.7 * r);
+        g.quadraticCurveTo(cx - 0.75 * r, headY - 0.55 * r, cx - 0.98 * r, headY - 0.2 * r); g.closePath();
+        g.moveTo(cx + 0.1 * r, headY - 1.0 * r); g.quadraticCurveTo(cx + 0.25 * r, headY - 1.35 * r, cx + 0.45 * r, headY - 1.25 * r); g.quadraticCurveTo(cx + 0.3 * r, headY - 1.1 * r, cx + 0.3 * r, headY - 0.98 * r); g.closePath();
+    }
+  };
+  ink(g, top, p.hairStyle === "gray" ? "#c8c6c2" : hairCol, lw);
+  // one shiny highlight on the hair
+  g.fillStyle = "rgba(255,255,255,0.28)"; g.beginPath(); g.ellipse(cx - 0.35 * r, headY - 0.98 * r, 0.25 * r, 0.08 * r, -0.35, 0, 7); g.fill();
 }
 
 function drawCat(g, cat, cx, by, s, { tabby = false } = {}) {
   const fur = cat.color, dark = cat.stripe, belly = cat.belly || shade(cat.color, 1.2);
   // tail
-  g.strokeStyle = fur; g.lineWidth = 16 * s; g.lineCap = "round";
+  g.strokeStyle = INK; g.lineWidth = 22 * s; g.lineCap = "round";
+  g.beginPath(); g.moveTo(cx + 50 * s, by - 18 * s); g.bezierCurveTo(cx + 120 * s, by - 10 * s, cx + 112 * s, by - 90 * s, cx + 84 * s, by - 110 * s); g.stroke();
+  g.strokeStyle = fur; g.lineWidth = 16 * s;
   g.beginPath(); g.moveTo(cx + 50 * s, by - 18 * s); g.bezierCurveTo(cx + 120 * s, by - 10 * s, cx + 112 * s, by - 90 * s, cx + 84 * s, by - 110 * s); g.stroke();
   // body (sitting, pear-shaped)
   const bg = g.createRadialGradient(cx - 20 * s, by - 90 * s, 10 * s, cx, by - 50 * s, 95 * s);
@@ -174,7 +160,7 @@ function drawCat(g, cat, cx, by, s, { tabby = false } = {}) {
   g.bezierCurveTo(cx - 70 * s, by - 80 * s, cx - 78 * s, by, cx - 30 * s, by);
   g.lineTo(cx + 30 * s, by);
   g.bezierCurveTo(cx + 78 * s, by, cx + 70 * s, by - 80 * s, cx + 34 * s, by - 120 * s);
-  g.closePath(); g.fill();
+  g.closePath(); g.fill(); g.strokeStyle = INK; g.lineWidth = 6 * s; g.lineJoin = "round"; g.stroke();
   g.fillStyle = belly; g.beginPath(); g.ellipse(cx, by - 52 * s, 26 * s, 44 * s, 0, 0, 7); g.fill();
   // front paws
   g.fillStyle = shade(fur, 1.05); [-1, 1].forEach(k => { g.beginPath(); g.ellipse(cx + k * 18 * s, by - 6 * s, 15 * s, 9 * s, 0, 0, 7); g.fill(); });
@@ -182,11 +168,11 @@ function drawCat(g, cat, cx, by, s, { tabby = false } = {}) {
   // head
   const hy = by - 140 * s;
   g.fillStyle = fur;
-  [-1, 1].forEach(k => { g.beginPath(); g.moveTo(cx + k * 40 * s, hy - 10 * s); g.lineTo(cx + k * 40 * s, hy - 62 * s); g.lineTo(cx + k * 10 * s, hy - 34 * s); g.closePath(); g.fill(); });
+  [-1, 1].forEach(k => { g.beginPath(); g.moveTo(cx + k * 40 * s, hy - 10 * s); g.lineTo(cx + k * 40 * s, hy - 62 * s); g.lineTo(cx + k * 10 * s, hy - 34 * s); g.closePath(); g.fill(); g.strokeStyle = INK; g.lineWidth = 6 * s; g.stroke(); });
   g.fillStyle = "#f2a7b4"; [-1, 1].forEach(k => { g.beginPath(); g.moveTo(cx + k * 35 * s, hy - 18 * s); g.lineTo(cx + k * 37 * s, hy - 50 * s); g.lineTo(cx + k * 17 * s, hy - 32 * s); g.closePath(); g.fill(); });
   const hgd = g.createRadialGradient(cx - 12 * s, hy - 14 * s, 4 * s, cx, hy, 50 * s);
   hgd.addColorStop(0, shade(fur, 1.1)); hgd.addColorStop(1, shade(fur, 0.9));
-  g.fillStyle = hgd; g.beginPath(); g.ellipse(cx, hy, 46 * s, 38 * s, 0, 0, 7); g.fill();
+  g.fillStyle = hgd; g.beginPath(); g.ellipse(cx, hy, 46 * s, 38 * s, 0, 0, 7); g.fill(); g.strokeStyle = INK; g.lineWidth = 6 * s; g.stroke();
   if (tabby || cat.stripe) {
     g.strokeStyle = dark; g.lineWidth = (tabby ? 5 : 3.5) * s; g.lineCap = "round";
     for (let k = -1; k <= 1; k++) { g.beginPath(); g.moveTo(cx + k * 11 * s, hy - 34 * s); g.lineTo(cx + k * 8 * s, hy - 18 * s); g.stroke(); }
@@ -229,12 +215,12 @@ export function portraitCanvas(family, cats) {
   // back row (standing), then front row (seated)
   const back = family.filter(p => p.row !== "front"), front = family.filter(p => p.row === "front");
   back.forEach((p, i) => {
-    const r = p.kid ? 66 : 74, cx = W * (0.5 + (i - (back.length - 1) / 2) * 0.205);
-    drawPerson(g, p, cx, (p.kid ? 335 : 300) + (i % 2) * 14, r, H);
+    const r = p.kid ? 76 : 84, cx = W * (0.5 + (i - (back.length - 1) / 2) * 0.215);
+    drawPerson(g, p, cx, (p.kid ? 330 : 280) + (i % 2) * 12, r, H);
   });
   front.forEach((p, i) => {
     const cx = W * (0.5 + (i - (front.length - 1) / 2) * 0.33);
-    drawPerson(g, p, cx, 545, 80, H + 40);
+    drawPerson(g, p, cx, 545, 92, H + 40);
   });
   // cats: one on each lap, one in front
   const [c0, c1, c2] = cats;
@@ -244,12 +230,9 @@ export function portraitCanvas(family, cats) {
 
   // studio softness: oval vignette, warm grade and grain
   const vig = g.createRadialGradient(W / 2, H * 0.48, 330, W / 2, H * 0.5, 820);
-  vig.addColorStop(0, "rgba(0,0,0,0)"); vig.addColorStop(1, "rgba(5,0,25,0.62)");
+  vig.addColorStop(0, "rgba(0,0,0,0)"); vig.addColorStop(1, "rgba(5,0,25,0.45)");
   g.fillStyle = vig; g.fillRect(0, 0, W, H);
   g.fillStyle = "rgba(255,200,140,0.06)"; g.fillRect(0, 0, W, H);
-  const r = rand(96), d = g.getImageData(0, 0, W, H);
-  for (let i = 0; i < d.data.length; i += 4) { const n = (r() - 0.5) * 14; d.data[i] += n; d.data[i + 1] += n; d.data[i + 2] += n; }
-  g.putImageData(d, 0, 0);
   g.fillStyle = "rgba(255,240,215,0.82)"; g.font = "italic 30px Georgia"; g.textAlign = "right";
   g.fillText("The Cerchios · Picture Day ’96", W - 30, H - 26);
   return c;
