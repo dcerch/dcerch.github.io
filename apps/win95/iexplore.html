@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>dom 95 Start Page - Internet Explorer</title>
+<link rel="stylesheet" href="w95app.css">
+<style>
+#bars { flex: none; padding: 1px 0; box-shadow: inset 0 -1px #fff, inset 0 1px #808080; }
+.band { display: flex; align-items: center; border-top: 1px solid #fff; border-bottom: 1px solid #808080; }
+.band:first-child { border-top: 0; }
+#toolrow { display: flex; align-items: stretch; }
+#toolrow .toolbar { flex: 1; overflow: hidden; }
+#throb { flex: none; width: 46px; margin: 2px; background: #000; display: flex; align-items: center; justify-content: center; }
+#throb canvas { width: 40px; height: 40px; image-rendering: pixelated; }
+#addr { display: flex; align-items: center; gap: 4px; padding: 3px 4px; flex: 1; min-width: 0; }
+#addr input { flex: 1; min-width: 60px; height: 21px; }
+#addr select { height: 21px; }
+#addr .btn { min-width: 0; height: 21px; padding: 0 8px; }
+#addr .lbl { padding: 0 2px; }
+#main { flex: 1; display: flex; min-height: 0; margin-top: 2px; }
+#side { width: 210px; flex: none; display: flex; flex-direction: column; margin-right: 3px; }
+#side .sh { display: flex; align-items: center; padding: 2px 4px; font-weight: bold; }
+#side .sh span { flex: 1; }
+#side .sh .btn { min-width: 0; width: 16px; height: 14px; padding: 0; font: bold 10px Arial; }
+#favs { flex: 1; overflow: auto; background: #fff; padding: 2px; }
+.ff > .fh, .fl { display: flex; align-items: center; gap: 4px; padding: 2px 3px; white-space: nowrap; }
+.ff > .fh:hover, .fl:hover { color: #000080; text-decoration: underline; }
+.fl.on { background: #000080; color: #fff; }
+.ff .fk { padding-left: 14px; }
+.ff.shut .fk { display: none; }
+.fl svg, .fh svg { width: 16px; height: 16px; flex: none; }
+.fl small { color: #808080; margin-left: auto; padding-left: 6px; }
+.fl.on small { color: #c0c0ff; }
+#view { flex: 1; position: relative; min-width: 0; }
+#frame { position: absolute; inset: 2px; width: calc(100% - 4px); height: calc(100% - 4px); border: 0; background: #fff; }
+#cover { position: absolute; inset: 2px; background: #fff; display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px; font: 13px "Times New Roman", serif; }
+#cover h2 { font: bold 18px Arial, sans-serif; margin: 0 0 8px; }
+#cover .btn { font: 11px var(--font); margin: 4px; }
+.zone { display: flex; align-items: center; gap: 4px; width: 150px; }
+.zone svg { width: 16px; height: 16px; }
+#prog { width: 110px; padding: 2px !important; display: flex; }
+#prog i { display: block; height: 100%; background: #000080; width: 0; transition: width .4s; }
+@media (max-width: 560px) { #side { display: none !important; } .tb span { display: none; } .tb { min-width: 30px; } #yearSel, .lbl { display: none; } }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="titlebar"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="#1e6fd8"/><path d="M3 6h10M3 10h10M8 1c-3 4-3 10 0 14M8 1c3 4 3 10 0 14" stroke="#9fd2ff" fill="none"/></svg><span class="tt">dom 95 Start Page - Internet Explorer</span></div>
+  <div id="menu"></div>
+  <div id="bars">
+    <div class="band" id="toolrow">
+      <div class="toolbar" id="tools"></div>
+      <div id="throb" class="sunken" title="Internet Explorer is busy when this spins"><canvas id="globe" width="40" height="40"></canvas></div>
+    </div>
+    <div class="band"><div class="grabber" style="height:20px;margin-left:3px"></div>
+      <form id="addr" autocomplete="off"><span class="lbl">Address</span>
+        <input class="field" id="url" spellcheck="false" aria-label="Address">
+        <select class="field" id="yearSel" title="Time machine: load this address as it looked in…" aria-label="Year"></select>
+        <button class="btn" type="submit">Go</button>
+      </form>
+    </div>
+  </div>
+  <div id="main">
+    <div id="side" class="sunken" hidden>
+      <div class="sh"><span>Favorites</span><button class="btn" id="sideX" aria-label="Close favorites">×</button></div>
+      <div id="favs"></div>
+    </div>
+    <div id="view" class="sunken">
+      <iframe id="frame" title="Web page" referrerpolicy="no-referrer"
+        sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"></iframe>
+      <div id="cover" hidden></div>
+    </div>
+  </div>
+  <div class="statusbar"><span id="status">Done</span><span id="prog"><i></i></span><span class="zone"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="#1e6fd8"/><path d="M3 6h10M3 10h10M8 1c-3 4-3 10 0 14M8 1c3 4 3 10 0 14" stroke="#9fd2ff" fill="none"/></svg><span id="zone">Internet zone</span></span></div>
+</div>
+<script src="modem.js"></script>
+<script src="w95app.js"></script>
+<script>
+const { esc, h, dialog } = W95;
+const $ = s => document.querySelector(s);
+const HOME = new URL("iehome.html", location.href).href;
+
+// --------------------------------------------------------------- favorites (Wayback Machine snapshots)
+const WB = (ts, url) => `https://web.archive.org/web/${ts}if_/${url}`;
+const FAVS = [
+  { name: "Portals & Search", items: [
+    ["Yahoo!", "19961228024612", "http://www.yahoo.com/"],
+    ["Netscape", "19970101040026", "http://www.netscape.com/"],
+    ["AltaVista", "19971222163639", "http://altavista.digital.com/"],
+    ["Lycos", "19980109165410", "http://www.lycos.com/"],
+    ["Excite", "19980111094308", "http://www.excite.com/"],
+    ["Google!", "19990117032727", "http://www.google.com/"],
+    ["Ask Jeeves", "19991113062344", "http://www.askjeeves.com/"] ] },
+  { name: "Fun & Games", items: [
+    ["Space Jam", "19971221143941", "http://www.spacejam.com/"],
+    ["Nintendo", "19971210194325", "http://www.nintendo.com/"],
+    ["LEGO", "19980208151153", "http://www.lego.com/"],
+    ["GeoCities", "19980123230330", "http://www.geocities.com/"],
+    ["Hampster Dance", "20000104222046", "http://www.hampsterdance.com/"],
+    ["Zombo.com", "20001210005600", "http://www.zombo.com/"] ] },
+  { name: "News & Reference", items: [
+    ["NASA", "19961231235847", "http://www.nasa.gov/"],
+    ["The White House", "19961227062541", "http://www.whitehouse.gov/"],
+    ["The New York Times", "19961230230427", "http://www.nytimes.com/"],
+    ["The Weather Channel", "19970418032001", "http://www.weather.com/"],
+    ["Encarta Online", "19991114064533", "http://encarta.msn.com/"] ] },
+  { name: "Computers", items: [
+    ["Microsoft", "19961026164556", "http://www.microsoft.com/"],
+    ["Apple", "19971015112557", "http://www.apple.com/"],
+    ["Packard Bell", "19971211090334", "http://www.packardbell.com/"] ] },
+  { name: "Shopping", items: [
+    ["Amazon.com", "19990828014913", "http://www.amazon.com/"],
+    ["eBay", "19991103063447", "http://www.ebay.com/"],
+    ["McDonald's", "19961221230104", "http://www.mcdonalds.com/"] ] },
+  { name: "Y2K and After", items: [
+    ["MySpace", "20051230184548", "http://www.myspace.com/"],
+    ["YouTube", "20051231232401", "http://www.youtube.com/"],
+    ["dominiccerchio.com (2018)", "20180827051434", "http://dominiccerchio.com/"] ] }
+];
+const ALLFAV = FAVS.flatMap(f => f.items.map(([n, ts, u]) => ({ n, ts, u, href: WB(ts, u), year: ts.slice(0, 4) })));
+const I_PAGE = `<svg viewBox="0 0 16 16"><path d="M3 1h7l3 3v11H3z" fill="#fff" stroke="#000"/><circle cx="8" cy="9" r="3.4" fill="#1e6fd8"/><path d="M5 8h6M5 10h6" stroke="#9fd2ff"/></svg>`;
+const I_FOLD = `<svg viewBox="0 0 16 16"><path d="M1 4h5l1 1h8v9H1z" fill="#ffd84a" stroke="#806000"/></svg>`;
+const I_STAR = `<svg viewBox="0 0 16 16"><path d="M8 1l2 5h5l-4 3 2 6-5-4-5 4 2-6-4-3h5z" fill="#ffd700" stroke="#806000"/></svg>`;
+
+// --------------------------------------------------------------- toolbar icons (original drawings)
+const SVG = b => `<svg viewBox="0 0 24 24" shape-rendering="crispEdges">${b}</svg>`;
+const ICO = {
+  back: SVG(`<path d="M2 12 L11 4 V8 H21 V16 H11 V20 Z" fill="#3a9a3a" stroke="#0a400a"/>`),
+  fwd: SVG(`<path d="M22 12 L13 4 V8 H3 V16 H13 V20 Z" fill="#3a9a3a" stroke="#0a400a"/>`),
+  stop: SVG(`<path d="M8 2h8l6 6v8l-6 6H8l-6-6V8z" fill="#d82020" stroke="#600"/><path d="M8 8l8 8M16 8l-8 8" stroke="#fff" stroke-width="2.4"/>`),
+  refresh: SVG(`<rect x="3" y="2" width="15" height="19" fill="#fff" stroke="#000"/><path d="M15 9a5 5 0 1 0 1 4" fill="none" stroke="#1d7d1d" stroke-width="2"/><path d="M13 6h5v5z" fill="#1d7d1d"/>`),
+  home: SVG(`<path d="M2 12 L12 3 L22 12 Z" fill="#c03020" stroke="#400"/><rect x="5" y="12" width="14" height="10" fill="#f2e6b0" stroke="#000"/><rect x="10" y="15" width="4" height="7" fill="#805020"/><rect x="6.5" y="14" width="3" height="3" fill="#7fc8ff" stroke="#000"/>`),
+  search: SVG(`<circle cx="9" cy="9" r="6" fill="#bfe6ff" stroke="#000" stroke-width="1.5"/><path d="M13 13l8 8" stroke="#704010" stroke-width="3"/>`),
+  favs: SVG(`<rect x="2" y="6" width="20" height="15" fill="#ffd84a" stroke="#806000"/><path d="M2 6h7l2-2h-9z" fill="#ffd84a" stroke="#806000"/><path d="M12 8l1.6 3.6h3.9l-3.1 2.4 1.2 3.8L12 15.5l-3.6 2.3 1.2-3.8-3.1-2.4h3.9z" fill="#ffef7a" stroke="#806000"/>`),
+  history: SVG(`<circle cx="12" cy="12" r="9" fill="#fff" stroke="#000"/><path d="M12 6v6l4 3" stroke="#000" stroke-width="1.6" fill="none"/>`),
+  mail: SVG(`<rect x="2" y="6" width="20" height="13" fill="#fff" stroke="#000"/><path d="M2 6l10 7 10-7" fill="none" stroke="#000"/>`),
+  print: SVG(`<rect x="6" y="2" width="12" height="7" fill="#fff" stroke="#000"/><rect x="2" y="9" width="20" height="9" fill="#c0c0c0" stroke="#000"/><rect x="6" y="15" width="12" height="7" fill="#fff" stroke="#000"/><rect x="18" y="11" width="2" height="2" fill="#0a0"/>`),
+  newwin: SVG(`<rect x="2" y="5" width="15" height="15" fill="#fff" stroke="#000"/><rect x="2" y="5" width="15" height="3" fill="#000080"/><path d="M12 12 L22 2 M15 2h7v7" stroke="#000" stroke-width="2" fill="none"/>`)
+};
+
+// --------------------------------------------------------------- state
+const frame = $("#frame"), urlIn = $("#url"), status = $("#status"), cover = $("#cover"), prog = $("#prog i");
+let hist = [], hi = -1, cur = null, loading = false, slowT = 0;
+const online = () => sessionStorage.getItem("w95.online") === "1";
+
+// year selector: Live + 1996..2012
+const yearSel = $("#yearSel");
+yearSel.innerHTML = `<option value="">Now</option>` + Array.from({ length: 17 }, (_, i) => 1996 + i).map(y => `<option ${y === 1998 ? "selected" : ""}>${y}</option>`).join("");
+
+function normalize(raw) {
+  let v = raw.trim();
+  if (!v) return null;
+  if (/^(about:home|home|start)$/i.test(v)) return { href: HOME, shown: "about:home", local: true };
+  if (/^https?:\/\/web\.archive\.org\//i.test(v)) return { href: v, shown: v };
+  if (!/^[a-z]+:\/\//i.test(v)) {
+    if (!/\./.test(v) || /\s/.test(v)) { // looks like a search: use a 90s engine in the time machine
+      const fav = ALLFAV.find(f => f.n.toLowerCase().includes(v.toLowerCase()));
+      if (fav) return { href: fav.href, shown: fav.u, title: fav.n, year: fav.year };
+      return { href: "https://duckduckgo.com/html/?q=" + encodeURIComponent(v), shown: "Search: " + v, external: true };
+    }
+    v = "http://" + v;
+  }
+  let u; try { u = new URL(v); } catch (e) { return null; }
+  if (u.origin === location.origin) return { href: u.href, shown: u.href, local: true };
+  const y = yearSel.value;
+  if (!y) return { href: u.href, shown: u.href, external: true };
+  return { href: `https://web.archive.org/web/${y}0601000000if_/${u.href}`, shown: u.href, year: y };
+}
+
+function setTitle(t) { W95.title(t + " - Internet Explorer"); }
+function busy(on) {
+  loading = on; $("[data-a=stop]").disabled = !on;
+  prog.style.width = on ? "15%" : "0";
+  if (on) { clearTimeout(slowT); slowT = setTimeout(() => { if (loading) { prog.style.width = "70%"; status.textContent = "Waiting for web.archive.org (the Wayback Machine can be slow)..."; } }, 4000); }
+}
+function syncNav() { $("[data-a=back]").disabled = hi <= 0; $("[data-a=fwd]").disabled = hi >= hist.length - 1; }
+
+async function go(entry, push = true) {
+  if (!entry) return;
+  if (entry.external) {
+    // the live web refuses to load inside other pages; send it to a real tab
+    const r = await dialog("Internet Explorer", `<p>Today's websites won't open inside a 1995 browser frame.</p><p>Open <b>${esc(entry.shown)}</b> in a new window instead?</p><p style="color:#808080">Tip: pick a year in the box next to the address bar to visit the 1990s version.</p>`, { buttons: ["Open", "Cancel"], icon: "info" });
+    if (r === 0) window.open(entry.href, "_blank", "noopener");
+    return;
+  }
+  if (!entry.local && !online()) {
+    const ok = await dial();
+    if (!ok) { showOffline(entry); return; }
+  }
+  if (push) { hist = hist.slice(0, hi + 1); hist.push(entry); hi = hist.length - 1; }
+  cur = entry; cover.hidden = true;
+  urlIn.value = entry.shown;
+  status.textContent = entry.local ? "Opening page " + entry.shown + "..." : "Connecting to web.archive.org...";
+  $("#zone").textContent = entry.local ? "Local intranet zone" : "Internet zone";
+  setTitle(entry.title || (entry.local ? "dom 95 Start Page" : entry.shown.replace(/^https?:\/\//, "").replace(/\/$/, "")));
+  busy(true); syncNav();
+  frame.src = entry.href;
+  markFav();
+}
+frame.addEventListener("load", () => {
+  if (!frame.src) return;
+  busy(false); clearTimeout(slowT); status.textContent = "Done";
+  try { const d = frame.contentDocument; if (d && d.title && cur && cur.local) setTitle(d.title); } catch (e) {}
+});
+
+function showOffline(entry) {
+  cur = entry; urlIn.value = entry.shown; busy(false);
+  cover.hidden = false;
+  cover.innerHTML = `<div><h2>The page cannot be displayed</h2><p>You are working offline. To see this page, connect to the Internet.</p>
+    <button class="btn def" id="reconnect">Connect...</button><button class="btn" id="homeBtn">Start Page</button></div>`;
+  $("#reconnect").onclick = () => go(entry);
+  $("#homeBtn").onclick = () => go(normalize("about:home"));
+  status.textContent = "Working offline";
+}
+
+// --------------------------------------------------------------- Dial-up Connection dialog (autodial)
+function dial() {
+  const p = dialog("Dial-up Connection", `<p>Select the service you want to connect to, and then enter your user name and password.</p>
+    <label>Connect to: <select class="field" style="flex:1"><option>dom Online</option></select></label>
+    <label>User name: <input class="field" style="flex:1" value="guest" id="dUser"></label>
+    <label>Password: <input class="field" style="flex:1" type="password" value="dom95" id="dPass"></label>
+    <label><input type="checkbox" checked> Save password</label>
+    <label><input type="checkbox"> Connect automatically</label>`,
+    { buttons: ["Connect", "Work Offline"], width: 340, icon: `<svg class="ico32" viewBox="0 0 32 32"><rect x="1" y="12" width="13" height="10" fill="#c0c0c0" stroke="#000"/><rect x="3" y="14" width="9" height="6" fill="#008080"/><rect x="18" y="8" width="13" height="10" fill="#c0c0c0" stroke="#000"/><rect x="20" y="10" width="9" height="6" fill="#008080"/><path d="M14 18 Q16 25 24 18" stroke="#000" fill="none"/></svg>` });
+  return p.then(r => r === 0 ? connecting() : false);
+}
+async function connecting() {
+  const p = dialog("Connecting to dom Online", `<div style="display:flex;gap:12px;align-items:center"><svg class="ico32" viewBox="0 0 32 32"><rect x="2" y="8" width="28" height="14" rx="2" fill="#d8d8d8" stroke="#000"/><rect x="6" y="12" width="3" height="2" fill="#0c0" id="led1"/><rect x="11" y="12" width="3" height="2" fill="#0c0"/><rect x="16" y="12" width="3" height="2" fill="#060" id="led3"/><rect x="4" y="22" width="4" height="3"/><rect x="24" y="22" width="4" height="3"/></svg>
+    <div><p style="margin:0 0 4px">Number: 555-0195</p><p style="margin:0">Status: <b id="dStat">Dialing...</b></p></div></div>`, { buttons: ["Cancel"], width: 330 });
+  const blink = setInterval(() => { const l = document.getElementById("led3"); if (l) l.setAttribute("fill", l.getAttribute("fill") === "#0f0" ? "#060" : "#0f0"); }, 140);
+  const done = Modem.play("5550195", txt => { const s = document.getElementById("dStat"); if (s) s.textContent = txt; status.textContent = txt; });
+  p.then(() => Modem.stop());
+  const ok = await done; clearInterval(blink);
+  if (!ok) { status.textContent = "Connection cancelled"; return false; }
+  p.close(0);
+  sessionStorage.setItem("w95.online", "1");
+  if (W95.EMBEDDED) try { parent.postMessage({ type: "net-online" }, location.origin); } catch (e) {}
+  status.textContent = "Connected at 28,800 bps";
+  return true;
+}
+
+// --------------------------------------------------------------- favorites pane + menu
+function renderFavs() {
+  $("#favs").innerHTML = FAVS.map((f, i) => `<div class="ff${i > 1 ? " shut" : ""}"><div class="fh" data-f="${i}">${I_FOLD}${esc(f.name)}</div><div class="fk">${f.items.map(([n, ts, u]) => `<div class="fl" data-href="${esc(WB(ts, u))}">${I_PAGE}<span>${esc(n)}</span><small>${ts.slice(0, 4)}</small></div>`).join("")}</div></div>`).join("")
+    + `<div class="fl" data-home="1">${I_PAGE}<span>dom 95 Start Page</span></div>`;
+  $("#favs").querySelectorAll(".fh").forEach(e => e.onclick = () => e.parentElement.classList.toggle("shut"));
+  $("#favs").querySelectorAll(".fl").forEach(e => e.onclick = () => e.dataset.home ? go(normalize("about:home")) : openFav(e.dataset.href));
+  markFav();
+}
+function markFav() { document.querySelectorAll("#favs .fl").forEach(e => e.classList.toggle("on", !!(cur && (e.dataset.href === cur.href || (e.dataset.home && cur.local))))); }
+function openFav(href) { const f = ALLFAV.find(x => x.href === href); if (f) { yearSel.value = f.year; go({ href: f.href, shown: f.u, title: f.n + " (" + f.year + ")", year: f.year }); } }
+function toggleSide(on) { $("#side").hidden = on === undefined ? !$("#side").hidden : !on; localStorage.setItem("w95.ie.side", $("#side").hidden ? "0" : "1"); }
+$("#sideX").onclick = () => toggleSide(false);
+
+// --------------------------------------------------------------- toolbar
+const TOOLS = [["back", "Back"], ["fwd", "Forward"], ["stop", "Stop"], ["refresh", "Refresh"], ["home", "Home"], "|", ["search", "Search"], ["favs", "Favorites"], ["history", "History"], "|", ["mail", "Mail"], ["print", "Print"], ["newwin", "Open"]];
+$("#tools").innerHTML = `<div class="grabber"></div>` + TOOLS.map(t => t === "|" ? `<div class="tbsep"></div>` : `<button class="tb" data-a="${t[0]}" title="${t[1]}">${ICO[t[0]]}<span>${t[1]}</span></button>`).join("");
+const ACT = {
+  back: () => { if (hi > 0) { hi--; go(hist[hi], false); } },
+  fwd: () => { if (hi < hist.length - 1) { hi++; go(hist[hi], false); } },
+  stop: () => { if (loading) { frame.src = "about:blank"; busy(false); status.textContent = "Stopped"; } },
+  refresh: () => cur && go(cur, false),
+  home: () => go(normalize("about:home")),
+  search: () => go({ href: HOME + "#search", shown: "about:home#search", local: true, title: "Search the Web" }),
+  favs: () => toggleSide(),
+  history: () => dialog("History", hist.length ? `<div class="sunken" style="background:#fff;max-height:220px;overflow:auto;padding:4px;min-width:280px">${hist.map((e, i) => `<div class="fl" data-h="${i}" style="cursor:pointer">${I_PAGE}<span>${esc(e.title || e.shown)}</span></div>`).join("")}</div>` : "<p>You haven't visited any pages yet.</p>", { buttons: ["Close"] }),
+  mail: () => W95.openApp("inbox"),
+  print: () => dialog("Print", "<p>Your printer is out of paper.</p><p style=\"color:#808080\">(It's 1996. It's always out of paper.)</p>", { icon: "warn" }),
+  newwin: () => { if (cur && !cur.local) window.open(cur.href, "_blank", "noopener"); else window.open(HOME, "_blank"); }
+};
+$("#tools").addEventListener("click", e => { const b = e.target.closest("[data-a]"); if (b && !b.disabled) ACT[b.dataset.a](); });
+document.addEventListener("click", e => { const d = e.target.closest("[data-h]"); if (d) { document.querySelector(".veil .x").click(); hi = +d.dataset.h; go(hist[hi], false); } });
+
+$("#addr").addEventListener("submit", e => { e.preventDefault(); const n = normalize(urlIn.value); if (n) go(n); else dialog("Internet Explorer", "<p>The address is not valid.</p>", { icon: "err" }); });
+urlIn.addEventListener("focus", () => urlIn.select());
+yearSel.addEventListener("change", () => { if (cur && !cur.local && cur.shown) go(normalize(cur.shown)); });
+
+W95.menubar($("#menu"), {
+  File: [["New Window", () => window.open(location.href.replace(/[?&]embed=1/, ""), "_blank"), "Ctrl+N"], ["Open...", () => { urlIn.focus(); }, "Ctrl+O"], "-",
+    ["Work Offline", () => { sessionStorage.removeItem("w95.online"); if (W95.EMBEDDED) parent.postMessage({ type: "net-offline" }, location.origin); status.textContent = "Working offline"; }],
+    ["Close", W95.EMBEDDED ? W95.exit : null]],
+  Edit: [["Select All", null], ["Find (on this page)...", null]],
+  View: [["Favorites bar", () => toggleSide()], "-", ["Stop", ACT.stop, "Esc"], ["Refresh", ACT.refresh, "F5"]],
+  Go: () => [["Back", hi > 0 ? ACT.back : null], ["Forward", hi < hist.length - 1 ? ACT.fwd : null], "-", ["Start Page", ACT.home], ["Search the Web", ACT.search], ["Read Mail", ACT.mail]],
+  Favorites: () => [["Organize Favorites...", () => toggleSide(true)], "-", ...FAVS.flatMap(f => [{ head: f.name }, ...f.items.map(([n, ts, u]) => [n + "  (" + ts.slice(0, 4) + ")", () => openFav(WB(ts, u)), "", I_PAGE])])],
+  Help: [["About Internet Explorer", () => dialog("About Internet Explorer", `<p><b>Internet Explorer</b> for dom 95</p><p>A tribute recreation. Old websites are served live from the Internet Archive's Wayback Machine (web.archive.org). Thank you, Internet Archive.</p><p style="color:#808080">Not affiliated with Microsoft. The globe is original artwork.</p>`, { icon: "info" })]]
+});
+document.addEventListener("keydown", e => {
+  if (e.key === "F5") { e.preventDefault(); ACT.refresh(); }
+  if (e.key === "Escape" && loading) ACT.stop();
+  if (e.altKey && e.key === "ArrowLeft") ACT.back();
+  if (e.altKey && e.key === "ArrowRight") ACT.fwd();
+});
+
+// --------------------------------------------------------------- throbber: an original spinning globe
+(function () {
+  const c = $("#globe"), g = c.getContext("2d"); let a = 0, last = 0;
+  function draw(t) {
+    if (t - last > 60) {
+      last = t; if (loading) a += 0.18;
+      g.fillStyle = "#000"; g.fillRect(0, 0, 40, 40);
+      g.save(); g.beginPath(); g.arc(20, 20, 14, 0, 7); g.clip();
+      const gr = g.createRadialGradient(15, 14, 2, 20, 20, 16); gr.addColorStop(0, "#6fb8ff"); gr.addColorStop(1, "#0b3fa0"); g.fillStyle = gr; g.fillRect(0, 0, 40, 40);
+      g.fillStyle = "#3aa04a";
+      for (let k = 0; k < 3; k++) { const x = 20 + ((a * 9 + k * 13) % 39) - 19; g.beginPath(); g.ellipse(x, 14 + k * 6, 5, 3 + k, 0.4, 0, 7); g.fill(); }
+      g.restore();
+      g.strokeStyle = "#ffd84a"; g.lineWidth = 2; g.beginPath(); g.ellipse(20, 20, 18, 6, -0.4, a % 6.283, a % 6.283 + 4.2); g.stroke();
+    }
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+})();
+
+// --------------------------------------------------------------- start
+renderFavs();
+if (localStorage.getItem("w95.ie.side") !== "0" && innerWidth > 560) toggleSide(true);
+const start = location.hash.slice(1);
+if (start && /^https?:/.test(decodeURIComponent(start))) go(normalize(decodeURIComponent(start)));
+else go(normalize("about:home"));
+// links from the start page ask us to navigate (so the dial-up and history work)
+window.addEventListener("message", e => {
+  if (e.origin !== location.origin || !e.data) return;
+  if (e.data.type === "ie-go" && typeof e.data.url === "string") { const f = ALLFAV.find(x => x.href === e.data.url || x.n === e.data.url); f ? openFav(f.href) : go(normalize(e.data.url)); }
+  if (e.data.type === "ie-app") W95.openApp(e.data.id);
+});
+</script>
+</body>
+</html>

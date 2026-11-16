@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="icon" href="data:,">
+<title>Calculator</title>
+<style>
+:root{--font:"MS Sans Serif","Microsoft Sans Serif",Tahoma,sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%}
+body{background:#c0c0c0;font:11px/1.2 var(--font);color:#000;overflow:hidden;
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;cursor:default}
+body.standalone{background:#008080;display:flex;overflow:auto}
+#app{display:flex;flex-direction:column;height:100%;background:#c0c0c0;position:relative}
+body.standalone #app{flex:none;height:auto;margin:auto;padding:3px;
+  box-shadow:inset -1px -1px #000,inset 1px 1px #dfdfdf,inset -2px -2px #808080,inset 2px 2px #fff}
+#titlebar{display:none}
+body.standalone #titlebar{display:flex;align-items:center;gap:4px;height:18px;padding:0 3px;
+  background:linear-gradient(90deg,#000080,#1084d0);color:#fff;font-weight:bold;white-space:nowrap}
+
+/* ---------- menu bar ---------- */
+#menubar{display:flex;flex:none;padding:1px 0 2px;position:relative;z-index:20;background:#c0c0c0}
+.mtop{position:relative;padding:3px 7px;line-height:13px;white-space:nowrap}
+.mtop.open{background:#000080;color:#fff}
+.drop{display:none;position:absolute;left:0;top:100%;min-width:150px;background:#c0c0c0;color:#000;padding:2px;
+  border:1px solid;border-color:#dfdfdf #000 #000 #dfdfdf;box-shadow:inset 1px 1px #fff,inset -1px -1px #808080}
+.mtop.open .drop{display:block}
+.mi{display:flex;align-items:center;padding:3px 18px 3px 2px;white-space:nowrap;line-height:13px}
+.mi .chk{width:18px;flex:none;display:flex;justify-content:center;align-items:center;height:13px}
+.mi .lbl{flex:1}
+.mi .key{padding-left:28px}
+.mi:hover{background:#000080;color:#fff}
+.mi.disabled{color:#808080;text-shadow:1px 1px 0 #fff}
+.mi.disabled:hover{text-shadow:none}
+.sep{height:2px;margin:3px 1px;border-top:1px solid #808080;border-bottom:1px solid #fff}
+u{text-decoration:underline}
+
+/* ---------- calculator ---------- */
+#calc{flex:none;width:max-content;padding:5px 7px 9px 7px}
+#disp{height:23px;margin:0 0 8px;background:#fff;text-align:right;padding:4px 5px 0;font-size:12px;white-space:nowrap;overflow:hidden;
+  box-shadow:inset -1px -1px #fff,inset 1px 1px #808080,inset -2px -2px #dfdfdf,inset 2px 2px #000;-webkit-user-select:text;user-select:text}
+.row{display:flex;align-items:center}
+.cb{font:inherit;font-size:11px;color:var(--c,#000);width:36px;height:29px;padding:0;background:#c0c0c0;border:none;border-radius:0;outline:none;flex:none;
+  box-shadow:inset -1px -1px #000,inset 1px 1px #fff,inset -2px -2px #808080,inset 2px 2px #dfdfdf;touch-action:manipulation}
+.cb.down{box-shadow:inset 1px 1px #000,inset -1px -1px #fff,inset 2px 2px #808080,inset -2px -2px #dfdfdf;padding:2px 0 0 2px}
+.cb:disabled{color:#808080;text-shadow:1px 1px 0 #fff}
+.cb.wide{width:62px}
+.ind{width:28px;height:26px;flex:none;display:flex;align-items:center;justify-content:center;font-size:11px;
+  box-shadow:inset 1px 1px #808080,inset -1px -1px #fff}
+.grid{display:grid;grid-auto-rows:29px;row-gap:5px;column-gap:4px}
+.grp{position:relative;display:flex;align-items:center;height:26px;padding:0 6px;border:1px solid #808080;box-shadow:1px 1px 0 #fff,inset 1px 1px 0 #fff}
+.rb,.ck{display:inline-flex;align-items:center;gap:4px;margin-right:9px;white-space:nowrap}
+.rb:last-child,.ck:last-child{margin-right:0}
+.rb input,.ck input{-webkit-appearance:none;appearance:none;margin:0;width:12px;height:12px;flex:none;background:#fff;outline:none}
+.rb input{border-radius:50%;box-shadow:inset 1px 1px #808080,inset -1px -1px #fff,inset 2px 2px #000,inset -2px -2px #dfdfdf}
+.rb input:checked{background:radial-gradient(circle at 50% 50%,#000 0 1.9px,#fff 2.3px)}
+.ck input{width:13px;height:13px;box-shadow:inset 1px 1px #808080,inset -1px -1px #fff,inset 2px 2px #000,inset -2px -2px #dfdfdf}
+.ck input:checked{background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='7' shape-rendering='crispEdges'%3E%3Cpath d='M6 0h1v2H6v1H5v1H4v1H3v1H2V5H1V4H0V2h1v1h1v1h1V3h1V2h1V1h1z'/%3E%3C/svg%3E") 3px 3px no-repeat}
+.rb.dis,.ck.dis{color:#808080;text-shadow:1px 1px 0 #fff}
+#std,#sci{display:none}
+body.vstd #std,body.vsci #sci{display:block}
+
+/* ---------- controls / dialogs ---------- */
+button.w95{font:inherit;color:#000;min-width:75px;height:23px;padding:0 8px;background:#c0c0c0;border:none;border-radius:0;outline:none;
+  box-shadow:inset -1px -1px #000,inset 1px 1px #fff,inset -2px -2px #808080,inset 2px 2px #dfdfdf}
+button.w95.def{box-shadow:inset 0 0 0 1px #000,inset -2px -2px #000,inset 2px 2px #fff,inset -3px -3px #808080,inset 3px 3px #dfdfdf}
+button.w95:active{box-shadow:inset 0 0 0 1px #000,inset 1px 1px #808080,inset -1px -1px #808080;padding-top:2px;padding-left:10px}
+button.w95.sm{min-width:44px}
+.overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:100}
+.overlay.modeless{pointer-events:none}
+.overlay.modeless .dlg{pointer-events:auto}
+.dlg{position:relative;background:#c0c0c0;padding:3px;max-width:calc(100vw - 8px);
+  box-shadow:inset -1px -1px #000,inset 1px 1px #dfdfdf,inset -2px -2px #808080,inset 2px 2px #fff,2px 2px 0 rgba(0,0,0,.25)}
+.dtitle{display:flex;align-items:center;justify-content:space-between;gap:8px;height:18px;padding:0 2px 0 4px;
+  background:linear-gradient(90deg,#000080,#1084d0);color:#fff;font-weight:bold;white-space:nowrap;touch-action:none}
+.tbtn{width:16px;height:14px;padding:0;display:flex;align-items:center;justify-content:center;background:#c0c0c0;border:none;
+  box-shadow:inset -1px -1px #000,inset 1px 1px #fff,inset -2px -2px #808080,inset 2px 2px #dfdfdf}
+.tbtn:active{box-shadow:inset 1px 1px #000,inset -1px -1px #fff,inset 2px 2px #808080,inset -2px -2px #dfdfdf}
+.dbody{padding:12px 12px 10px}
+.btnrow{display:flex;justify-content:center;gap:8px;margin-top:14px}
+.msg{display:flex;gap:14px;align-items:flex-start;max-width:300px}
+.msg p{margin:2px 0 0;line-height:1.45}
+.statwrap{display:flex;gap:8px}
+.statlist{width:150px;height:118px;background:#fff;overflow-y:auto;padding:2px;
+  box-shadow:inset -1px -1px #fff,inset 1px 1px #808080,inset -2px -2px #dfdfdf,inset 2px 2px #000}
+.statlist div{padding:0 3px;line-height:14px;text-align:right}
+.statlist div.sel{background:#000080;color:#fff}
+.statbtns{display:flex;flex-direction:column;gap:5px}
+</style>
+</head>
+<body class="vstd">
+<div id="app">
+  <div id="titlebar"><canvas id="ticon" width="16" height="16"></canvas><span>Calculator</span></div>
+  <div id="menubar" role="menubar">
+    <div class="mtop" role="menuitem"><u>E</u>dit
+      <div class="drop" role="menu">
+        <div class="mi" data-act="copy"><span class="chk"></span><span class="lbl"><u>C</u>opy</span><span class="key">Ctrl+C</span></div>
+        <div class="mi" data-act="paste"><span class="chk"></span><span class="lbl"><u>P</u>aste</span><span class="key">Ctrl+V</span></div>
+      </div>
+    </div>
+    <div class="mtop" role="menuitem"><u>V</u>iew
+      <div class="drop" role="menu">
+        <div class="mi" data-act="sci" data-radio="sci"><span class="chk"></span><span class="lbl"><u>S</u>cientific</span></div>
+        <div class="mi" data-act="std" data-radio="std"><span class="chk"></span><span class="lbl">S<u>t</u>andard</span></div>
+        <div class="sep" id="exitsep"></div>
+        <div class="mi" data-act="exit" id="exititem"><span class="chk"></span><span class="lbl">E<u>x</u>it</span></div>
+      </div>
+    </div>
+    <div class="mtop" role="menuitem"><u>H</u>elp
+      <div class="drop" role="menu">
+        <div class="mi disabled"><span class="chk"></span><span class="lbl"><u>H</u>elp Topics</span></div>
+        <div class="sep"></div>
+        <div class="mi" data-act="about"><span class="chk"></span><span class="lbl"><u>A</u>bout Calculator</span></div>
+      </div>
+    </div>
+  </div>
+  <div id="calc">
+    <div id="disp" aria-live="polite">0.</div>
+    <div id="std"></div>
+    <div id="sci"></div>
+  </div>
+</div>
+<script>
+(function () {
+'use strict';
+
+/* ================= environment ================= */
+const qs = new URLSearchParams(location.search);
+const EMBEDDED = (() => { try { return window.parent !== window; } catch (_) { return true; } })();
+if (!qs.has('embed')) document.body.classList.add('standalone');
+const STANDALONE = !qs.has('embed');
+function post(msg) { if (!EMBEDDED) return; try { window.parent.postMessage(msg, location.origin); } catch (_) {} }
+
+const $ = (id) => document.getElementById(id);
+const disp = $('disp'), calcEl = $('calc'), menubar = $('menubar');
+const STORE = 'w95.calc';
+let prefs = { sci: false };
+try { const p = JSON.parse(localStorage.getItem(STORE) || 'null'); if (p && typeof p.sci === 'boolean') prefs.sci = p.sci; } catch (_) {}
+function savePrefs() { try { localStorage.setItem(STORE, JSON.stringify(prefs)); } catch (_) {} }
+
+/* ================= title icon ================= */
+(function () {
+  const c = $('ticon').getContext('2d');
+  c.fillStyle = '#000'; c.fillRect(2, 0, 12, 16);
+  c.fillStyle = '#c0c0c0'; c.fillRect(3, 1, 10, 14);
+  c.fillStyle = '#9fc59f'; c.fillRect(4, 2, 8, 3);
+  for (let y = 0; y < 4; y++) for (let x = 0; x < 3; x++) { c.fillStyle = (x === 2 ? '#c00000' : '#000080'); c.fillRect(4 + x * 3, 7 + y * 2, 2, 1); }
+})();
+
+/* ================= engine state ================= */
+const E_DIV = 'Cannot divide by zero.', E_INV = 'Invalid input for function.', E_OVF = 'Overflow.';
+let sci = false, base = 10, angle = 'deg', bits = 32, inv = false, hyp = false, fe = false;
+let cur = 0, entry = null, frames = [{ v: [], o: [] }], lastWasOp = false, lastRep = null, err = null;
+let mem = 0, stats = [], statDlg = null, statSel = -1;
+
+function top() { return frames[frames.length - 1]; }
+function mask(x) { return BigInt.asUintN(bits, x); }
+function checkNum(x) {
+  if (Number.isNaN(x)) throw E_INV;
+  if (!Number.isFinite(x)) throw E_OVF;
+  return x;
+}
+function norm(x) {
+  checkNum(x);
+  if (base !== 10) return Number(mask(BigInt(Math.trunc(x))));
+  if (x === 0) return 0;
+  return x;
+}
+function parseEntry() {
+  if (entry === null) return cur;
+  if (base === 10) { const x = parseFloat(entry); return isNaN(x) ? 0 : x; }
+  const x = parseInt(entry || '0', base);
+  return isNaN(x) ? 0 : Number(mask(BigInt(x)));
+}
+function value() { return entry !== null ? parseEntry() : cur; }
+function commit() { if (entry !== null) { cur = norm(parseEntry()); entry = null; } }
+function setCur(x) { cur = norm(x); entry = null; }
+function setErr(e) {
+  err = typeof e === 'string' ? e : E_INV;
+  entry = null; frames = [{ v: [], o: [] }]; lastWasOp = false;
+}
+
+const PREC_SCI = { '|': 1, '^': 2, '&': 3, '<<': 4, '>>': 4, '+': 5, '-': 5, '*': 6, '/': 6, 'mod': 6, 'pow': 7, 'root': 7 };
+function prec(op) { return sci ? PREC_SCI[op] : 1; }
+
+function toInt64(x) { return BigInt.asIntN(64, BigInt(Math.trunc(checkNum(x)))); }
+function apply(a, op, b) {
+  if (base !== 10 || ['&', '|', '^', '<<', '>>'].indexOf(op) >= 0) {
+    if (op !== 'pow' && op !== 'root') {
+      const A = toInt64(a), B = toInt64(b);
+      let R;
+      switch (op) {
+        case '+': R = A + B; break;
+        case '-': R = A - B; break;
+        case '*': R = A * B; break;
+        case '/': if (B === 0n) throw E_DIV; R = A / B; break;
+        case 'mod': if (B === 0n) throw E_DIV; R = A % B; break;
+        case '&': R = A & B; break;
+        case '|': R = A | B; break;
+        case '^': R = A ^ B; break;
+        case '<<': R = B < 0n || B > 127n ? 0n : A << B; break;
+        case '>>': R = B < 0n || B > 127n ? 0n : A >> B; break;
+      }
+      return base !== 10 ? Number(mask(R)) : Number(BigInt.asIntN(64, R));
+    }
+  }
+  let r;
+  switch (op) {
+    case '+': r = a + b; break;
+    case '-': r = a - b; break;
+    case '*': r = a * b; break;
+    case '/': if (b === 0) throw E_DIV; r = a / b; break;
+    case 'mod': if (b === 0) throw E_DIV; r = a % b; break;
+    case 'pow':
+      if (a < 0 && !Number.isInteger(b)) throw E_INV;
+      r = Math.pow(a, b); break;
+    case 'root':
+      if (b === 0) throw E_INV;
+      if (a < 0) {
+        if (Number.isInteger(b) && Math.abs(b) % 2 === 1) r = -Math.pow(-a, 1 / b);
+        else throw E_INV;
+      } else r = Math.pow(a, 1 / b);
+      break;
+  }
+  return checkNum(r);
+}
+function reduce(f) {
+  const b = f.v.pop(), a = f.v.pop(), op = f.o.pop();
+  f.v.push(norm(apply(a, op, b)));
+  lastRep = { op: op, b: b };
+}
+
+/* ================= formatting ================= */
+function stripExp(s) {
+  // "1.2300000e+21" -> "1.23e+21"; ensure mantissa has '.'
+  let m = s.split('e'), man = m[0], ex = m[1] || '+0';
+  if (man.indexOf('.') >= 0) man = man.replace(/0+$/, '');
+  if (man.indexOf('.') < 0) man += '.';
+  if (ex[0] !== '-' && ex[0] !== '+') ex = '+' + ex;
+  return man + 'e' + ex;
+}
+function fmt(x) {
+  if (base !== 10) return BigInt.asUintN(bits, BigInt(Math.trunc(x))).toString(base).toUpperCase();
+  if (fe) return stripExp(x.toExponential(14));
+  if (x === 0) return '0.';
+  const a = Math.abs(x);
+  if (a >= 1e16 || a < 1e-15) return stripExp(x.toExponential(14));
+  let s = String(Number(x.toPrecision(15)));
+  if (s.indexOf('e') >= 0) {
+    const m = /^(-?)(\d)(?:\.(\d+))?e-(\d+)$/.exec(s);
+    if (m) s = m[1] + '0.' + '0'.repeat(+m[4] - 1) + m[2] + (m[3] || '');
+    else return stripExp(s);
+  }
+  if (s.indexOf('.') < 0) s += '.';
+  return s;
+}
+function fmtEntry() {
+  if (base !== 10) return (entry || '0').toUpperCase();
+  let s = entry === '' ? '0' : entry;
+  if (s === '-') s = '-0';
+  const ei = s.indexOf('e');
+  if (ei >= 0) {
+    let man = s.slice(0, ei), ex = s.slice(ei + 1);
+    if (man.indexOf('.') < 0) man += '.';
+    if (ex.length === 1) ex += '0';
+    return man + 'e' + ex;
+  }
+  if (s.indexOf('.') < 0) s += '.';
+  return s;
+}
+function displayText() {
+  if (err) return err;
+  return entry !== null ? fmtEntry() : fmt(cur);
+}
+
+/* ================= operations ================= */
+function maxDigits() { return base === 10 ? 16 : base === 16 ? bits / 4 : base === 8 ? Math.ceil(bits / 3) : bits; }
+function digitAllowed(d) { return parseInt(d, 16) < base; }
+
+function digit(d) {
+  if (err || !digitAllowed(d)) return;
+  if (entry === null) entry = '';
+  lastWasOp = false;
+  const ei = entry.indexOf('e');
+  if (ei >= 0) {
+    const ex = entry.slice(ei + 2);
+    if (ex.length >= 4) return;
+    if (ex === '0') entry = entry.slice(0, ei + 2) + d; else entry += d;
+    return;
+  }
+  if (entry.replace(/[-.]/g, '').length >= maxDigits() && entry !== '0' && entry !== '-0') return;
+  if (entry === '0') entry = d;
+  else if (entry === '-0') entry = '-' + d;
+  else entry += (base === 10 ? d : d.toLowerCase());
+}
+function dot() {
+  if (err || base !== 10) return;
+  if (entry === null) entry = '0';
+  lastWasOp = false;
+  if (entry.indexOf('.') >= 0 || entry.indexOf('e') >= 0) return;
+  entry += '.';
+}
+function expKey() {
+  if (err || base !== 10) return;
+  if (entry === null) {
+    const s = String(Number(cur.toPrecision(15)));
+    if (s.indexOf('e') >= 0) return;
+    entry = s;
+  }
+  if (entry.indexOf('e') >= 0) return;
+  if (entry === '' || entry === '-') entry += '0';
+  entry += 'e+';
+  lastWasOp = false;
+}
+function back() {
+  if (err || entry === null) return;
+  if (/e[+-]$/.test(entry)) entry = entry.slice(0, -2);
+  else entry = entry.slice(0, -1);
+  if (entry === '' || entry === '-') entry = '0';
+}
+function negate() {
+  if (err) return;
+  if (entry !== null && base === 10) {
+    const ei = entry.indexOf('e');
+    if (ei >= 0) {
+      const sign = entry[ei + 1];
+      entry = entry.slice(0, ei + 1) + (sign === '+' ? '-' : '+') + entry.slice(ei + 2);
+    } else entry = entry[0] === '-' ? entry.slice(1) : '-' + entry;
+    return;
+  }
+  try { setCur(base !== 10 ? Number(mask(-BigInt(Math.trunc(value())))) : -value()); } catch (e) { setErr(e); }
+  lastWasOp = false;
+}
+function clearEntry() { err = null; entry = null; cur = 0; lastWasOp = false; }
+function clearAll() { err = null; entry = null; cur = 0; frames = [{ v: [], o: [] }]; lastWasOp = false; lastRep = null; inv = false; hyp = false; }
+
+function binop(op) {
+  if (err) return;
+  if (op === 'pow' && inv) op = 'root';
+  if (op === '<<' && inv) op = '>>';
+  if (op === 'pow' || op === 'root' || op === '<<' || op === '>>') { inv = false; hyp = false; }
+  const f = top();
+  if (lastWasOp && f.o.length) { f.o[f.o.length - 1] = op; return; }
+  const v = value(); entry = null;
+  f.v.push(v);
+  try { while (f.o.length && prec(f.o[f.o.length - 1]) >= prec(op)) reduce(f); }
+  catch (e) { setErr(e); return; }
+  cur = f.v[f.v.length - 1];
+  f.o.push(op);
+  lastWasOp = true;
+}
+function equals() {
+  if (err) return;
+  const pending = frames.length > 1 || frames[0].o.length > 0;
+  try {
+    if (!pending) {
+      if (lastRep) setCur(apply(value(), lastRep.op, lastRep.b));
+      else commit();
+    } else {
+      let v = value();
+      while (frames.length) {
+        const f = frames.pop();
+        f.v.push(v);
+        while (f.o.length) reduce(f);
+        v = f.v.pop();
+      }
+      setCur(v);
+    }
+  } catch (e) { setErr(e); }
+  frames = [{ v: [], o: [] }];
+  lastWasOp = false; entry = null;
+}
+function parenOpen() {
+  if (err || frames.length > 25) return;
+  frames.push({ v: [], o: [] });
+  entry = null; lastWasOp = false;
+}
+function parenClose() {
+  if (err || frames.length < 2) return;
+  const f = frames.pop();
+  try {
+    f.v.push(value());
+    while (f.o.length) reduce(f);
+    setCur(f.v.pop());
+  } catch (e) { setErr(e); }
+  lastWasOp = false;
+}
+function percent() {
+  if (err) return;
+  const f = top();
+  try {
+    if (f.o.length && f.v.length) setCur(f.v[f.v.length - 1] * value() / 100);
+    else setCur(0);
+  } catch (e) { setErr(e); }
+  lastWasOp = false;
+}
+
+function toRad(x) { return angle === 'deg' ? x * Math.PI / 180 : angle === 'grad' ? x * Math.PI / 200 : x; }
+function fromRad(x) { return angle === 'deg' ? x * 180 / Math.PI : angle === 'grad' ? x * 200 / Math.PI : x; }
+function tiny(x) { return Math.abs(x) < 1e-14 ? 0 : x; }
+function gamma(z) {
+  if (z < 0.5) return Math.PI / (Math.sin(Math.PI * z) * gamma(1 - z));
+  z -= 1;
+  const g = 7, c = [0.99999999999980993, 676.5203681218851, -1259.1392167224028, 771.32342877765313,
+    -176.61502916214059, 12.507343278686905, -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
+  let x = c[0];
+  for (let i = 1; i < g + 2; i++) x += c[i] / (z + i);
+  const t = z + g + 0.5;
+  return Math.sqrt(2 * Math.PI) * Math.pow(t, z + 0.5) * Math.exp(-t) * x;
+}
+function trig(fn, x) {
+  if (hyp) {
+    if (inv) {
+      if (fn === 'sin') return Math.asinh(x);
+      if (fn === 'cos') { if (x < 1) throw E_INV; return Math.acosh(x); }
+      if (Math.abs(x) >= 1) throw E_INV; return Math.atanh(x);
+    }
+    return fn === 'sin' ? Math.sinh(x) : fn === 'cos' ? Math.cosh(x) : Math.tanh(x);
+  }
+  if (inv) {
+    if (fn !== 'tan' && Math.abs(x) > 1) throw E_INV;
+    return fromRad(fn === 'sin' ? Math.asin(x) : fn === 'cos' ? Math.acos(x) : Math.atan(x));
+  }
+  let a = x;
+  if (angle === 'deg') a = x % 360; else if (angle === 'grad') a = x % 400;
+  if (fn === 'tan') {
+    const q = angle === 'deg' ? 90 : angle === 'grad' ? 100 : 0;
+    if (q && Math.abs(a % (2 * q)) === q) throw E_INV;
+  }
+  const r = toRad(a);
+  return tiny(fn === 'sin' ? Math.sin(r) : fn === 'cos' ? Math.cos(r) : Math.tan(r));
+}
+function unary(id) {
+  if (err) return;
+  const x = value();
+  let r;
+  try {
+    switch (id) {
+      case 'sqrt': if (x < 0) throw E_INV; r = Math.sqrt(x); break;
+      case 'recip': if (x === 0) throw E_DIV; r = 1 / x; break;
+      case 'sin': case 'cos': case 'tan': r = trig(id, x); break;
+      case 'sqr': if (inv) { if (x < 0) throw E_INV; r = Math.sqrt(x); } else r = x * x; break;
+      case 'cube': r = inv ? Math.cbrt(x) : x * x * x; break;
+      case 'ln': if (inv) r = Math.exp(x); else { if (x <= 0) throw E_INV; r = Math.log(x); } break;
+      case 'log': if (inv) r = Math.pow(10, x); else { if (x <= 0) throw E_INV; r = Math.log10(x); } break;
+      case 'fact':
+        if (x < 0 && Number.isInteger(x)) throw E_INV;
+        if (x > 170.6) throw E_OVF;
+        if (Number.isInteger(x)) { r = 1; for (let i = 2; i <= x; i++) r *= i; }
+        else r = gamma(x + 1);
+        break;
+      case 'dms': {
+        const s = x < 0 ? -1 : 1, a = Math.abs(x);
+        if (inv) {
+          const d = Math.trunc(a), mm = Math.trunc(Math.round((a - d) * 1e10) / 1e8), ss = ((a - d) * 100 - mm) * 100;
+          r = s * (d + mm / 60 + ss / 3600);
+        } else {
+          const d = Math.trunc(a), mf = (a - d) * 60, mm = Math.trunc(mf + 1e-9), ss = (mf - mm) * 60;
+          r = s * (d + mm / 100 + ss / 10000);
+        }
+        break;
+      }
+      case 'int': r = inv ? x - Math.trunc(x) : Math.trunc(x); break;
+      case 'not': r = base !== 10 ? Number(mask(~BigInt(Math.trunc(x)))) : Number(~toInt64(x)); break;
+      case 'pi': r = inv ? 2 * Math.PI : Math.PI; break;
+    }
+    setCur(r);
+  } catch (e) { setErr(e); }
+  lastWasOp = false;
+  inv = false; hyp = false;
+}
+
+/* ---------- memory ---------- */
+function memOp(id) {
+  if (err && id !== 'mc') return;
+  try {
+    if (id === 'mc') mem = 0;
+    else if (id === 'mr') { setCur(mem); lastWasOp = false; }
+    else if (id === 'ms') { commit(); mem = cur; }
+    else if (id === 'mp') { commit(); mem = checkNum(mem + cur); }
+  } catch (e) { setErr(e); }
+}
+
+/* ---------- statistics ---------- */
+function statFn(id) {
+  if (err || !statDlg) return;
+  const n = stats.length;
+  try {
+    if (id === 'dat') { commit(); stats.push(cur); statSel = stats.length - 1; renderStats(); return; }
+    if (id === 'sum') { setCur(stats.reduce((a, b) => a + (inv ? b * b : b), 0)); }
+    else if (id === 'ave') { if (!n) throw E_INV; setCur(stats.reduce((a, b) => a + (inv ? b * b : b), 0) / n); }
+    else if (id === 's') {
+      const d = inv ? n : n - 1;
+      if (d <= 0) throw E_INV;
+      const m = stats.reduce((a, b) => a + b, 0) / n;
+      setCur(Math.sqrt(stats.reduce((a, b) => a + (b - m) * (b - m), 0) / d));
+    }
+  } catch (e) { setErr(e); }
+  lastWasOp = false; inv = false; hyp = false;
+}
+
+/* ---------- base / angle ---------- */
+function setBase(b) {
+  if (base === b) return;
+  if (err) clearAll();
+  try { commit(); } catch (e) { setErr(e); }
+  // Pending operations are lost in Win95 when changing base mid-expression; keep it simple
+  frames = [{ v: [], o: [] }]; lastWasOp = false;
+  base = b;
+  try { cur = norm(cur); } catch (e) { cur = 0; }
+  if (base !== 10) fe = false;
+}
+function setBits(n) { bits = n; try { cur = norm(cur); } catch (e) { cur = 0; } }
+
+/* ================= UI ================= */
+const COL = { dig: '#0000ff', op: '#ff0000', fn: '#000080', sfn: '#800080' };
+const BTN = {
+  mc: ['MC', 'op'], mr: ['MR', 'op'], ms: ['MS', 'op'], mp: ['M+', 'op'],
+  back: ['Back', 'op'], ce: ['CE', 'op'], clr: ['C', 'op'],
+  div: ['/', 'op'], mul: ['*', 'op'], sub: ['-', 'op'], add: ['+', 'op'], eq: ['=', 'op'],
+  sqrt: ['sqrt', 'fn'], pct: ['%', 'fn'], recip: ['1/x', 'fn'],
+  neg: ['+/-', 'dig'], dot: ['.', 'dig'],
+  sta: ['Sta', 'fn'], ave: ['Ave', 'fn'], sum: ['Sum', 'fn'], s: ['s', 'fn'], dat: ['Dat', 'fn'],
+  fe: ['F-E', 'sfn'], lp: ['(', 'sfn'], rp: [')', 'sfn'], dms: ['dms', 'sfn'], exp: ['Exp', 'sfn'], ln: ['ln', 'sfn'],
+  sin: ['sin', 'sfn'], pow: ['x^y', 'sfn'], log: ['log', 'sfn'], cos: ['cos', 'sfn'], cube: ['x^3', 'sfn'], fact: ['n!', 'sfn'],
+  tan: ['tan', 'sfn'], sqr: ['x^2', 'sfn'], pi: ['pi', 'fn'],
+  mod: ['Mod', 'op'], and: ['And', 'op'], or: ['Or', 'op'], xor: ['Xor', 'op'], lsh: ['Lsh', 'op'], not: ['Not', 'op'], int: ['Int', 'op']
+};
+'0123456789ABCDEF'.split('').forEach((d) => { BTN['d' + d] = [d, 'dig']; });
+
+const panels = { std: $('std'), sci: $('sci') };
+function el(tag, cls, text) { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
+function mkBtn(id, wide) {
+  const def = BTN[id];
+  const b = el('button', 'cb' + (wide ? ' wide' : ''), def[0]);
+  b.type = 'button'; b.tabIndex = -1; b.dataset.id = id;
+  b.style.setProperty('--c', COL[def[1]]);
+  b.setAttribute('aria-label', def[0]);
+  b.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    if (b.disabled) return;
+    b.classList.add('down');
+    try { b.setPointerCapture(e.pointerId); } catch (_) {}
+  });
+  const up = () => b.classList.remove('down');
+  b.addEventListener('pointerup', (e) => {
+    const r = b.getBoundingClientRect();
+    const inside = e.clientX >= r.left && e.clientX < r.right && e.clientY >= r.top && e.clientY < r.bottom;
+    if (b.classList.contains('down') && inside && !b.disabled) press(id);
+    up();
+  });
+  b.addEventListener('pointercancel', up);
+  b.addEventListener('lostpointercapture', up);
+  b.addEventListener('click', (e) => { if (e.detail === 0 && !b.disabled) press(id); });
+  return b;
+}
+function grid(cols, rows) {
+  const g = el('div', 'grid');
+  g.style.gridTemplateColumns = 'repeat(' + cols + ',36px)';
+  rows.forEach((r) => r.forEach((id) => g.appendChild(mkBtn(id))));
+  return g;
+}
+function radio(name, value, label, key) {
+  const l = el('label', 'rb'); const i = el('input'); i.type = 'radio'; i.name = name; i.value = value; i.tabIndex = -1;
+  l.appendChild(i); const s = el('span'); s.innerHTML = label; l.appendChild(s);
+  l.addEventListener('pointerdown', (e) => e.preventDefault());
+  i.addEventListener('change', () => { if (i.checked) { press(key); } });
+  l.dataset.key = key;
+  return l;
+}
+function check(id, label) {
+  const l = el('label', 'ck'); const i = el('input'); i.type = 'checkbox'; i.tabIndex = -1; i.id = id;
+  l.appendChild(i); const s = el('span'); s.innerHTML = label; l.appendChild(s);
+  l.addEventListener('pointerdown', (e) => e.preventDefault());
+  i.addEventListener('change', () => press(id));
+  return l;
+}
+function topRow(width, leftNodes) {
+  const r = el('div', 'row'); r.style.width = width + 'px'; r.style.marginBottom = '6px';
+  leftNodes.forEach((n) => r.appendChild(n));
+  const sp = el('div'); sp.style.flex = '1'; r.appendChild(sp);
+  ['back', 'ce', 'clr'].forEach((id, i) => { const b = mkBtn(id, true); if (i) b.style.marginLeft = '4px'; r.appendChild(b); });
+  return r;
+}
+
+function buildStd() {
+  const p = panels.std;
+  const mInd = el('div', 'ind mind');
+  p.appendChild(topRow(242, [mInd]));
+  const r = el('div', 'row'); r.style.alignItems = 'flex-start';
+  const memCol = grid(1, [['mc'], ['mr'], ['ms'], ['mp']]);
+  const main = grid(5, [['d7', 'd8', 'd9', 'div', 'sqrt'], ['d4', 'd5', 'd6', 'mul', 'pct'], ['d1', 'd2', 'd3', 'sub', 'recip'], ['d0', 'neg', 'dot', 'add', 'eq']]);
+  main.style.marginLeft = '10px';
+  r.appendChild(memCol); r.appendChild(main);
+  p.appendChild(r);
+}
+function buildSci() {
+  const p = panels.sci, W = 448;
+  const r1 = el('div', 'row'); r1.style.width = W + 'px'; r1.style.marginBottom = '6px'; r1.style.gap = '6px';
+  const gBase = el('div', 'grp'); gBase.style.width = '212px';
+  [['16', '<u>H</u>ex', 'hex'], ['10', '<u>D</u>ec', 'dec'], ['8', '<u>O</u>ct', 'oct'], ['2', '<u>B</u>in', 'bin']].forEach((a) => gBase.appendChild(radio('base', a[0], a[1], a[2])));
+  const gAng = el('div', 'grp'); gAng.style.flex = '1'; gAng.id = 'gAng';
+  r1.appendChild(gBase); r1.appendChild(gAng);
+  p.appendChild(r1);
+  const gIH = el('div', 'grp'); gIH.style.width = '110px'; gIH.style.marginRight = '6px';
+  gIH.appendChild(check('inv', '<u>I</u>nv')); gIH.appendChild(check('hyp', 'H<u>y</u>p'));
+  const pInd = el('div', 'ind pind'); pInd.style.width = '36px'; pInd.style.marginRight = '6px';
+  const mInd = el('div', 'ind mind');
+  p.appendChild(topRow(W, [gIH, pInd, mInd]));
+  const r = el('div', 'row'); r.style.alignItems = 'flex-start';
+  const stat = grid(1, [['sta'], ['ave'], ['sum'], ['s'], ['dat']]);
+  const fn = grid(3, [['fe', 'lp', 'rp'], ['dms', 'exp', 'ln'], ['sin', 'pow', 'log'], ['cos', 'cube', 'fact'], ['tan', 'sqr', 'recip']]);
+  const memc = grid(1, [['mc'], ['mr'], ['ms'], ['mp'], ['pi']]);
+  const main = grid(6, [['d7', 'd8', 'd9', 'div', 'mod', 'and'], ['d4', 'd5', 'd6', 'mul', 'or', 'xor'], ['d1', 'd2', 'd3', 'sub', 'lsh', 'not'],
+    ['d0', 'neg', 'dot', 'add', 'eq', 'int'], ['dA', 'dB', 'dC', 'dD', 'dE', 'dF']]);
+  fn.style.marginLeft = '8px'; memc.style.marginLeft = '8px'; main.style.marginLeft = '8px';
+  [stat, fn, memc, main].forEach((g) => r.appendChild(g));
+  p.appendChild(r);
+}
+function buildAngleGroup() {
+  const g = $('gAng');
+  g.innerHTML = '';
+  if (base === 10) {
+    [['deg', 'D<u>e</u>g', 'deg'], ['rad', 'R<u>a</u>d', 'rad'], ['grad', '<u>G</u>rad', 'grad']].forEach((a) => g.appendChild(radio('ang', a[0], a[1], a[2])));
+  } else {
+    [['32', 'D<u>w</u>ord', 'dword'], ['16', 'W<u>o</u>rd', 'word'], ['8', 'B<u>y</u>te', 'byte']].forEach((a) => g.appendChild(radio('ang', a[0], a[1], a[2])));
+  }
+  g.dataset.mode = base === 10 ? 'ang' : 'bits';
+}
+buildStd(); buildSci(); buildAngleGroup();
+
+function render() {
+  disp.textContent = displayText();
+  document.querySelectorAll('.mind').forEach((n) => { n.textContent = mem !== 0 ? 'M' : ''; });
+  document.querySelectorAll('.pind').forEach((n) => { n.textContent = frames.length > 1 ? '(=' + (frames.length - 1) : ''; });
+  $('inv').checked = inv; $('hyp').checked = hyp;
+  document.querySelectorAll('input[name=base]').forEach((i) => { i.checked = +i.value === base; });
+  const g = $('gAng');
+  if ((g.dataset.mode === 'ang') !== (base === 10)) buildAngleGroup();
+  document.querySelectorAll('input[name=ang]').forEach((i) => { i.checked = base === 10 ? i.value === angle : +i.value === bits; });
+  const nonDec = base !== 10;
+  document.querySelectorAll('.cb').forEach((b) => {
+    const id = b.dataset.id;
+    let dis = false;
+    if (id.length === 2 && id[0] === 'd') dis = !digitAllowed(id[1]);
+    else if (['dot', 'exp', 'fe', 'dms'].indexOf(id) >= 0) dis = nonDec;
+    else if (['ave', 'sum', 's', 'dat'].indexOf(id) >= 0) dis = !statDlg;
+    if (!sci && id === 'dot') dis = false;
+    b.disabled = dis;
+    if (dis) b.classList.remove('down');
+  });
+  document.querySelectorAll('.mi[data-radio]').forEach((mi) => {
+    const on = (mi.dataset.radio === 'sci') === sci;
+    mi.querySelector('.chk').innerHTML = on ? '<svg width="6" height="6" viewBox="0 0 6 6" shape-rendering="crispEdges"><path d="M1 0h4v1h1v4H5v1H1V5H0V1h1z" fill="currentColor"/></svg>' : '';
+  });
+}
+
+function setView(s) {
+  if (sci === s) { render(); return; }
+  sci = s;
+  if (!sci) {
+    // Standard view works in decimal only
+    if (base !== 10) setBase(10);
+    inv = false; hyp = false;
+    if (statDlg) statDlg.close();
+  }
+  prefs.sci = sci; savePrefs();
+  document.body.classList.toggle('vsci', sci);
+  document.body.classList.toggle('vstd', !sci);
+  render();
+  reportSize();
+}
+function naturalSize() {
+  return { width: Math.ceil(calcEl.offsetWidth), height: Math.ceil(menubar.offsetHeight + calcEl.offsetHeight) };
+}
+function reportSize() {
+  const s = naturalSize();
+  post({ type: 'win95:app-size', app: 'calc', width: s.width, height: s.height });
+}
+
+/* ================= dispatch ================= */
+function press(id) {
+  if (id.length === 2 && id[0] === 'd') digit(id[1]);
+  else switch (id) {
+    case 'dot': dot(); break;
+    case 'neg': negate(); break;
+    case 'back': back(); break;
+    case 'ce': clearEntry(); break;
+    case 'clr': clearAll(); break;
+    case 'add': binop('+'); break;
+    case 'sub': binop('-'); break;
+    case 'mul': binop('*'); break;
+    case 'div': binop('/'); break;
+    case 'mod': binop('mod'); break;
+    case 'and': binop('&'); break;
+    case 'or': binop('|'); break;
+    case 'xor': binop('^'); break;
+    case 'lsh': binop('<<'); break;
+    case 'pow': binop('pow'); break;
+    case 'eq': equals(); break;
+    case 'pct': percent(); break;
+    case 'lp': parenOpen(); break;
+    case 'rp': parenClose(); break;
+    case 'exp': expKey(); break;
+    case 'fe': if (base === 10 && !err) { commit(); fe = !fe; } break;
+    case 'mc': case 'mr': case 'ms': case 'mp': memOp(id); break;
+    case 'sta': toggleStats(); break;
+    case 'ave': case 'sum': case 's': case 'dat': statFn(id); break;
+    case 'inv': inv = !inv; break;
+    case 'hyp': hyp = !hyp; break;
+    case 'hex': setBase(16); break;
+    case 'dec': setBase(10); break;
+    case 'oct': setBase(8); break;
+    case 'bin': setBase(2); break;
+    case 'deg': case 'rad': case 'grad': angle = id; break;
+    case 'dword': setBits(32); break;
+    case 'word': setBits(16); break;
+    case 'byte': setBits(8); break;
+    default: unary(id);
+  }
+  render();
+}
+function flash(id) {
+  const b = panels[sci ? 'sci' : 'std'].querySelector('.cb[data-id="' + id + '"]');
+  if (!b || b.disabled) return false;
+  b.classList.add('down');
+  setTimeout(() => b.classList.remove('down'), 90);
+  return true;
+}
+function exists(id) {
+  const b = panels[sci ? 'sci' : 'std'].querySelector('.cb[data-id="' + id + '"]');
+  return !!b && !b.disabled;
+}
+function keyPress(id) {
+  if (['inv', 'hyp', 'hex', 'dec', 'oct', 'bin', 'deg', 'rad', 'grad', 'dword', 'word', 'byte'].indexOf(id) >= 0) {
+    if (!sci) return false;
+    press(id); return true;
+  }
+  if (!exists(id)) return false;
+  flash(id); press(id); return true;
+}
+function charToId(ch) {
+  const c = ch;
+  if (/^[0-9]$/.test(c)) return 'd' + c;
+  if (base === 16 && /^[a-fA-F]$/.test(c)) return 'd' + c.toUpperCase();
+  switch (c) {
+    case '.': case ',': return 'dot';
+    case '+': return 'add';
+    case '-': return 'sub';
+    case '*': return 'mul';
+    case '/': return 'div';
+    case '=': return 'eq';
+    case '%': return sci ? 'mod' : 'pct';
+    case '@': return sci ? 'sqr' : 'sqrt';
+    case 'r': case 'R': return 'recip';
+    case '(': return 'lp';
+    case ')': return 'rp';
+    case 'n': case 'N': return 'ln';
+    case 'l': case 'L': return 'log';
+    case 's': case 'S': return 'sin';
+    case 'o': case 'O': return 'cos';
+    case 't': case 'T': return 'tan';
+    case 'y': case 'Y': return 'pow';
+    case '#': return 'cube';
+    case '!': return 'fact';
+    case 'p': case 'P': return 'pi';
+    case 'x': case 'X': return 'exp';
+    case 'm': case 'M': return 'dms';
+    case 'i': case 'I': return 'inv';
+    case 'h': case 'H': return 'hyp';
+    case '&': return 'and';
+    case '|': return 'or';
+    case '^': return 'xor';
+    case '~': return 'not';
+    case '<': return 'lsh';
+    case ';': return 'int';
+    case 'v': case 'V': return 'fe';
+  }
+  return null;
+}
+
+/* ================= keyboard ================= */
+document.addEventListener('keydown', (e) => {
+  const topDlg = dlgStack[dlgStack.length - 1];
+  if (topDlg && topDlg.modal) {
+    if (e.key === 'Enter' && !(e.target instanceof HTMLButtonElement)) { e.preventDefault(); (topDlg.ok || topDlg.close)(); }
+    else if (e.key === 'Escape') { e.preventDefault(); (topDlg.cancel || topDlg.close)(); }
+    return;
+  }
+  if (e.key === 'Escape' && openMenu) { closeMenu(); return; }
+  if (e.altKey && !e.ctrlKey) {
+    const k = e.key.toLowerCase(), i = { e: 0, v: 1, h: 2 }[k];
+    if (i !== undefined) { e.preventDefault(); openM(tops[i]); }
+    return;
+  }
+  if (openMenu && e.key.length === 1) {
+    const items = openMenu.querySelectorAll('.mi:not(.disabled)');
+    for (const it of items) {
+      const u = it.querySelector('u');
+      if (u && u.textContent.toLowerCase() === e.key.toLowerCase() && it.style.display !== 'none') {
+        e.preventDefault(); closeMenu(); action(it.dataset.act); return;
+      }
+    }
+    return;
+  }
+  if (e.ctrlKey || e.metaKey) {
+    const k = e.key.toLowerCase();
+    const map = { m: 'ms', r: 'mr', l: 'mc', p: 'mp', s: 'sta', a: 'ave', t: 'sum', d: 's' };
+    if (k === 'c') { e.preventDefault(); doCopy(); return; }
+    if (k === 'v') return; // handled by paste event
+    if (map[k]) { e.preventDefault(); if (map[k] === 'sta' ? sci : true) keyPress(map[k]); }
+    return;
+  }
+  let id = null;
+  switch (e.key) {
+    case 'Enter': id = 'eq'; break;
+    case 'Escape': id = 'clr'; break;
+    case 'Backspace': id = 'back'; break;
+    case 'Delete': id = 'ce'; break;
+    case 'Insert': id = 'dat'; break;
+    case 'F9': id = 'neg'; break;
+    case 'F5': id = 'hex'; break;
+    case 'F6': id = 'dec'; break;
+    case 'F7': id = 'oct'; break;
+    case 'F8': id = 'bin'; break;
+    case 'F2': id = base === 10 ? 'deg' : 'dword'; break;
+    case 'F3': id = base === 10 ? 'rad' : 'word'; break;
+    case 'F4': id = base === 10 ? 'grad' : 'byte'; break;
+    default: if (e.key.length === 1) id = charToId(e.key);
+  }
+  if (id) { e.preventDefault(); keyPress(id); }
+});
+document.addEventListener('paste', (e) => {
+  const t = e.clipboardData && e.clipboardData.getData('text');
+  if (t) { e.preventDefault(); pasteText(t); }
+});
+function pasteText(t) {
+  for (const ch of String(t).slice(0, 200)) {
+    if (ch === '\n' || ch === '\r') continue;
+    if (ch === 'c' || ch === 'C') { if (base !== 16) { press('clr'); continue; } }
+    if (ch === 'e' || ch === 'E') { if (base === 10) { press('exp'); continue; } }
+    const id = charToId(ch);
+    if (id && (exists(id) || ['inv', 'hyp'].indexOf(id) >= 0)) press(id);
+  }
+}
+function doCopy() {
+  let t = displayText();
+  if (!err && base === 10) t = t.replace(/\.(?=e|$)/, '');
+  const fallback = () => {
+    const ta = document.createElement('textarea');
+    ta.value = t; ta.style.position = 'fixed'; ta.style.left = '-1000px';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); } catch (_) {}
+    ta.remove();
+  };
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).catch(fallback);
+    else fallback();
+  } catch (_) { fallback(); }
+}
+function doPaste() {
+  const fail = () => msgBox('Calculator', 'Your browser blocked clipboard access. Press Ctrl+V to paste instead.');
+  try {
+    if (navigator.clipboard && navigator.clipboard.readText) {
+      navigator.clipboard.readText().then((t) => { pasteText(t); render(); }).catch(fail);
+    } else fail();
+  } catch (_) { fail(); }
+}
+
+/* ================= menus ================= */
+let openMenu = null;
+const tops = Array.from(document.querySelectorAll('.mtop'));
+function openM(t) { if (openMenu) openMenu.classList.remove('open'); openMenu = t; t.classList.add('open'); }
+function closeMenu() { if (openMenu) openMenu.classList.remove('open'); openMenu = null; }
+tops.forEach((t) => {
+  t.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0 || e.target.closest('.drop')) return;
+    e.preventDefault();
+    if (openMenu === t) closeMenu(); else openM(t);
+  });
+  t.addEventListener('pointerenter', () => { if (openMenu && openMenu !== t) openM(t); });
+});
+document.querySelectorAll('.mi').forEach((mi) => {
+  mi.addEventListener('pointerup', (e) => {
+    if (e.button !== 0 || mi.classList.contains('disabled') || !openMenu) return;
+    e.stopPropagation();
+    closeMenu();
+    action(mi.dataset.act);
+  });
+});
+document.addEventListener('pointerdown', (e) => {
+  if (openMenu && !menubar.contains(e.target)) { closeMenu(); e.preventDefault(); e.stopPropagation(); }
+}, true);
+if (!EMBEDDED || STANDALONE) { $('exititem').style.display = 'none'; $('exitsep').style.display = 'none'; }
+function action(a) {
+  switch (a) {
+    case 'copy': doCopy(); break;
+    case 'paste': doPaste(); break;
+    case 'std': setView(false); break;
+    case 'sci': setView(true); break;
+    case 'about': aboutBox(); break;
+    case 'exit': post({ type: 'win95:close', app: 'calc' }); break;
+  }
+}
+
+/* ================= dialogs ================= */
+const dlgStack = [];
+const XSVG = '<svg width="8" height="7" viewBox="0 0 8 7" shape-rendering="crispEdges"><path d="M0 0h2v1h1v1h2V1h1V0h2v1H7v1H6v1H5v1h1v1h1v1h1v1H6V6H5V5H3v1H2v1H0V6h1V5h1V4h1V3H2V2H1V1H0z"/></svg>';
+function openDialog(title, build, opts) {
+  opts = opts || {};
+  closeMenu();
+  const ov = el('div', 'overlay' + (opts.modeless ? ' modeless' : '')), d = el('div', 'dlg'), tb = el('div', 'dtitle'), body = el('div', 'dbody');
+  d.setAttribute('role', 'dialog'); d.setAttribute('aria-label', title);
+  tb.appendChild(el('span', null, title));
+  const x = el('button', 'tbtn'); x.type = 'button'; x.setAttribute('aria-label', 'Close'); x.innerHTML = XSVG;
+  tb.appendChild(x);
+  d.appendChild(tb); d.appendChild(body); ov.appendChild(d);
+  const api = {
+    ok: null, cancel: null, modal: !opts.modeless, el: d,
+    close: () => { ov.remove(); const i = dlgStack.indexOf(api); if (i >= 0) dlgStack.splice(i, 1); if (opts.onClose) opts.onClose(); }
+  };
+  x.addEventListener('click', () => (api.cancel || api.close)());
+  let drag = null, dx = 0, dy = 0;
+  tb.addEventListener('pointerdown', (e) => {
+    if (e.target.closest('.tbtn')) return;
+    drag = { x: e.clientX - dx, y: e.clientY - dy }; tb.setPointerCapture(e.pointerId);
+  });
+  tb.addEventListener('pointermove', (e) => {
+    if (!drag) return;
+    dx = e.clientX - drag.x; dy = e.clientY - drag.y;
+    d.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+  });
+  tb.addEventListener('pointerup', () => { drag = null; });
+  build(body, api);
+  document.body.appendChild(ov);
+  dlgStack.push(api);
+  if (!opts.modeless) { const f = body.querySelector('button.def') || body.querySelector('button'); if (f) f.focus(); }
+  return api;
+}
+function btn(label, fn, def, cls) {
+  const b = el('button', 'w95' + (def ? ' def' : '') + (cls ? ' ' + cls : ''), label);
+  b.type = 'button'; b.addEventListener('click', fn);
+  return b;
+}
+function bigIcon() {
+  const cv = el('canvas'); cv.width = 32; cv.height = 32;
+  const c = cv.getContext('2d');
+  c.fillStyle = '#000'; c.fillRect(5, 1, 22, 30);
+  c.fillStyle = '#c0c0c0'; c.fillRect(6, 2, 20, 28);
+  c.fillStyle = '#fff'; c.fillRect(6, 2, 20, 1); c.fillRect(6, 2, 1, 28);
+  c.fillStyle = '#808080'; c.fillRect(25, 3, 1, 27); c.fillRect(7, 29, 19, 1);
+  c.fillStyle = '#000'; c.fillRect(8, 4, 16, 7);
+  c.fillStyle = '#9fc59f'; c.fillRect(9, 5, 14, 5);
+  c.fillStyle = '#000'; c.fillRect(17, 6, 2, 3); c.fillRect(20, 6, 2, 3);
+  for (let y = 0; y < 4; y++) for (let x = 0; x < 4; x++) {
+    c.fillStyle = '#fff'; c.fillRect(8 + x * 4, 13 + y * 4, 3, 3);
+    c.fillStyle = x === 3 ? '#ff0000' : '#0000ff'; c.fillRect(9 + x * 4, 14 + y * 4, 2, 2);
+  }
+  return cv;
+}
+function msgBox(title, text) {
+  openDialog(title, (body, api) => {
+    const m = el('div', 'msg'); m.appendChild(bigIcon());
+    const p = el('p'); p.textContent = text; m.appendChild(p); body.appendChild(m);
+    const row = el('div', 'btnrow'); api.ok = api.close; row.appendChild(btn('OK', api.close, true)); body.appendChild(row);
+  });
+}
+function aboutBox() {
+  openDialog('About Calculator', (body, api) => {
+    const m = el('div', 'msg'); m.appendChild(bigIcon());
+    const p = el('p');
+    p.innerHTML = '<b>Calculator</b> \u2014 a tribute recreation for dom 95.<br>Not affiliated with Microsoft.<br><br>Standard and Scientific views, memory, statistics and Hex/Dec/Oct/Bin.';
+    m.appendChild(p); body.appendChild(m);
+    const row = el('div', 'btnrow'); api.ok = api.close; row.appendChild(btn('OK', api.close, true)); body.appendChild(row);
+  });
+}
+function renderStats() {
+  if (!statDlg) return;
+  const list = statDlg.el.querySelector('.statlist');
+  list.innerHTML = '';
+  stats.forEach((v, i) => {
+    const d = el('div', i === statSel ? 'sel' : '', fmt(v));
+    d.addEventListener('pointerdown', (e) => { e.preventDefault(); statSel = i; renderStats(); });
+    list.appendChild(d);
+  });
+  statDlg.el.querySelector('.statn').textContent = 'n=' + stats.length;
+}
+function toggleStats() {
+  if (statDlg) { statDlg.close(); return; }
+  statDlg = openDialog('Statistics Box', (body, api) => {
+    const w = el('div', 'statwrap'), list = el('div', 'statlist'), col = el('div', 'statbtns');
+    col.appendChild(btn('RET', () => {}, true, 'sm'));
+    col.appendChild(btn('LOAD', () => { if (statSel >= 0 && stats[statSel] !== undefined) { setCur(stats[statSel]); lastWasOp = false; render(); } }, false, 'sm'));
+    col.appendChild(btn('CD', () => { if (statSel >= 0) { stats.splice(statSel, 1); statSel = Math.min(statSel, stats.length - 1); renderStats(); } }, false, 'sm'));
+    col.appendChild(btn('CAD', () => { stats = []; statSel = -1; renderStats(); }, false, 'sm'));
+    col.appendChild(el('div', 'statn', 'n=0'));
+    w.appendChild(list); w.appendChild(col); body.appendChild(w);
+    col.querySelectorAll('button').forEach((b) => b.addEventListener('pointerdown', (e) => e.preventDefault()));
+  }, { modeless: true, onClose: () => { statDlg = null; render(); } });
+  statDlg.el.style.transform = 'translate(0px,40px)';
+  renderStats();
+}
+
+/* ================= boot ================= */
+document.addEventListener('contextmenu', (e) => e.preventDefault());
+sci = !prefs.sci; setView(prefs.sci);
+render();
+requestAnimationFrame(() => { reportSize(); });
+window.addEventListener('load', reportSize);
+window.__calc = { press: press, display: () => disp.textContent, size: naturalSize, setView: setView };
+})();
+</script>
+</body>
+</html>

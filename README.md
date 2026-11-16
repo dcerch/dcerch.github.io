@@ -38,7 +38,12 @@ Double-click around. Drag icons wherever you like or rubber-band a few at once, 
 | Icon | Program | What it is |
 |---|---|---|
 | 🏠 | **Navigator 3.5** · **Navigator 3.9** | Two 2D homages to *Packard Bell Navigator*, the house-shaped shell our family PC booted into. See below. |
-| 🃏 | **Solitaire** | Klondike with Draw One/Three, standard or Vegas scoring, six original card backs, and *that* bouncing-cards victory. |
+| 🌐 | **Internet Explorer** | Browses the 1990s web through the Internet Archive's Wayback Machine. Favorites go from Yahoo! (1996) to YouTube (2005), and a year picker sends any address you type back in time. A dial-up dialog connects you first. |
+| 📞 | **dom Online** | A parody of 90s online services: sign on, hear the 28.8k modem handshake (synthesised live), then the Welcome screen, Buddy List, keywords and a Lobby chat room full of 1996. |
+| 📬 | **Inbox** | An Outlook Express-style mailbox with letters from me (and Aunt Linda's chain letter). Compose copies your note and opens my LinkedIn so you can send it there. |
+| 🃏 | **Solitaire · FreeCell · Hearts** | Klondike with Vegas scoring and the bouncing-cards win; FreeCell with the real Microsoft deal numbers; Hearts with passing, shooting the moon and a score sheet. |
+| ⛷️ | **SkiDom** | Ski downhill, dodge trees, hit the ramps. Keep going past 2,000 m. Something's out there. |
+| 🧮 | **Calculator · WordPad** | Standard and Scientific calculator; a WordPad with fonts, formatting and a ruler. |
 | 💣 | **Minesweeper** | Beginner, Intermediate, Expert and Custom. Chording, ? marks, Best Times, and a smiley that gets nervous. |
 | 🚀 | **Space Pinball** | An original table in the spirit of *3D Pinball – Space Cadet*. |
 | 🎨 | **Paint** | 16 tools, the 28-color palette, magnifier, select/move, undo, and save as PNG. |
@@ -47,11 +52,11 @@ Double-click around. Drag icons wherever you like or rubber-band a few at once, 
 | 📁 | **My Apps / Toolbox** | My full apps, and 21 tiny tools restyled as proper Win95 dialogs. |
 | 🗑️ | **Recycle Bin** | My old green-screen homepage, plus an **Archived** folder with a `.TXT` note for every app I've retired. |
 
-**Display Properties** has 35 wallpapers and 13 desktop patterns, grouped by era (3.1, 95, 98, 2000 and XP). Every one is painted in code; none are Microsoft images.
+**Display Properties** has 35 wallpapers and 13 desktop patterns, grouped by era (3.1, 95, 98, 2000 and XP), seven screen savers (Flying Through Space, Flying Houses, Mystify Your Mind, Pipes, Curves and Colors, Scrolling Marquee, Blank Screen) and 19 colour schemes from Windows Standard to Hot Dog Stand. Every one is drawn in code; none are Microsoft images.
 
 ![The desktop](docs/img/desktop.jpg)
 
-> **Try:** Start ▸ Run… and type `kidspace`, `nav39`, `winmine`, `pbrush`, `dos` or `help`. Shut Down… works too.
+> **Try:** Start ▸ Run… and type `kidspace`, `nav39`, `iexplore`, `aol`, `calc`, `winmine`, `pbrush`, `dos` or `help`. Shut Down… works too.
 
 ---
 

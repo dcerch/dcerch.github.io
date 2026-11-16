@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>FreeCell</title>
+<link rel="icon" href="data:,">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:#c0c0c0;font:11px "MS Sans Serif","Microsoft Sans Serif",Tahoma,sans-serif;color:#000;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;cursor:default}
+#win{position:absolute;inset:0;display:flex;flex-direction:column;background:#c0c0c0}
+#titlebar{display:none}
+body.standalone{background:#008080}
+body.standalone #win{inset:auto;left:50%;top:50%;transform:translate(-50%,-50%);width:min(680px,calc(100vw - 16px));height:min(540px,calc(100vh - 16px));padding:3px;box-shadow:inset -1px -1px #000,inset 1px 1px #dfdfdf,inset -2px -2px #808080,inset 2px 2px #fff}
+body.standalone #titlebar{display:flex;align-items:center;height:18px;padding:0 2px 0 3px;background:linear-gradient(90deg,#000080,#1084d0);color:#fff;font-weight:bold;gap:4px;flex:none}
+#titlebar .t{flex:1;white-space:nowrap;overflow:hidden}
+#app{flex:1;display:flex;flex-direction:column;min-height:0}
+#menubar{display:flex;height:20px;flex:none;align-items:stretch;padding:1px 0 1px 2px;position:relative;z-index:50}
+.mtop{padding:2px 6px;cursor:default;position:relative;line-height:15px}
+.mtop.open{background:#000080;color:#fff}
+.menu{display:none;position:absolute;left:0;top:18px;background:#c0c0c0;min-width:170px;padding:3px;box-shadow:inset -1px -1px #000,inset 1px 1px #dfdfdf,inset -2px -2px #808080,inset 2px 2px #fff;color:#000;z-index:60}
+.mtop.open .menu{display:block}
+.mi{display:flex;justify-content:space-between;padding:3px 10px 3px 20px;white-space:nowrap;gap:24px;line-height:13px}
+.mi:hover:not(.dis){background:#000080;color:#fff}
+.mi.dis{color:#808080;text-shadow:1px 1px #fff}
+.mi.dis:hover{background:transparent}
+.sep{height:0;border-top:1px solid #808080;border-bottom:1px solid #fff;margin:3px 1px}
+u{text-decoration:underline}
+#felt{flex:1;position:relative;z-index:0;overflow:hidden;background:#008000;touch-action:none;min-height:0;box-shadow:inset 1px 1px #808080,inset -1px -1px #fff}
+#status{display:flex;height:22px;flex:none;padding:2px;gap:2px}
+.panel{padding:2px 6px;box-shadow:inset 1px 1px #808080,inset -1px -1px #fff;white-space:nowrap;overflow:hidden;line-height:14px}
+#stLeft{flex:1}
+#stRight{min-width:110px;text-align:right}
+.cell{position:absolute;border:1px solid;border-color:#000 #00ff00 #00ff00 #000;pointer-events:none}
+canvas.card{position:absolute;left:0;top:0;transition:left .15s ease-out,top .15s ease-out;touch-action:none}
+canvas.card.nt,canvas.card.drag{transition:none}
+canvas.card.sel{filter:invert(1)}
+#king{position:absolute;pointer-events:none}
+#modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:9000}
+#modal.on{display:flex}
+.dlg{background:#c0c0c0;padding:3px;min-width:240px;max-width:calc(100vw - 12px);box-shadow:inset -1px -1px #000,inset 1px 1px #dfdfdf,inset -2px -2px #808080,inset 2px 2px #fff,2px 2px 0 rgba(0,0,0,.25)}
+.dlg .tb{height:18px;display:flex;align-items:center;background:linear-gradient(90deg,#000080,#1084d0);color:#fff;font-weight:bold;padding:0 2px 0 4px}
+.dlg .tb span{flex:1;white-space:nowrap}
+.xbtn{width:16px;height:14px;padding:0;background:#c0c0c0;border:0;box-shadow:inset -1px -1px #000,inset 1px 1px #fff,inset -2px -2px #808080,inset 2px 2px #dfdfdf;display:flex;align-items:center;justify-content:center}
+.xbtn:active{box-shadow:inset 1px 1px #000,inset -1px -1px #fff,inset 2px 2px #808080,inset -2px -2px #dfdfdf}
+.dlg .bd{padding:12px 12px 10px;display:flex;gap:12px;align-items:flex-start}
+.dlg .msg{line-height:15px;padding-top:4px;max-width:340px}
+.dlg .btns{display:flex;justify-content:center;gap:6px;padding:0 10px 10px;flex-wrap:wrap}
+.btn{min-width:75px;height:23px;background:#c0c0c0;border:0;font:inherit;color:#000;padding:0 8px;box-shadow:inset -1px -1px #000,inset 1px 1px #fff,inset -2px -2px #808080,inset 2px 2px #dfdfdf;cursor:default}
+.btn.def{box-shadow:0 0 0 1px #000,inset -1px -1px #000,inset 1px 1px #fff,inset -2px -2px #808080,inset 2px 2px #dfdfdf}
+.btn:active{box-shadow:inset 1px 1px #000,inset -1px -1px #fff,inset 2px 2px #808080,inset -2px -2px #dfdfdf;padding-top:2px}
+.btn:focus{outline:1px dotted #000;outline-offset:-5px}
+input.w95in{font:inherit;height:21px;width:90px;padding:3px 4px;border:none;border-radius:0;background:#fff;color:#000;outline:none;-webkit-user-select:text;user-select:text;box-shadow:inset -1px -1px #fff,inset 1px 1px #808080,inset -2px -2px #dfdfdf,inset 2px 2px #000}
+.stats{display:grid;grid-template-columns:auto auto;gap:4px 18px;margin-top:4px}
+fieldset{border:0;box-shadow:inset 1px 1px #808080,inset -1px -1px #808080,1px 1px #fff,inset 2px 2px #fff;margin:4px 0;padding:8px 10px 6px}
+legend{padding:0 3px}
+</style>
+</head>
+<body>
+<div id="win">
+ <div id="titlebar"><svg width="16" height="14" viewBox="0 0 16 14"><rect x="0.5" y="0.5" width="9" height="12" fill="#fff" stroke="#000"/><rect x="6.5" y="1.5" width="9" height="12" fill="#1848a8" stroke="#000"/><path d="M5 3l2.5 3.5L5 10 2.5 6.5z" fill="#d40000"/></svg><span class="t">FreeCell</span></div>
+ <div id="app">
+  <div id="menubar">
+   <div class="mtop" data-m="game"><u>G</u>ame
+    <div class="menu">
+     <div class="mi" data-a="new"><span><u>N</u>ew Game</span><span>F2</span></div>
+     <div class="mi" data-a="select"><span><u>S</u>elect Game...</span><span>F3</span></div>
+     <div class="mi" data-a="restart" id="miRestart"><span><u>R</u>estart Game</span><span></span></div>
+     <div class="sep"></div>
+     <div class="mi" data-a="undo" id="miUndo"><span><u>U</u>ndo</span><span>Ctrl+Z</span></div>
+     <div class="mi" data-a="stats"><span>S<u>t</u>atistics...</span><span>F4</span></div>
+     <div class="sep" id="exitSep"></div>
+     <div class="mi" data-a="exit" id="miExit"><span>E<u>x</u>it</span><span></span></div>
+    </div>
+   </div>
+   <div class="mtop" data-m="help"><u>H</u>elp
+    <div class="menu">
+     <div class="mi" data-a="help"><span><u>H</u>ow to Play</span><span>F1</span></div>
+     <div class="sep"></div>
+     <div class="mi" data-a="about"><span><u>A</u>bout FreeCell...</span><span></span></div>
+    </div>
+   </div>
+  </div>
+  <div id="felt"><canvas id="king"></canvas></div>
+  <div id="status"><div class="panel" id="stLeft"></div><div class="panel" id="stRight">Cards Left: 52</div></div>
+ </div>
+</div>
+<div id="modal"></div>
+<script>
+"use strict";
+const $ = s => document.querySelector(s);
+const felt = $('#felt');
+const qs = new URLSearchParams(location.search);
+const EMBEDDED = (() => { try { return window.parent !== window; } catch (_) { return true; } })();
+if (!qs.has('embed')) document.body.classList.add('standalone');
+const DPR = Math.min(2, window.devicePixelRatio || 1);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+/* ================= procedural card art (original) ================= */
+const RANKS = ['', 'A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+const RED = '#d40000';
+const suitOf = c => c % 4;            // 0 clubs, 1 diamonds, 2 hearts, 3 spades
+const rankOf = c => (c >> 2) + 1;     // 1..13
+const isRedS = s => s === 1 || s === 2;
+const isRed = c => isRedS(suitOf(c));
+function rrect(ctx, x, y, w, h, r) {
+  ctx.beginPath(); ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
+function fillSuit(ctx, s) {
+  if (s === 0) {
+    const r = .21;
+    for (const [x, y] of [[0, -.26], [-.25, .07], [.25, .07]]) { ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill(); }
+    ctx.beginPath(); ctx.moveTo(0, -.05); ctx.lineTo(-.17, .5); ctx.lineTo(.17, .5); ctx.closePath(); ctx.fill();
+    ctx.fillRect(-.1, -.15, .2, .25);
+    return;
+  }
+  ctx.beginPath();
+  if (s === 1) { ctx.moveTo(0, -.5); ctx.lineTo(.38, 0); ctx.lineTo(0, .5); ctx.lineTo(-.38, 0); }
+  else if (s === 2) {
+    ctx.moveTo(0, .46); ctx.bezierCurveTo(-.2, .28, -.5, .08, -.5, -.17); ctx.bezierCurveTo(-.5, -.42, -.16, -.52, 0, -.26);
+    ctx.bezierCurveTo(.16, -.52, .5, -.42, .5, -.17); ctx.bezierCurveTo(.5, .08, .2, .28, 0, .46);
+  } else {
+    ctx.moveTo(0, -.5); ctx.bezierCurveTo(-.2, -.3, -.5, -.12, -.5, .1); ctx.bezierCurveTo(-.5, .32, -.2, .38, -.06, .2);
+    ctx.lineTo(-.17, .5); ctx.lineTo(.17, .5); ctx.lineTo(.06, .2);
+    ctx.bezierCurveTo(.2, .38, .5, .32, .5, .1); ctx.bezierCurveTo(.5, -.12, .2, -.3, 0, -.5);
+  }
+  ctx.closePath(); ctx.fill();
+}
+function drawSuit(ctx, s, x, y, sz, flip, color) {
+  ctx.save(); ctx.translate(x, y); if (flip) ctx.rotate(Math.PI); ctx.scale(sz, sz);
+  ctx.fillStyle = color || (isRedS(s) ? RED : '#000'); fillSuit(ctx, s); ctx.restore();
+}
+const PIPS = {
+  1: [[.5, .5]], 2: [[.5, 0], [.5, 1]], 3: [[.5, 0], [.5, .5], [.5, 1]],
+  4: [[0, 0], [1, 0], [0, 1], [1, 1]], 5: [[0, 0], [1, 0], [0, 1], [1, 1], [.5, .5]],
+  6: [[0, 0], [1, 0], [0, .5], [1, .5], [0, 1], [1, 1]],
+  7: [[0, 0], [1, 0], [0, .5], [1, .5], [0, 1], [1, 1], [.5, .25]],
+  8: [[0, 0], [1, 0], [0, .5], [1, .5], [0, 1], [1, 1], [.5, .25], [.5, .75]],
+  9: [[0, 0], [0, 1 / 3], [0, 2 / 3], [0, 1], [1, 0], [1, 1 / 3], [1, 2 / 3], [1, 1], [.5, .5]],
+  10: [[0, 0], [0, 1 / 3], [0, 2 / 3], [0, 1], [1, 0], [1, 1 / 3], [1, 2 / 3], [1, 1], [.5, 1 / 6], [.5, 5 / 6]]
+};
+function drawCourt(ctx, w, h, s, r) {
+  const fx = w * .23, fy = h * .14, fw = w * .54, fh = h * .72;
+  const robe = r === 13 ? '#c00000' : r === 12 ? '#1840b0' : '#d89a00';
+  const trim = r === 11 ? '#1840b0' : '#f0c000';
+  ctx.save(); ctx.beginPath(); ctx.rect(fx, fy, fw, fh); ctx.clip();
+  ctx.fillStyle = '#fffbe8'; ctx.fillRect(fx, fy, fw, fh);
+  const half = () => {
+    const cx = fx + fw / 2, H2 = fh / 2, hr = fw * .14, hy = fy + H2 * .42;
+    ctx.lineWidth = Math.max(.6, w / 90); ctx.strokeStyle = '#000';
+    // robe
+    ctx.fillStyle = robe; ctx.beginPath();
+    ctx.moveTo(cx - fw * .2, hy + hr * .9); ctx.lineTo(cx + fw * .2, hy + hr * .9);
+    ctx.lineTo(cx + fw * .44, fy + H2); ctx.lineTo(cx - fw * .44, fy + H2); ctx.closePath(); ctx.fill(); ctx.stroke();
+    // centre band
+    ctx.fillStyle = trim; ctx.beginPath();
+    ctx.moveTo(cx - fw * .06, hy + hr); ctx.lineTo(cx + fw * .06, hy + hr); ctx.lineTo(cx + fw * .1, fy + H2); ctx.lineTo(cx - fw * .1, fy + H2); ctx.closePath(); ctx.fill(); ctx.stroke();
+    // collar
+    ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.ellipse(cx, hy + hr * 1.05, fw * .2, hr * .35, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    // held item
+    ctx.strokeStyle = '#000'; ctx.lineWidth = Math.max(1, w / 50);
+    const ix = cx + fw * .3;
+    ctx.beginPath(); ctx.moveTo(ix, hy - hr * .4); ctx.lineTo(ix, fy + H2); ctx.stroke();
+    if (r === 13) { ctx.beginPath(); ctx.moveTo(ix - fw * .07, hy + hr * .2); ctx.lineTo(ix + fw * .07, hy + hr * .2); ctx.stroke(); }
+    else if (r === 12) { ctx.fillStyle = RED; ctx.beginPath(); ctx.arc(ix, hy - hr * .5, fw * .055, 0, Math.PI * 2); ctx.fill(); }
+    else { ctx.fillStyle = '#808080'; ctx.beginPath(); ctx.moveTo(ix, hy - hr * .9); ctx.lineTo(ix + fw * .07, hy - hr * .2); ctx.lineTo(ix, hy); ctx.closePath(); ctx.fill(); }
+    ctx.lineWidth = Math.max(.6, w / 90);
+    // head
+    ctx.fillStyle = '#f6d2a8'; ctx.beginPath(); ctx.arc(cx, hy, hr, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#000';
+    ctx.fillRect(cx - hr * .45, hy - hr * .15, hr * .22, hr * .22); ctx.fillRect(cx + hr * .23, hy - hr * .15, hr * .22, hr * .22);
+    ctx.fillStyle = RED; ctx.fillRect(cx - hr * .25, hy + hr * .45, hr * .5, hr * .12);
+    // headgear
+    const ty = hy - hr * .7;
+    if (r === 13) {
+      ctx.fillStyle = '#f0c000'; ctx.beginPath(); ctx.moveTo(cx - hr, ty);
+      ctx.lineTo(cx - hr, ty - hr * .9); ctx.lineTo(cx - hr * .5, ty - hr * .45); ctx.lineTo(cx, ty - hr * 1.05);
+      ctx.lineTo(cx + hr * .5, ty - hr * .45); ctx.lineTo(cx + hr, ty - hr * .9); ctx.lineTo(cx + hr, ty); ctx.closePath(); ctx.fill(); ctx.stroke();
+    } else if (r === 12) {
+      ctx.fillStyle = '#5a3a1a'; ctx.beginPath(); ctx.arc(cx, hy, hr * 1.12, Math.PI * 1.05, Math.PI * 1.95); ctx.lineTo(cx + hr * 1.1, hy + hr * .6); ctx.lineTo(cx + hr * .95, hy); ctx.lineTo(cx - hr * .95, hy); ctx.lineTo(cx - hr * 1.1, hy + hr * .6); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#f0c000'; ctx.beginPath(); ctx.moveTo(cx - hr * .7, ty); ctx.lineTo(cx - hr * .35, ty - hr * .6); ctx.lineTo(cx, ty - hr * .2); ctx.lineTo(cx + hr * .35, ty - hr * .6); ctx.lineTo(cx + hr * .7, ty); ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#f6d2a8'; ctx.beginPath(); ctx.arc(cx, hy + hr * .05, hr * .78, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#000'; ctx.fillRect(cx - hr * .45, hy - hr * .15, hr * .22, hr * .22); ctx.fillRect(cx + hr * .23, hy - hr * .15, hr * .22, hr * .22);
+      ctx.fillStyle = RED; ctx.fillRect(cx - hr * .25, hy + hr * .45, hr * .5, hr * .12);
+    } else {
+      ctx.fillStyle = trim; ctx.beginPath(); ctx.moveTo(cx - hr * 1.15, ty + hr * .2); ctx.lineTo(cx + hr * 1.15, ty + hr * .2);
+      ctx.lineTo(cx + hr * .7, ty - hr * .55); ctx.lineTo(cx - hr * .7, ty - hr * .55); ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.strokeStyle = RED; ctx.beginPath(); ctx.moveTo(cx + hr * .5, ty - hr * .4); ctx.quadraticCurveTo(cx + hr * 1.4, ty - hr * 1.2, cx + hr * 1.6, ty - hr * .3); ctx.stroke();
+    }
+    drawSuit(ctx, s, cx - fw * .3, fy + H2 * .2, fw * .2);
+  };
+  half();
+  ctx.save(); ctx.translate(w / 2, h / 2); ctx.rotate(Math.PI); ctx.translate(-w / 2, -h / 2); half(); ctx.restore();
+  ctx.restore();
+  ctx.strokeStyle = isRedS(s) ? RED : '#000'; ctx.lineWidth = 1; ctx.strokeRect(Math.round(fx) + .5, Math.round(fy) + .5, Math.round(fw), Math.round(fh));
+}
+function drawFace(ctx, w, h, c) {
+  const s = suitOf(c), r = rankOf(c), col = isRedS(s) ? RED : '#000';
+  const rad = Math.max(2, w * .06);
+  ctx.fillStyle = '#fff'; rrect(ctx, .5, .5, w - 1, h - 1, rad); ctx.fill();
+  ctx.strokeStyle = '#000'; ctx.lineWidth = 1; ctx.stroke();
+  const fs = Math.max(7, Math.round(w * .17));
+  const corner = () => {
+    ctx.fillStyle = col; ctx.font = `bold ${fs}px Arial,Helvetica,sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    const cx = w * .115;
+    ctx.fillText(RANKS[r], cx, h * .035, w * .2);
+    drawSuit(ctx, s, cx, h * .035 + fs * 1.45, fs * .8);
+  };
+  corner();
+  ctx.save(); ctx.translate(w, h); ctx.rotate(Math.PI); corner(); ctx.restore();
+  if (r <= 10) {
+    const x0 = w * .32, x1 = w * .68, y0 = h * .2, y1 = h * .8;
+    const ps = r === 1 ? Math.min(w * .42, h * .32) : Math.min(w * .19, h * .135);
+    for (const [px, py] of PIPS[r]) drawSuit(ctx, s, x0 + (x1 - x0) * px, y0 + (y1 - y0) * py, ps, py > .5);
+  } else drawCourt(ctx, w, h, s, r);
+}
+function drawBack(ctx, w, h) {
+  const rad = Math.max(2, w * .06);
+  ctx.fillStyle = '#fff'; rrect(ctx, .5, .5, w - 1, h - 1, rad); ctx.fill();
+  ctx.strokeStyle = '#000'; ctx.lineWidth = 1; ctx.stroke();
+  const m = Math.max(2, Math.round(w * .07));
+  ctx.save(); rrect(ctx, m, m, w - 2 * m, h - 2 * m, rad * .5); ctx.clip();
+  ctx.fillStyle = '#0c3c9c'; ctx.fillRect(0, 0, w, h);
+  ctx.strokeStyle = '#6a98e8'; ctx.lineWidth = Math.max(1, w / 55);
+  const step = Math.max(3, w / 10);
+  ctx.beginPath();
+  for (let d = -h; d < w + h; d += step) { ctx.moveTo(d, 0); ctx.lineTo(d + h, h); ctx.moveTo(d, h); ctx.lineTo(d + h, 0); }
+  ctx.stroke();
+  ctx.restore();
+  ctx.strokeStyle = '#082a70'; rrect(ctx, m + .5, m + .5, w - 2 * m - 1, h - 2 * m - 1, rad * .5); ctx.stroke();
+}
+const artCache = new Map();
+function cardArt(id, up, w, h) {
+  const key = (up ? id : 'b') + '|' + w + '|' + h;
+  let cv = artCache.get(key);
+  if (!cv) {
+    cv = document.createElement('canvas'); cv.width = Math.round(w * DPR); cv.height = Math.round(h * DPR);
+    const ctx = cv.getContext('2d'); ctx.scale(DPR, DPR);
+    if (up) drawFace(ctx, w, h, id); else drawBack(ctx, w, h);
+    artCache.set(key, cv);
+  }
+  return cv;
+}
+function paintCard(el, id, up, w, h) {
+  const key = (up ? id : 'b') + '|' + w + '|' + h;
+  if (el._key === key) return;
+  el._key = key;
+  el.width = Math.round(w * DPR); el.height = Math.round(h * DPR);
+  el.style.width = w + 'px'; el.style.height = h + 'px';
+  el.getContext('2d').drawImage(cardArt(id, up, w, h), 0, 0);
+}
+
+/* ================= Microsoft-compatible deal ================= */
+function msDeal(n) {
+  let seed = n >>> 0;
+  const deck = []; for (let i = 0; i < 52; i++) deck.push(i);
+  const cols = [[], [], [], [], [], [], [], []];
+  for (let i = 0; i < 52; i++) {
+    const left = 52 - i;
+    seed = (Math.imul(seed, 214013) + 2531011) & 0x7fffffff;
+    const j = ((seed >> 16) & 0x7fff) % left;
+    cols[i % 8].push(deck[j]);
+    deck[j] = deck[left - 1];
+  }
+  return cols;
+}
+
+/* ================= state ================= */
+let S, gameNo = 0, history = [], moved = false, won = false, busy = false, sel = null, token = 0, lookLeft = true;
+let L = null;
+const cardEls = [];
+for (let i = 0; i < 52; i++) {
+  const el = document.createElement('canvas'); el.className = 'card'; el.dataset.id = i; felt.appendChild(el); cardEls.push(el);
+}
+const cellEls = [];
+for (let i = 0; i < 8; i++) { const d = document.createElement('div'); d.className = 'cell'; felt.appendChild(d); cellEls.push(d); }
+const kingCv = $('#king');
+
+const last = a => a[a.length - 1];
+const fits = (c, onto) => rankOf(onto) === rankOf(c) + 1 && isRed(c) !== isRed(onto);
+const freeEmpty = () => S.free.filter(x => x == null).length;
+const colsEmpty = () => S.cols.filter(c => !c.length).length;
+const cap = toEmpty => (freeEmpty() + 1) * Math.pow(2, Math.max(0, colsEmpty() - (toEmpty ? 1 : 0)));
+const cardsLeft = () => 52 - S.home.reduce((a, h) => a + h.length, 0);
+function runLen(col) {
+  if (!col.length) return 0;
+  let n = 1;
+  for (let i = col.length - 1; i > 0; i--) { if (fits(col[i], col[i - 1])) n++; else break; }
+  return n;
+}
+function homeSlotFor(c) {
+  if (rankOf(c) === 1) return S.home.findIndex(h => !h.length);
+  return S.home.findIndex(h => h.length && suitOf(last(h)) === suitOf(c) && rankOf(last(h)) === rankOf(c) - 1);
+}
+function homeRank(s) { const h = S.home.find(h => h.length && suitOf(h[0]) === s); return h ? h.length : 0; }
+const snap = () => JSON.stringify(S);
+const pileCard = p => p.t === 'free' ? S.free[p.i] : p.t === 'col' ? last(S.cols[p.i]) : null;
+
+/* ================= stats ================= */
+const STATS_KEY = 'dom95.freecell.stats';
+function loadStats() {
+  try { return Object.assign({ won: 0, lost: 0, sw: 0, sl: 0, cur: 0 }, JSON.parse(localStorage.getItem(STATS_KEY) || '{}')); }
+  catch (_) { return { won: 0, lost: 0, sw: 0, sl: 0, cur: 0 }; }
+}
+function saveStats(st) { try { localStorage.setItem(STATS_KEY, JSON.stringify(st)); } catch (_) {} }
+const session = { won: 0, lost: 0 };
+function recordResult(win) {
+  const st = loadStats();
+  if (win) { st.won++; session.won++; st.cur = st.cur > 0 ? st.cur + 1 : 1; st.sw = Math.max(st.sw, st.cur); }
+  else { st.lost++; session.lost++; st.cur = st.cur < 0 ? st.cur - 1 : -1; st.sl = Math.max(st.sl, -st.cur); }
+  saveStats(st);
+}
+
+/* ================= layout & render ================= */
+function layout() {
+  const W = felt.clientWidth, H = felt.clientHeight;
+  if (!W || !H) return;
+  let w = Math.floor(Math.min((W - 8) / 8.9, H / 4.3, 96));
+  w = Math.max(22, w);
+  const h = Math.round(w * 1.38);
+  const pad = Math.max(3, Math.round(w * .06));
+  const free = [], home = [];
+  for (let i = 0; i < 4; i++) {
+    free.push({ x: pad + i * w, y: pad, w, h });
+    home.push({ x: W - pad - (4 - i) * w, y: pad, w, h });
+  }
+  const g = (W - 8 * w) / 9;
+  const colTop = pad + h + Math.max(8, Math.round(h * .16));
+  const cols = [];
+  for (let i = 0; i < 8; i++) cols.push({ x: Math.round(g + i * (w + g)), y: colTop, w, h });
+  const ks = Math.max(16, Math.min(Math.round(w * .9), home[0].x - (free[3].x + w) - 6, h));
+  L = { W, H, w, h, pad, free, home, cols, g, colTop, king: { x: Math.round(W / 2 - ks / 2), y: Math.round(pad + (h - ks) / 2), s: ks } };
+  free.concat(home).forEach((r, i) => { const e = cellEls[i]; e.style.left = r.x + 'px'; e.style.top = r.y + 'px'; e.style.width = r.w + 'px'; e.style.height = r.h + 'px'; });
+  kingCv.style.left = L.king.x + 'px'; kingCv.style.top = L.king.y + 'px';
+  kingCv.style.width = ks + 'px'; kingCv.style.height = ks + 'px';
+  kingCv.width = Math.round(ks * DPR); kingCv.height = Math.round(ks * DPR);
+  drawKing();
+  cardEls.forEach(el => el.classList.add('nt'));
+  render();
+  void felt.offsetWidth;
+  cardEls.forEach(el => el.classList.remove('nt'));
+}
+function colOffset(i) {
+  const n = S.cols[i].length, base = Math.round(L.h * .24);
+  if (n < 2) return base;
+  const avail = L.H - L.colTop - L.h - 4;
+  return Math.max(3, Math.min(base, Math.floor(avail / (n - 1))));
+}
+function cardPos(id) {
+  for (let i = 0; i < 8; i++) {
+    const j = S.cols[i].indexOf(id);
+    if (j >= 0) return { x: L.cols[i].x, y: L.colTop + j * colOffset(i), z: 20 + j };
+  }
+  const f = S.free.indexOf(id);
+  if (f >= 0) return { x: L.free[f].x, y: L.free[f].y, z: 20 };
+  for (let i = 0; i < 4; i++) { const j = S.home[i].indexOf(id); if (j >= 0) return { x: L.home[i].x, y: L.home[i].y, z: 20 + j }; }
+  return { x: -200, y: -200, z: 0 };
+}
+function render() {
+  if (!L || !S) return;
+  const selId = sel ? pileCard(sel) : null;
+  for (let id = 0; id < 52; id++) {
+    const el = cardEls[id], p = cardPos(id);
+    paintCard(el, id, true, L.w, L.h);
+    const nx = p.x + 'px', ny = p.y + 'px';
+    el._z = p.z;
+    if (el.style.left !== nx || el.style.top !== ny) {
+      if (!el.classList.contains('nt')) {
+        el.style.zIndex = 400 + p.z; clearTimeout(el._zt);
+        el._zt = setTimeout(() => { el.style.zIndex = el._z; el._zt = 0; }, 180);
+      } else el.style.zIndex = p.z;
+      el.style.left = nx; el.style.top = ny;
+    } else if (!el._zt) el.style.zIndex = p.z;
+    el.classList.toggle('sel', id === selId);
+  }
+  $('#stRight').textContent = 'Cards Left: ' + cardsLeft();
+  $('#miUndo').classList.toggle('dis', !history.length || busy || won);
+}
+function drawKing() {
+  if (!L) return;
+  const ctx = kingCv.getContext('2d'), s = L.king.s;
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.clearRect(0, 0, s, s);
+  const u = s / 32, k = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x * u, y * u, w * u, h * u); };
+  // crown
+  ctx.fillStyle = '#f0c000'; ctx.strokeStyle = '#000'; ctx.lineWidth = Math.max(1, u * .8);
+  ctx.beginPath(); ctx.moveTo(8 * u, 11 * u); ctx.lineTo(8 * u, 3 * u); ctx.lineTo(12 * u, 7 * u); ctx.lineTo(16 * u, 2 * u); ctx.lineTo(20 * u, 7 * u); ctx.lineTo(24 * u, 3 * u); ctx.lineTo(24 * u, 11 * u); ctx.closePath(); ctx.fill(); ctx.stroke();
+  k(15, 5, 2, 2, '#d40000'); k(9.5, 7, 1.6, 1.6, '#1840b0'); k(21, 7, 1.6, 1.6, '#1840b0');
+  // face
+  ctx.fillStyle = '#f6d2a8'; ctx.beginPath(); ctx.rect(8 * u, 11 * u, 16 * u, 12 * u); ctx.fill(); ctx.stroke();
+  // beard
+  ctx.fillStyle = '#e8e8e8'; ctx.beginPath(); ctx.moveTo(8 * u, 19 * u); ctx.lineTo(24 * u, 19 * u); ctx.lineTo(22 * u, 27 * u); ctx.lineTo(16 * u, 31 * u); ctx.lineTo(10 * u, 27 * u); ctx.closePath(); ctx.fill(); ctx.stroke();
+  // eyes
+  k(10, 13.5, 5, 3, '#fff'); k(17, 13.5, 5, 3, '#fff');
+  const dx = lookLeft ? 0 : 3;
+  k(10 + dx, 13.5, 2, 3, '#000'); k(17 + dx, 13.5, 2, 3, '#000');
+  k(10, 12, 5, 1, '#5a3a1a'); k(17, 12, 5, 1, '#5a3a1a');
+  // nose + mouth
+  k(lookLeft ? 15 : 16, 16, 1.5, 3, '#c89070');
+  if (won) { ctx.strokeStyle = '#d40000'; ctx.beginPath(); ctx.arc(16 * u, 20 * u, 3.2 * u, .15 * Math.PI, .85 * Math.PI); ctx.stroke(); }
+  else k(13, 21, 6, 1.2, '#d40000');
+}
+function look(x) { const nl = x < L.W / 2; if (nl !== lookLeft) { lookLeft = nl; drawKing(); } }
+
+/* ================= game flow ================= */
+function setTitle() {
+  const t = 'FreeCell Game #' + gameNo;
+  $('#titlebar .t').textContent = t; document.title = t;
+  if (EMBEDDED) { try { window.parent.postMessage({ type: 'win-title', title: t }, location.origin); } catch (_) {} }
+}
+function status(t) { $('#stLeft').textContent = t; }
+function startGame(n) {
+  token++; busy = false;
+  gameNo = n; S = { cols: msDeal(n), free: [null, null, null, null], home: [[], [], [], []] };
+  history = []; moved = false; won = false; sel = null;
+  setTitle(); status('Game #' + n);
+  drawKing();
+  // deal from the top centre
+  if (L) {
+    cardEls.forEach(el => { el.classList.add('nt'); el.style.left = (L.W / 2 - L.w / 2) + 'px'; el.style.top = L.pad + 'px'; });
+    void felt.offsetWidth;
+    cardEls.forEach(el => el.classList.remove('nt'));
+  }
+  render();
+}
+async function confirmResign() {
+  if (!moved || won) return true;
+  const v = await dialog({ title: 'FreeCell', icon: 'q', msg: 'Do you want to resign this game?', buttons: [{ label: '<u>Y</u>es', value: 'y', def: true }, { label: '<u>N</u>o', value: 'n' }], cancel: 'n' });
+  if (v !== 'y') return false;
+  recordResult(false); moved = false;
+  return true;
+}
+async function newGame() { if (!(await confirmResign())) return; startGame(1 + Math.floor(Math.random() * 32000)); }
+async function restartGame() { if (!(await confirmResign())) return; startGame(gameNo); }
+async function selectGame() {
+  const body = document.createElement('div');
+  body.innerHTML = '<div class="msg">Select a game number from 1 to 1000000:</div>';
+  const inp = document.createElement('input'); inp.className = 'w95in'; inp.value = 1 + Math.floor(Math.random() * 32000); inp.inputMode = 'numeric';
+  inp.style.marginTop = '8px'; body.appendChild(inp);
+  const v = await dialog({ title: 'Game Number', body, init: () => { inp.focus(); inp.select(); }, buttons: [{ label: 'OK', value: 'ok', def: true }, { label: 'Cancel', value: 'c' }], cancel: 'c' });
+  if (v !== 'ok') return;
+  const n = parseInt(inp.value, 10);
+  if (!(n >= 1 && n <= 1000000)) { await dialog({ title: 'FreeCell', icon: 'w', msg: 'Please enter a number from 1 to 1000000.', buttons: [{ label: 'OK', value: 1, def: true }] }); return selectGame(); }
+  if (!(await confirmResign())) return;
+  startGame(n);
+}
+function undo() {
+  if (busy || won || !history.length) return;
+  S = JSON.parse(history.pop()); sel = null; status('Game #' + gameNo); render();
+}
+function take(p, n) {
+  if (p.t === 'free') { const c = S.free[p.i]; S.free[p.i] = null; return [c]; }
+  return S.cols[p.i].splice(S.cols[p.i].length - n, n);
+}
+async function commit(src, dst, n) {
+  history.push(snap());
+  const cards = take(src, n);
+  if (dst.t === 'free') S.free[dst.i] = cards[0];
+  else if (dst.t === 'home') S.home[dst.i].push(cards[0]);
+  else S.cols[dst.i].push(...cards);
+  moved = true; sel = null; status('Game #' + gameNo);
+  render();
+  await afterMove();
+}
+function isSafe(c) {
+  const r = rankOf(c), s = suitOf(c);
+  if (r <= 2) return true;
+  const opp = isRedS(s) ? [0, 3] : [1, 2];
+  const same = [0, 1, 2, 3].find(x => x !== s && isRedS(x) === isRedS(s));
+  return opp.every(o => homeRank(o) >= r - 1) && homeRank(same) >= r - 2;
+}
+async function afterMove() {
+  const t = token; busy = true; render();
+  for (;;) {
+    let did = false;
+    const srcs = [];
+    for (let i = 0; i < 4; i++) if (S.free[i] != null) srcs.push({ t: 'free', i });
+    for (let i = 0; i < 8; i++) if (S.cols[i].length) srcs.push({ t: 'col', i });
+    for (const p of srcs) {
+      const c = pileCard(p), hs = homeSlotFor(c);
+      if (hs >= 0 && isSafe(c)) {
+        await sleep(90); if (t !== token) return;
+        take(p, 1); S.home[hs].push(c); render(); did = true; break;
+      }
+    }
+    if (!did) break;
+  }
+  await sleep(160); if (t !== token) return;
+  busy = false; render();
+  if (!cardsLeft()) return win();
+  if (!anyMoves()) return lose();
+}
+function anyMoves() {
+  if (freeEmpty() || colsEmpty()) return true;
+  const tops = [];
+  for (let i = 0; i < 4; i++) tops.push(S.free[i]);
+  for (let i = 0; i < 8; i++) tops.push(last(S.cols[i]));
+  for (const c of tops) {
+    if (homeSlotFor(c) >= 0) return true;
+    for (let j = 0; j < 8; j++) if (fits(c, last(S.cols[j]))) return true;
+  }
+  return false;
+}
+async function win() {
+  won = true; drawKing(); render(); recordResult(true); moved = false;
+  status('You win!');
+  const v = await dialog({ title: 'Game Over', icon: 'i', msg: 'Congratulations, you win!<br><br>Do you want to play again?', buttons: [{ label: '<u>Y</u>es', value: 'y', def: true }, { label: '<u>N</u>o', value: 'n' }], cancel: 'n' });
+  if (v === 'y') startGame(1 + Math.floor(Math.random() * 32000));
+}
+async function lose() {
+  status('There are no more legal moves.');
+  const v = await dialog({ title: 'Game Over', icon: 'w', msg: 'Sorry, you lose. There are no more legal moves.<br><br>Do you want to play this game again?', buttons: [{ label: '<u>Y</u>es', value: 'y', def: true }, { label: '<u>N</u>o', value: 'n' }], cancel: 'n' });
+  recordResult(false); moved = false;
+  if (v === 'y') startGame(gameNo); else startGame(1 + Math.floor(Math.random() * 32000));
+}
+
+// returns 'ok' | 'bad' | 'cancel'
+async function tryMove(src, dst, n) {
+  if (busy || won) return 'cancel';
+  if (src.t === dst.t && src.i === dst.i) return 'cancel';
+  if (dst.t === 'free') {
+    if (S.free[dst.i] != null || (n && n > 1) || pileCard(src) == null) return 'bad';
+    await commit(src, dst, 1); return 'ok';
+  }
+  if (dst.t === 'home') {
+    if (n && n > 1) return 'bad';
+    const c = pileCard(src); if (c == null) return 'bad';
+    const hs = homeSlotFor(c); if (hs < 0) return 'bad';
+    await commit(src, { t: 'home', i: hs }, 1); return 'ok';
+  }
+  const dcol = S.cols[dst.i];
+  if (src.t === 'free') {
+    const c = S.free[src.i];
+    if (c == null || (dcol.length && !fits(c, last(dcol)))) return 'bad';
+    await commit(src, dst, 1); return 'ok';
+  }
+  const scol = S.cols[src.i]; if (!scol.length) return 'bad';
+  const run = runLen(scol);
+  let k = 0;
+  if (!dcol.length) {
+    const ce = cap(true);
+    if (n) { if (n > run) return 'bad'; k = n; }
+    else {
+      const m = Math.min(run, ce);
+      if (m > 1) {
+        const v = await dialog({ title: 'Move to Empty Column...', icon: 'q', msg: 'Do you want to move the whole column or a single card?', buttons: [{ label: 'Move <u>c</u>olumn', value: 'col', def: true }, { label: 'Move <u>s</u>ingle card', value: 'one' }, { label: 'Cancel', value: 'c' }], cancel: 'c' });
+        if (v === 'c' || v == null) return 'cancel';
+        k = v === 'col' ? m : 1;
+      } else k = 1;
+    }
+    if (k > ce) { await tooMany(k, ce); return 'cancel'; }
+  } else {
+    const t = last(dcol);
+    if (n) { if (n <= run && fits(scol[scol.length - n], t)) k = n; }
+    else for (let j = 1; j <= run; j++) if (fits(scol[scol.length - j], t)) { k = j; break; }
+    if (!k) return 'bad';
+    const c = cap(false);
+    if (k > c) { await tooMany(k, c); return 'cancel'; }
+  }
+  await commit(src, dst, k); return 'ok';
+}
+async function tooMany(k, c) {
+  await dialog({ title: 'FreeCell', icon: 'w', msg: `That move requires moving ${k} cards. You only have enough free space to move ${c} card${c > 1 ? 's' : ''}.`, buttons: [{ label: 'OK', value: 1, def: true }] });
+  render();
+}
+
+/* ================= pointer input ================= */
+function fpt(e) { const r = felt.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
+function pileAt(x, y) {
+  if (!L) return null;
+  const inR = (r, m) => x >= r.x - m && x <= r.x + r.w + m && y >= r.y - m && y <= r.y + r.h + m;
+  for (let i = 0; i < 4; i++) { if (inR(L.free[i], 0)) return { t: 'free', i }; if (inR(L.home[i], 0)) return { t: 'home', i }; }
+  if (y >= L.colTop - L.h * .1) {
+    for (let i = 0; i < 8; i++) { const c = L.cols[i]; if (x >= c.x - L.g / 2 && x <= c.x + c.w + L.g / 2) return { t: 'col', i }; }
+  }
+  return null;
+}
+function cardIndexAt(i, y) {
+  const col = S.cols[i], off = colOffset(i);
+  for (let j = col.length - 1; j >= 0; j--) { const top = L.colTop + j * off; if (y >= top && y <= top + L.h) return j; }
+  return -1;
+}
+let down = null, lastSel = null;
+felt.addEventListener('pointerdown', e => {
+  if (modalOpen || !S || !L) return;
+  if (e.pointerType === 'mouse' && e.button !== 0) return;
+  const p = fpt(e); look(p.x);
+  if (busy || won) return;
+  const pile = pileAt(p.x, p.y);
+  down = { x: p.x, y: p.y, pile, pid: e.pointerId, drag: null };
+  if (pile && pile.t === 'col') {
+    const j = cardIndexAt(pile.i, p.y), col = S.cols[pile.i];
+    if (j >= 0 && col.length - j <= runLen(col)) down.cand = { src: pile, n: col.length - j };
+  } else if (pile && pile.t === 'free' && S.free[pile.i] != null) down.cand = { src: pile, n: 1 };
+  try { felt.setPointerCapture(e.pointerId); } catch (_) {}
+  e.preventDefault();
+});
+felt.addEventListener('pointermove', e => {
+  if (!down || e.pointerId !== down.pid) return;
+  const p = fpt(e);
+  if (!down.drag) {
+    if (!down.cand || Math.hypot(p.x - down.x, p.y - down.y) < 6) return;
+    const ids = down.cand.src.t === 'free' ? [S.free[down.cand.src.i]] : S.cols[down.cand.src.i].slice(-down.cand.n);
+    down.drag = { ids, starts: ids.map(id => cardPos(id)) };
+    sel = null; render();
+    ids.forEach((id, k) => { cardEls[id].classList.add('drag'); cardEls[id].style.zIndex = 1000 + k; });
+  }
+  const dx = p.x - down.x, dy = p.y - down.y;
+  down.drag.ids.forEach((id, k) => { const s = down.drag.starts[k]; cardEls[id].style.left = (s.x + dx) + 'px'; cardEls[id].style.top = (s.y + dy) + 'px'; });
+});
+async function endPointer(e, cancelled) {
+  if (!down || e.pointerId !== down.pid) return;
+  const d = down; down = null;
+  if (d.drag) {
+    const p = fpt(e);
+    d.drag.ids.forEach(id => { const el = cardEls[id]; el.classList.remove('drag'); });
+    if (cancelled) { render(); return; }
+    const s0 = d.drag.starts[0];
+    const cx = s0.x + (p.x - d.x) + L.w / 2, cy = s0.y + (p.y - d.y) + L.h / 2;
+    let tgt = pileAt(cx, cy) || pileAt(p.x, p.y);
+    if (tgt && tgt.t === 'col' && cy < L.colTop - L.h * .1) tgt = null;
+    if (tgt) { const r = await tryMove(d.cand.src, tgt, d.cand.n); if (r === 'bad') status('That move is not allowed.'); }
+    render();
+    return;
+  }
+  if (!cancelled) await click(d.pile);
+}
+felt.addEventListener('pointerup', e => endPointer(e, false));
+felt.addEventListener('pointercancel', e => endPointer(e, true));
+felt.addEventListener('contextmenu', e => e.preventDefault());
+const same = (a, b) => a && b && a.t === b.t && a.i === b.i;
+async function click(pile) {
+  const now = performance.now();
+  if (!pile) { if (sel) { sel = null; render(); } return; }
+  const dbl = lastSel && same(lastSel.pile, pile) && now - lastSel.t < 450;
+  lastSel = null;
+  if (dbl) {
+    sel = null;
+    if (pile.t === 'col' && S.cols[pile.i].length) {
+      const fi = S.free.indexOf(null);
+      if (fi >= 0) await tryMove(pile, { t: 'free', i: fi }, 1); else { status('There are no free cells available.'); render(); }
+    } else if (pile.t === 'free' && S.free[pile.i] != null) {
+      if ((await tryMove(pile, { t: 'home', i: 0 }, 1)) !== 'ok') render();
+    } else render();
+    return;
+  }
+  if (!sel) {
+    if ((pile.t === 'col' && S.cols[pile.i].length) || (pile.t === 'free' && S.free[pile.i] != null)) {
+      sel = pile; lastSel = { pile, t: now }; status('Game #' + gameNo); render();
+    }
+    return;
+  }
+  if (same(sel, pile)) { sel = null; render(); return; }
+  const src = sel; sel = null;
+  const r = await tryMove(src, pile, null);
+  if (r === 'bad') status('That move is not allowed.');
+  render();
+}
+
+/* ================= dialogs ================= */
+let modalOpen = false;
+const ICONS = {
+  i: '<svg width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="14" fill="#fff" stroke="#000"/><rect x="14" y="13" width="4" height="11" fill="#000080"/><rect x="14" y="7" width="4" height="4" fill="#000080"/></svg>',
+  q: '<svg width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="14" fill="#fff" stroke="#000"/><path d="M11 12a5 5 0 1 1 7 4.5c-1.5.8-2 1.5-2 3.5" fill="none" stroke="#000080" stroke-width="3"/><rect x="14.5" y="22" width="3" height="3" fill="#000080"/></svg>',
+  w: '<svg width="32" height="32" viewBox="0 0 32 32"><path d="M16 3L30 28H2z" fill="#ff0" stroke="#000"/><rect x="14.5" y="11" width="3" height="10" fill="#000"/><rect x="14.5" y="23" width="3" height="3" fill="#000"/></svg>'
+};
+const XSVG = '<svg width="8" height="7" viewBox="0 0 8 7"><path d="M0 0h2l2 2 2-2h2L5 3.5 8 7H6L4 5 2 7H0l3-3.5z"/></svg>';
+function dialog(o) {
+  return new Promise(res => {
+    closeMenus();
+    const m = $('#modal'); m.innerHTML = '';
+    const d = document.createElement('div'); d.className = 'dlg'; d.setAttribute('role', 'dialog');
+    d.innerHTML = `<div class="tb"><span></span><button class="xbtn" aria-label="Close">${XSVG}</button></div><div class="bd"></div><div class="btns"></div>`;
+    d.querySelector('.tb span').textContent = o.title;
+    const bd = d.querySelector('.bd');
+    if (o.icon) bd.insertAdjacentHTML('beforeend', ICONS[o.icon]);
+    if (o.msg) bd.insertAdjacentHTML('beforeend', `<div class="msg">${o.msg}</div>`);
+    if (o.body) bd.appendChild(o.body);
+    const cancelV = o.cancel !== undefined ? o.cancel : (o.buttons[o.buttons.length - 1] || {}).value;
+    let done = false;
+    const close = v => { if (done) return; done = true; m.classList.remove('on'); m.innerHTML = ''; modalOpen = false; document.removeEventListener('keydown', kd, true); res(v); };
+    let defBtn = null;
+    const bs = d.querySelector('.btns');
+    o.buttons.forEach(b => {
+      const btn = document.createElement('button'); btn.className = 'btn' + (b.def ? ' def' : ''); btn.innerHTML = b.label;
+      btn.addEventListener('click', () => close(b.value)); bs.appendChild(btn);
+      if (b.def) defBtn = btn;
+      const um = b.label.match(/<u>(.)<\/u>/); if (um) btn.dataset.key = um[1].toLowerCase();
+    });
+    d.querySelector('.xbtn').addEventListener('click', () => close(cancelV));
+    const kd = e => {
+      if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(cancelV); }
+      else if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); const f = document.activeElement; if (f && f.tagName === 'BUTTON' && d.contains(f)) f.click(); else if (defBtn) defBtn.click(); }
+      else if (e.key.length === 1 && !(e.target instanceof HTMLInputElement)) { const b = bs.querySelector(`[data-key="${e.key.toLowerCase()}"]`); if (b) { e.preventDefault(); b.click(); } }
+    };
+    document.addEventListener('keydown', kd, true);
+    m.appendChild(d); m.classList.add('on'); modalOpen = true;
+    if (o.init) o.init(d); else if (defBtn) defBtn.focus();
+  });
+}
+function showStats() {
+  const st = loadStats(), pct = (w, l) => (w + l ? Math.round(100 * w / (w + l)) : 0) + '%';
+  const body = document.createElement('div');
+  body.innerHTML = `<fieldset><legend>This session</legend><div class="stats"><span>Won: ${session.won}</span><span>Lost: ${session.lost}</span><span>Percent won:</span><span>${pct(session.won, session.lost)}</span></div></fieldset>
+    <fieldset><legend>Total</legend><div class="stats"><span>Won: ${st.won}</span><span>Lost: ${st.lost}</span><span>Percent won:</span><span>${pct(st.won, st.lost)}</span></div></fieldset>
+    <fieldset><legend>Streaks</legend><div class="stats"><span>Wins: ${st.sw}</span><span>Losses: ${st.sl}</span><span>Current:</span><span>${Math.abs(st.cur)} ${st.cur > 0 ? (st.cur === 1 ? 'win' : 'wins') : st.cur < 0 ? (st.cur === -1 ? 'loss' : 'losses') : ''}</span></div></fieldset>`;
+  dialog({ title: 'FreeCell Statistics', body, buttons: [{ label: 'OK', value: 'ok', def: true }, { label: '<u>C</u>lear', value: 'clear' }], cancel: 'ok' })
+    .then(v => { if (v === 'clear') { saveStats({ won: 0, lost: 0, sw: 0, sl: 0, cur: 0 }); session.won = session.lost = 0; showStats(); } });
+}
+function showHelp() {
+  dialog({ title: 'FreeCell Help', icon: 'i', msg: 'Move all the cards to the four home cells (top right), building each suit up from Ace to King.<br><br>' +
+    'Build down the columns in alternating colours. Each free cell (top left) holds one card.<br><br>' +
+    'Click a card to select it, then click where it should go — or drag it. Double-click a card to send it to a free cell.<br><br>' +
+    'You can move several cards at once if there are enough free cells and empty columns.', buttons: [{ label: 'OK', value: 1, def: true }] });
+}
+function showAbout() {
+  dialog({ title: 'About FreeCell', icon: 'i', msg: '<b>FreeCell</b><br><br>FreeCell — a tribute recreation for dom 95. Not affiliated with Microsoft.<br><br>Deals are compatible with the classic numbered games.', buttons: [{ label: 'OK', value: 1, def: true }] });
+}
+
+/* ================= menus ================= */
+let menuOpen = null;
+function closeMenus() { document.querySelectorAll('.mtop.open').forEach(m => m.classList.remove('open')); menuOpen = null; }
+function openMenu(m) { closeMenus(); m.classList.add('open'); menuOpen = m; }
+document.querySelectorAll('.mtop').forEach(m => {
+  m.addEventListener('pointerdown', e => { if (e.target.closest('.menu')) return; e.preventDefault(); if (menuOpen === m) closeMenus(); else openMenu(m); });
+  m.addEventListener('pointerenter', () => { if (menuOpen && menuOpen !== m) openMenu(m); });
+});
+document.querySelectorAll('.mi').forEach(mi => mi.addEventListener('click', e => {
+  e.stopPropagation(); if (mi.classList.contains('dis')) return;
+  closeMenus(); action(mi.dataset.a);
+}));
+document.addEventListener('pointerdown', e => { if (menuOpen && !e.target.closest('#menubar')) closeMenus(); }, true);
+if (!EMBEDDED) { $('#miExit').style.display = 'none'; $('#exitSep').style.display = 'none'; }
+function action(a) {
+  if (a === 'new') newGame();
+  else if (a === 'select') selectGame();
+  else if (a === 'restart') restartGame();
+  else if (a === 'undo') undo();
+  else if (a === 'stats') showStats();
+  else if (a === 'help') showHelp();
+  else if (a === 'about') showAbout();
+  else if (a === 'exit') { if (EMBEDDED) { try { window.parent.postMessage({ type: 'win95:close' }, location.origin); } catch (_) {} } }
+}
+document.addEventListener('keydown', e => {
+  if (modalOpen) return;
+  if (e.key === 'Escape') { if (menuOpen) closeMenus(); else if (sel) { sel = null; render(); } return; }
+  const k = { F1: 'help', F2: 'new', F3: 'select', F4: 'stats' }[e.key];
+  if (k) { e.preventDefault(); closeMenus(); action(k); return; }
+  if ((e.ctrlKey || e.metaKey) && (e.key === 'z' || e.key === 'Z')) { e.preventDefault(); undo(); return; }
+  if (menuOpen && e.key.length === 1) {
+    const items = [...menuOpen.querySelectorAll('.mi:not(.dis)')].filter(i => i.style.display !== 'none');
+    const it = items.find(i => { const u = i.querySelector('u'); return u && u.textContent.toLowerCase() === e.key.toLowerCase(); });
+    if (it) { e.preventDefault(); closeMenus(); action(it.dataset.a); }
+  } else if (e.altKey && !menuOpen) {
+    const m = { g: 'game', h: 'help' }[e.key.toLowerCase()];
+    if (m) { e.preventDefault(); openMenu(document.querySelector(`.mtop[data-m="${m}"]`)); }
+  }
+});
+
+/* ================= boot ================= */
+new ResizeObserver(() => layout()).observe(felt);
+const initial = parseInt(qs.get('game'), 10);
+startGame(initial >= 1 && initial <= 1000000 ? initial : 1 + Math.floor(Math.random() * 32000));
+layout();
+</script>
+</body>
+</html>

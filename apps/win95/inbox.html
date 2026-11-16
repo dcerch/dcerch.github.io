@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inbox - Outlook Express</title>
+<link rel="stylesheet" href="w95app.css">
+<style>
+#bar { flex: none; border-top: 1px solid #fff; border-bottom: 1px solid #808080; }
+#main { flex: 1; display: flex; min-height: 0; margin-top: 2px; gap: 3px; }
+#tree { width: 170px; flex: none; background: #fff; overflow: auto; padding: 3px; }
+.fold { display: flex; align-items: center; gap: 4px; padding: 2px 3px; white-space: nowrap; }
+.fold svg { width: 16px; height: 16px; flex: none; }
+.fold.on { background: #000080; color: #fff; }
+.fold.sub { padding-left: 18px; }
+.fold b { font-weight: bold; }
+#right { flex: 1; display: flex; flex-direction: column; min-width: 0; gap: 3px; }
+#fhead { flex: none; background: #808080; color: #fff; font: bold 14px Arial, sans-serif; padding: 3px 8px; }
+#listwrap { flex: 0 0 40%; background: #fff; overflow: auto; min-height: 60px; }
+table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+th { position: sticky; top: 0; background: var(--face); font-weight: normal; text-align: left; padding: 2px 4px; white-space: nowrap; overflow: hidden;
+  box-shadow: inset -1px -1px #808080, inset 1px 1px #fff; }
+td { padding: 2px 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+tr.unread td { font-weight: bold; }
+tr.sel td { background: #000080; color: #fff; }
+td.ic { width: 20px; padding: 0 2px; text-align: center; }
+td.ic svg { width: 16px; height: 16px; vertical-align: middle; }
+#preview { flex: 1; background: #fff; display: flex; flex-direction: column; min-height: 0; }
+#phead { flex: none; padding: 4px 8px; background: var(--face); border-bottom: 1px solid #808080; display: grid; grid-template-columns: 52px 1fr; gap: 1px 6px; }
+#phead b { text-align: right; }
+#pbody { flex: 1; overflow: auto; padding: 10px 12px; font: 13px/1.45 Arial, sans-serif; white-space: pre-wrap; user-select: text; -webkit-user-select: text; }
+#pbody .att { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; padding: 4px 8px; border: 1px solid #808080; background: #f4f4f4; cursor: pointer; white-space: normal; }
+#pbody .att svg { width: 24px; height: 24px; }
+#pbody a { color: #0000ee; cursor: pointer; }
+/* compose */
+#compose { position: absolute; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,.001); }
+#compose .dlg { width: min(560px, calc(100% - 16px)); height: min(420px, calc(100% - 16px)); display: flex; flex-direction: column; }
+#compose .db { flex: 1; display: flex; flex-direction: column; gap: 4px; padding: 6px; min-height: 0; }
+.hrow { display: grid; grid-template-columns: 58px 1fr; align-items: center; gap: 4px; }
+.hrow .field { height: 22px; }
+.to { background: #ececec; color: #000; padding: 3px 6px; box-shadow: inset 1px 1px #808080, inset -1px -1px #fff; display: flex; align-items: center; gap: 6px; }
+.to svg { width: 14px; height: 14px; }
+#cBody { flex: 1; resize: none; font: 13px/1.4 Arial, sans-serif; min-height: 80px; }
+.note { color: #404040; font-size: 11px; }
+@media (max-width: 560px) { #tree { display: none; } th.from, td.from { width: 30% !important; } th.date, td.date { display: none; } }
+</style>
+</head>
+<body>
+<div id="app" style="position:relative">
+  <div id="titlebar"><svg viewBox="0 0 16 16"><rect x="1" y="3" width="14" height="10" fill="#fff" stroke="#000"/><path d="M1 3l7 5 7-5" fill="none" stroke="#000"/></svg><span class="tt">Inbox - Outlook Express</span></div>
+  <div id="menu"></div>
+  <div id="bar"><div class="toolbar" id="tools"></div></div>
+  <div id="main">
+    <div id="tree" class="sunken"></div>
+    <div id="right">
+      <div id="fhead">Inbox</div>
+      <div id="listwrap" class="sunken"><table><thead><tr><th class="ic" style="width:20px">!</th><th class="ic" style="width:20px">✉</th><th class="from" style="width:32%">From</th><th>Subject</th><th class="date" style="width:120px">Received</th></tr></thead><tbody id="list"></tbody></table></div>
+      <div id="preview" class="sunken">
+        <div id="phead"></div>
+        <div id="pbody"></div>
+      </div>
+    </div>
+  </div>
+  <div class="statusbar"><span id="status"></span><span id="conn">Working Offline</span></div>
+</div>
+<script src="w95app.js"></script>
+<script>
+const { esc, h, dialog } = W95;
+const $ = s => document.querySelector(s);
+const LINKEDIN = "https://www.linkedin.com/in/dcerch/";
+const DOM = "Dominic Cerchio";
+
+// ------------------------------------------------------------ the mail
+const MAIL = [
+  { id: "welcome", folder: "inbox", from: DOM, subj: "Welcome to dom 95", date: "Fri 8/23/96 9:15 AM", pri: "high", body:
+`Hi!
+
+You found the mailbox. Not many people check it, so: hello, and thanks for poking around.
+
+This whole desktop is a love letter to the computers I grew up with. Everything you see was drawn and coded for this site: the games, the Navigator house, the modem noises. Nothing here is a screenshot.
+
+A few places to start:
+  - Navigator 3.5 and 3.9 are the house. Every room has some of my projects in it.
+  - Internet Explorer can visit the 1990s web through the Internet Archive.
+  - dom Online will dial in for you. Turn your speakers up.
+  - My Apps has the things I made for friends and family.
+
+If you want to say hi back, click Compose Message. It reaches me on LinkedIn.
+
+Dom` },
+  { id: "tips", folder: "inbox", from: DOM, subj: "Things to try (and a secret)", date: "Sat 8/24/96 11:02 PM", body:
+`A few things you might miss:
+
+  * Drag icons anywhere on the desktop, or drag across it to select a bunch.
+  * Right-click the desktop > Properties: wallpapers from Windows 3.1 to XP, screen savers, and colour schemes. Yes, Hot Dog Stand is in there. I'm sorry.
+  * Start > Run... knows some commands. Try kidspace, winmine or iexplore.
+  * In Internet Explorer, pick a year next to the address bar and type any website. You'll get it as it looked back then.
+  * The Recycle Bin has a folder of apps I retired. Each one left a note.
+
+And the secret: there's something about the Navigator house that's more curious than it looks. Type the word curiosity somewhere it can hear you.
+
+Dom` },
+  { id: "contact", folder: "inbox", from: DOM, subj: "How to reach me", date: "Mon 8/26/96 8:40 AM", body:
+`The easiest way to reach me is LinkedIn: ${LINKEDIN}
+
+If you write something with Compose Message here, Outlook Express will copy your note and open my LinkedIn profile. Click Message there and paste it in. (It's 1996 in here, but the mail has to go out over 2020s roads.)
+
+Talk soon,
+Dom`, link: true },
+  { id: "chain", folder: "inbox", from: "Aunt Linda", subj: "FW: FW: FW: FW: forward this to 10 people!!!", date: "Tue 9/3/96 6:12 PM", read: true, body:
+`>>>>>> THIS IS NOT A JOKE!!!!!
+>>>>>> A computer scientist at a VERY BIG UNIVERSITY has confirmed that if you forward this email to 10 people, your modem will get 2x faster. If you forward it to 20 people, your printer will finally have paper.
+>>>>>>
+>>>>>> My friend's cousin did not forward it and his mouse ball fell out.
+>>>>>>
+>>>>>> DON'T BREAK THE CHAIN!!!!!!!!!!
+
+Linda
+Sent from my desk` },
+  { id: "baby", folder: "inbox", from: "ModemKid95", subj: "you HAVE to see this", date: "Wed 9/11/96 3:33 PM", read: true, att: "dancing_baby.avi (1.4 MB)", body:
+`lol check out this video. it took me 45 minutes to download. worth it.
+
+-mk` },
+  { id: "hours", folder: "inbox", from: "dom Online Member Services", subj: "Your 1,000 FREE HOURS are waiting!", date: "Thu 9/12/96 7:00 AM", read: true, body:
+`Dear Valued Member,
+
+Your 1,000 FREE HOURS of dom Online are waiting! Just double-click dom Online on your desktop, click SIGN ON, and listen to that beautiful noise.
+
+Already a member? Look for another free trial disk in your cereal box, your magazine, and your mailbox. And your other mailbox.
+
+dom Online. It's everywhere you are.` },
+  { id: "3d", folder: "deleted", from: DOM, subj: "Re: the 3D house", date: "Sun 11/15/26 10:48 PM", read: true, body:
+`For a while, Navigator on this site was a whole 3D house you could walk around in. It looked neat in screenshots and felt a bit laggy in real life, and the original was never 3D anyway.
+
+So I rebuilt it the way it really was: flat, painted rooms you click through. Much better. This note stays in Deleted Items so I remember.
+
+Dom` }
+];
+// visitors' own sent notes live in localStorage
+const KEY = "w95.mail";
+const st = Object.assign({ read: [], deleted: [], sent: [], drafts: [] }, JSON.parse(localStorage.getItem(KEY) || "{}"));
+const save = () => localStorage.setItem(KEY, JSON.stringify(st));
+const all = () => [...MAIL, ...st.sent.map((m, i) => ({ ...m, id: "sent" + i, folder: "sent", read: true })), ...st.drafts.map((m, i) => ({ ...m, id: "draft" + i, folder: "drafts", read: true }))];
+const folderOf = m => (st.deleted.includes(m.id) ? "deleted" : m.folder);
+const isRead = m => m.read || st.read.includes(m.id);
+
+// ------------------------------------------------------------ icons
+const S = b => `<svg viewBox="0 0 16 16" shape-rendering="crispEdges">${b}</svg>`;
+const FI = {
+  root: S(`<rect x="1" y="3" width="14" height="10" fill="#fff" stroke="#000"/><path d="M1 3l7 5 7-5" fill="none" stroke="#000"/><circle cx="12" cy="12" r="3" fill="#1e6fd8"/>`),
+  inbox: S(`<path d="M1 8 L3 3 H13 L15 8 V14 H1 Z" fill="#ffd84a" stroke="#806000"/><path d="M1 8 H5 L6 10 H10 L11 8 H15" fill="none" stroke="#806000"/>`),
+  outbox: S(`<path d="M1 8 L3 3 H13 L15 8 V14 H1 Z" fill="#ffd84a" stroke="#806000"/><path d="M8 11 V4 M5 7 L8 4 L11 7" stroke="#0a0" stroke-width="2" fill="none"/>`),
+  sent: S(`<path d="M1 4 h14 v9 H1z" fill="#ffd84a" stroke="#806000"/><path d="M4 10 L13 6 L9 13 Z" fill="#fff" stroke="#000"/>`),
+  deleted: S(`<path d="M3 4 H13 L12 15 H4 Z" fill="#c0c0c0" stroke="#000"/><rect x="2" y="2" width="12" height="2" fill="#808080" stroke="#000"/>`),
+  drafts: S(`<path d="M1 4 h14 v9 H1z" fill="#ffd84a" stroke="#806000"/><path d="M5 12 L12 5 L13 6 L6 13 Z" fill="#fff" stroke="#000"/>`),
+  env: S(`<rect x="1" y="4" width="14" height="9" fill="#ffff9a" stroke="#000"/><path d="M1 4l7 5 7-5" fill="none" stroke="#000"/>`),
+  envOpen: S(`<path d="M1 7 L8 2 L15 7 V14 H1 Z" fill="#fff" stroke="#000"/><path d="M1 7l7 4 7-4" fill="none" stroke="#000"/>`),
+  hi: S(`<rect x="6" y="1" width="4" height="10" fill="#e00"/><rect x="6" y="12" width="4" height="3" fill="#e00"/>`),
+  clip: S(`<path d="M10 3 V11 A2 2 0 0 1 6 11 V4 A1.5 1.5 0 0 1 9 4 V10" fill="none" stroke="#000" stroke-width="1.2"/>`)
+};
+const FOLDERS = [["inbox", "Inbox"], ["outbox", "Outbox"], ["sent", "Sent Items"], ["deleted", "Deleted Items"], ["drafts", "Drafts"]];
+let curFolder = "inbox", sel = null;
+
+function renderTree() {
+  const msgs = all();
+  $("#tree").innerHTML = `<div class="fold">${FI.root}Outlook Express</div>` + FOLDERS.map(([id, name]) => {
+    const unread = msgs.filter(m => folderOf(m) === id && !isRead(m)).length;
+    return `<div class="fold sub${id === curFolder ? " on" : ""}" data-f="${id}">${FI[id]}<span>${unread ? `<b>${name}</b> <b style="color:${id === curFolder ? "#fff" : "#00f"}">(${unread})</b>` : name}</span></div>`;
+  }).join("");
+  const unreadInbox = msgs.filter(m => folderOf(m) === "inbox" && !isRead(m)).length;
+  W95.title((FOLDERS.find(f => f[0] === curFolder) || [])[1] + " - Outlook Express");
+  if (W95.EMBEDDED) try { parent.postMessage({ type: "mail-unread", n: unreadInbox }, location.origin); } catch (e) {}
+}
+function renderList() {
+  const msgs = all().filter(m => folderOf(m) === curFolder);
+  $("#fhead").textContent = (FOLDERS.find(f => f[0] === curFolder) || [])[1];
+  $("#list").innerHTML = msgs.length ? msgs.map(m => `<tr data-m="${m.id}" class="${isRead(m) ? "" : "unread"}${sel === m.id ? " sel" : ""}"><td class="ic">${m.pri === "high" ? FI.hi : ""}</td><td class="ic">${m.att ? FI.clip : isRead(m) ? FI.envOpen : FI.env}</td><td class="from">${esc(curFolder === "sent" || curFolder === "drafts" ? "To: " + DOM : m.from)}</td><td>${esc(m.subj || "(no subject)")}</td><td class="date">${esc(m.date)}</td></tr>`).join("")
+    : `<tr><td colspan="5" style="text-align:center;color:#808080;padding:12px">There are no items in this view.</td></tr>`;
+  const unread = msgs.filter(m => !isRead(m)).length;
+  $("#status").textContent = `${msgs.length} message(s), ${unread} unread`;
+  if (!msgs.some(m => m.id === sel)) { sel = null; preview(null); }
+}
+function preview(m) {
+  if (!m) { $("#phead").innerHTML = `<b></b><span style="color:#808080">No message selected</span>`; $("#pbody").textContent = ""; return; }
+  const out = m.folder === "sent" || m.folder === "drafts";
+  $("#phead").innerHTML = `<b>From:</b><span>${esc(out ? "You" : m.from)}</span><b>To:</b><span>${esc(out ? DOM + " (via LinkedIn)" : "You")}</span><b>Subject:</b><span>${esc(m.subj || "(no subject)")}</span>`;
+  let html = esc(m.body).replace(/https:\/\/www\.linkedin\.com\/in\/dcerch\//g, `<a data-li>${LINKEDIN}</a>`);
+  if (m.att) html += `\n<span class="att" data-att><svg viewBox="0 0 24 24"><rect x="3" y="2" width="16" height="20" fill="#fff" stroke="#000"/><rect x="5" y="6" width="12" height="9" fill="#000"/><path d="M10 8 L14 10.5 L10 13 Z" fill="#fff"/></svg>${esc(m.att)}</span>`;
+  $("#pbody").innerHTML = html;
+  $("#pbody").scrollTop = 0;
+}
+function select(id) {
+  sel = id; const m = all().find(x => x.id === id);
+  if (m && !isRead(m)) { st.read.push(id); save(); renderTree(); }
+  renderList(); preview(m);
+}
+$("#tree").addEventListener("click", e => { const f = e.target.closest("[data-f]"); if (f) { curFolder = f.dataset.f; sel = null; renderTree(); renderList(); } });
+$("#list").addEventListener("click", e => { const r = e.target.closest("[data-m]"); if (r) select(r.dataset.m); });
+$("#list").addEventListener("dblclick", e => { const r = e.target.closest("[data-m]"); if (r) { const m = all().find(x => x.id === r.dataset.m); if (m && (m.folder === "drafts")) compose(m); } });
+$("#pbody").addEventListener("click", e => {
+  if (e.target.closest("[data-li]")) window.open(LINKEDIN, "_blank", "noopener");
+  if (e.target.closest("[data-att]")) dialog("Opening attachment", "<p>dancing_baby.avi</p><p>Estimated time left: 2 hours 14 minutes (1.4 MB at 2.8 KB/sec)</p><p style='color:#808080'>On second thought, let's just imagine it. It was a very good baby. It danced.</p>", { icon: "info" });
+});
+document.addEventListener("keydown", e => {
+  if (e.target.matches("input,textarea") || $("#compose") || document.querySelector(".veil")) return;
+  if (e.key === "Delete" && sel) del();
+  if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+    const ids = all().filter(m => folderOf(m) === curFolder).map(m => m.id); if (!ids.length) return;
+    let i = ids.indexOf(sel); i = e.key === "ArrowDown" ? Math.min(ids.length - 1, i + 1) : Math.max(0, i - 1); select(ids[i]); e.preventDefault();
+  }
+});
+
+// ------------------------------------------------------------ actions
+function del() {
+  if (!sel) return;
+  const m = all().find(x => x.id === sel);
+  if (folderOf(m) === "deleted") {
+    if (m.folder === "sent") { st.sent.splice(+m.id.slice(4), 1); st.deleted = st.deleted.filter(d => !d.startsWith("sent")); }
+    else if (m.folder === "drafts") { st.drafts.splice(+m.id.slice(5), 1); st.deleted = st.deleted.filter(d => !d.startsWith("draft")); }
+    else return dialog("Outlook Express", "<p>Dom asked to keep this one.</p>", { icon: "info" });
+  } else st.deleted.push(sel);
+  save(); sel = null; renderTree(); renderList();
+}
+function compose(seed = {}) {
+  if ($("#compose")) return;
+  const isReply = seed.reply;
+  const box = h(`<div id="compose"><div class="dlg">
+    <div class="dt"><span>${isReply ? "Re: " + esc(seed.subj) : "New Message"}</span><button class="btn x" aria-label="Close">×</button></div>
+    <div class="db">
+      <div class="hrow"><b>To:</b><div class="to">${FI.root}${DOM} (via LinkedIn)</div></div>
+      <div class="hrow"><b>Subject:</b><input class="field" id="cSubj" maxlength="120"></div>
+      <textarea class="field" id="cBody" maxlength="2500" placeholder="Write your note here..."></textarea>
+      <div class="note">When you click Send, your note is copied to the clipboard and my LinkedIn profile opens. Click <b>Message</b> there and paste. Nothing is sent from this page.</div>
+      <div class="btns" style="margin-top:4px"><button class="btn def" data-send>Send</button><button class="btn" data-draft>Save Draft</button><button class="btn" data-x>Cancel</button></div>
+    </div></div></div>`);
+  $("#app").appendChild(box);
+  $("#cSubj").value = isReply ? "Re: " + seed.subj : seed.subj || "";
+  $("#cBody").value = seed.reply ? "\n\n----- Original Message -----\n> " + seed.body.split("\n").slice(0, 6).join("\n> ") : seed.body || "";
+  setTimeout(() => (isReply ? $("#cBody") : $("#cSubj")).focus(), 0);
+  if (isReply) $("#cBody").setSelectionRange(0, 0);
+  const shut = () => box.remove();
+  box.querySelector(".x").onclick = shut; box.querySelector("[data-x]").onclick = shut;
+  const draftIdx = seed.id && seed.id.startsWith("draft") ? +seed.id.slice(5) : -1;
+  box.querySelector("[data-draft]").onclick = () => {
+    const d = { subj: $("#cSubj").value, body: $("#cBody").value, date: stamp() };
+    if (draftIdx >= 0) st.drafts[draftIdx] = d; else st.drafts.push(d);
+    save(); shut(); renderTree(); renderList();
+  };
+  box.querySelector("[data-send]").onclick = async () => {
+    const subj = $("#cSubj").value.trim(), body = $("#cBody").value.trim();
+    if (!body && !subj) return dialog("Outlook Express", "<p>Your message is empty. Write something first?</p>", { icon: "warn" });
+    const text = (subj ? subj + "\n\n" : "") + body;
+    let copied = false;
+    try { await navigator.clipboard.writeText(text); copied = true; } catch (e) {}
+    if (draftIdx >= 0) st.drafts.splice(draftIdx, 1);
+    st.sent.push({ subj, body, date: stamp() }); save(); shut(); curFolder = "sent"; renderTree(); renderList();
+    const r = await dialog("Send via LinkedIn", copied
+      ? `<p>Your note is copied to the clipboard.</p><p>Next: on my LinkedIn profile, click <b>Message</b>, then paste (Ctrl+V).</p>`
+      : `<p>Copy your note (it's selected below), then on my LinkedIn profile click <b>Message</b> and paste.</p><textarea class="field" id="copyMe" style="width:100%;height:90px" readonly></textarea>`,
+      { buttons: ["Open LinkedIn", "Cancel"], icon: "info", width: 360 });
+    if (r === 0) window.open(LINKEDIN, "_blank", "noopener");
+  };
+}
+// show the text to copy if clipboard access was denied
+document.addEventListener("focusin", e => { if (e.target.id === "copyMe" && !e.target.value) { const last = st.sent[st.sent.length - 1]; e.target.value = (last.subj ? last.subj + "\n\n" : "") + last.body; e.target.select(); } });
+const stamp = () => new Date().toLocaleString([], { weekday: "short", month: "numeric", day: "numeric", year: "2-digit", hour: "numeric", minute: "2-digit" }).replace(",", "");
+
+function reply() {
+  const m = sel && all().find(x => x.id === sel);
+  if (!m || m.folder === "sent" || m.folder === "drafts") return dialog("Outlook Express", "<p>Select a message from Dom first.</p>", { icon: "info" });
+  compose({ reply: true, subj: m.subj.replace(/^(re|fw):\s*/i, ""), body: m.body });
+}
+async function sendRecv() {
+  const p = dialog("Outlook Express", `<p>Checking for new messages on 'dom95'...</p><div class="progress sunken" id="pr" style="width:260px"></div>`, { buttons: ["Hide"] });
+  for (let i = 0; i < 12; i++) { await new Promise(r => setTimeout(r, 140)); const pr = document.getElementById("pr"); if (!pr) return; pr.appendChild(document.createElement("i")); }
+  p.close(0);
+  $("#conn").textContent = sessionStorage.getItem("w95.online") === "1" ? "Online" : "Working Offline";
+  dialog("Outlook Express", "<p>There are no new messages.</p><p style='color:#808080'>(Everything new goes to Dom on LinkedIn these days.)</p>", { icon: "info" });
+}
+
+// ------------------------------------------------------------ toolbar + menus
+const T = b => `<svg viewBox="0 0 24 24" shape-rendering="crispEdges">${b}</svg>`;
+const TOOLS = [
+  ["compose", "Compose", T(`<rect x="2" y="6" width="16" height="12" fill="#fff" stroke="#000"/><path d="M2 6l8 6 8-6" fill="none" stroke="#000"/><path d="M14 20 L22 6 L24 8 L16 22 Z" fill="#ffd84a" stroke="#000"/>`), () => compose()],
+  "|",
+  ["reply", "Reply", T(`<rect x="6" y="6" width="16" height="12" fill="#fff" stroke="#000"/><path d="M6 6l8 6 8-6" fill="none" stroke="#000"/><path d="M1 13 L6 9 V11 H10 V15 H6 V17 Z" fill="#c00000"/>`), reply],
+  ["fwd", "Forward", T(`<rect x="2" y="6" width="16" height="12" fill="#fff" stroke="#000"/><path d="M2 6l8 6 8-6" fill="none" stroke="#000"/><path d="M23 13 L18 9 V11 H14 V15 H18 V17 Z" fill="#1e6fd8"/>`), () => dialog("Forward", "<p>Forwarding is disabled.</p><p style='color:#808080'>Aunt Linda has forwarded enough for all of us.</p>", { icon: "info" })],
+  "|",
+  ["sr", "Send/Recv", T(`<rect x="3" y="7" width="18" height="12" fill="#fff" stroke="#000"/><path d="M3 7l9 6 9-6" fill="none" stroke="#000"/><path d="M7 2 L10 5 L7 8 M17 2 L14 5 L17 8" stroke="#0a0" stroke-width="2" fill="none"/>`), sendRecv],
+  ["del", "Delete", T(`<path d="M5 6 H19 L18 22 H6 Z" fill="#c0c0c0" stroke="#000"/><rect x="3" y="3" width="18" height="3" fill="#808080" stroke="#000"/><path d="M9 9v10M12 9v10M15 9v10" stroke="#404040"/>`), del],
+  "|",
+  ["linkedin", "LinkedIn", T(`<rect x="2" y="2" width="20" height="20" rx="3" fill="#0a66c2"/><text x="12" y="17" fill="#fff" font-family="Arial" font-weight="bold" font-size="12" text-anchor="middle">in</text>`), () => window.open(LINKEDIN, "_blank", "noopener")]
+];
+$("#tools").innerHTML = `<div class="grabber"></div>` + TOOLS.map((t, i) => t === "|" ? `<div class="tbsep"></div>` : `<button class="tb" data-i="${i}" title="${t[1]}">${t[2]}<span>${t[1]}</span></button>`).join("");
+$("#tools").addEventListener("click", e => { const b = e.target.closest("[data-i]"); if (b) TOOLS[+b.dataset.i][3](); });
+W95.menubar($("#menu"), {
+  File: [["New Message", () => compose(), "Ctrl+N"], "-", ["Exit", W95.EMBEDDED ? W95.exit : null]],
+  Edit: [["Delete", () => del(), "Del"], ["Mark All as Read", () => { all().forEach(m => !isRead(m) && st.read.push(m.id)); save(); renderTree(); renderList(); }]],
+  View: [["Refresh", () => { renderTree(); renderList(); }]],
+  Tools: [["Send and Receive", sendRecv], ["Address Book...", () => dialog("Address Book", `<div class="sunken" style="background:#fff;padding:6px;min-width:260px"><b>${DOM}</b><br>Reach me on LinkedIn<br><a style="color:#00e;cursor:pointer" id="abLi">${LINKEDIN}</a></div>`, { buttons: ["Close"] }).then(() => {})]],
+  Message: [["New Message", () => compose()], ["Reply to Author", reply]],
+  Help: [["About Outlook Express", () => dialog("About Outlook Express", "<p><b>Outlook Express</b> for dom 95</p><p>A tribute recreation. Your sent notes and drafts are stored only in this browser.</p><p style='color:#808080'>Not affiliated with Microsoft.</p>", { icon: "info" })]]
+});
+document.addEventListener("click", e => { if (e.target.id === "abLi") window.open(LINKEDIN, "_blank", "noopener"); });
+
+$("#conn").textContent = sessionStorage.getItem("w95.online") === "1" ? "Online" : "Working Offline";
+renderTree(); renderList();
+preview(null);
+if (W95.qs.get("compose") === "1") compose();
+</script>
+</body>
+</html>

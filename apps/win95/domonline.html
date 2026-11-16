@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>dom Online</title>
+<link rel="stylesheet" href="w95app.css">
+<style>
+#stage { flex: 1; position: relative; min-height: 0; overflow: hidden; background: #0a3d7a; }
+.screen { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; overflow: auto; }
+/* sign-on */
+#signon { background: radial-gradient(circle at 30% 20%, #2f7fd0, #0a3d7a 70%); }
+.panel { background: var(--face); padding: 3px; width: min(520px, 96%); box-shadow: inset -1px -1px #000, inset 1px 1px #dfdfdf, inset -2px -2px #808080, inset 2px 2px #fff, 4px 4px 0 rgba(0,0,0,.35); }
+.panel .ptitle { height: 18px; display: flex; align-items: center; padding: 0 4px; background: linear-gradient(90deg, #000080, #1084d0); color: #fff; font-weight: bold; }
+.brand { display: flex; align-items: center; gap: 12px; padding: 12px 14px 8px; }
+.brand svg { width: 72px; height: 72px; flex: none; }
+.brand .wm { font: italic 900 30px/1 Georgia, "Times New Roman", serif; color: #0a3d7a; letter-spacing: -1px; }
+.brand .wm b { color: #e8402a; }
+.brand .tag { font-size: 11px; color: #404040; margin-top: 4px; }
+.fields { display: grid; grid-template-columns: 110px 1fr; gap: 6px 8px; align-items: center; padding: 6px 18px; }
+.fields .field { height: 22px; }
+.sbtns { display: flex; justify-content: space-between; align-items: flex-end; padding: 10px 14px 12px; }
+.big { display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 70px; padding: 4px; background: none; border: 0; }
+.big svg { width: 40px; height: 40px; }
+.big:hover { box-shadow: inset -1px -1px #808080, inset 1px 1px #fff; }
+.big:active { box-shadow: inset 1px 1px #808080, inset -1px -1px #fff; }
+.big b { font-size: 11px; }
+#go { min-width: 110px; height: 44px; font: bold 13px var(--font); }
+/* connecting */
+.steps { display: flex; justify-content: center; gap: 10px; padding: 14px; }
+.step { width: 120px; height: 100px; display: flex; align-items: center; justify-content: center; background: #000; opacity: .25; transition: opacity .3s; }
+.step.on { opacity: 1; }
+.step svg { width: 96px; height: 80px; }
+#cstat { text-align: center; padding: 0 14px 6px; font-weight: bold; min-height: 18px; }
+.cprog { margin: 0 18px 12px; }
+/* online */
+#online { flex-direction: column; align-items: stretch; justify-content: flex-start; background: #c8d8f0; overflow: hidden; }
+#otb { display: flex; gap: 2px; padding: 2px 4px; background: var(--face); flex-wrap: wrap; flex: none; }
+#otb .tb { min-width: 52px; }
+#otb .tb svg { width: 26px; height: 26px; }
+#kw { display: flex; align-items: center; gap: 4px; padding: 3px 6px; background: var(--face); border-top: 1px solid #fff; box-shadow: inset 0 -1px #808080; flex: none; }
+#kw input { flex: 1; max-width: 300px; height: 21px; }
+#kw .btn { min-width: 0; height: 21px; padding: 0 10px; }
+#desk { flex: 1; min-height: 0; padding: 10px; overflow: auto; display: flex; gap: 10px; align-items: flex-start; }
+@media (max-width: 640px) { #desk { flex-direction: column; } #buddy { width: 100% !important; } }
+.oww { background: var(--face); padding: 3px; box-shadow: inset -1px -1px #000, inset 1px 1px #dfdfdf, inset -2px -2px #808080, inset 2px 2px #fff, 3px 3px 0 rgba(0,0,0,.2); }
+.oww .ptitle { height: 18px; display: flex; align-items: center; padding: 0 4px; background: linear-gradient(90deg, #000080, #1084d0); color: #fff; font-weight: bold; }
+#welcome { flex: 1; min-width: 300px; }
+.wgrid { display: grid; grid-template-columns: 1.15fr 1fr; gap: 8px; padding: 8px; }
+.hello { background: linear-gradient(160deg, #fff7d6, #ffe08a); padding: 10px; border: 1px solid #808080; }
+.hello h2 { margin: 0 0 6px; font: bold 18px Georgia, serif; color: #0a3d7a; }
+.mailbtn { display: flex; align-items: center; gap: 8px; margin-top: 8px; padding: 6px; background: #fff; border: 1px solid #808080; width: 100%; text-align: left; }
+.mailbtn svg { width: 46px; height: 40px; flex: none; }
+.mailbtn:hover { background: #fffbe0; }
+.story { background: #fff; border: 1px solid #808080; padding: 8px; margin-top: 8px; font: 12px/1.35 Georgia, serif; }
+.story h4 { margin: 0 0 4px; font: bold 12px Arial; color: #c00000; text-transform: uppercase; }
+.chans { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+.chan { display: flex; align-items: center; gap: 6px; padding: 5px 6px; border: 0; color: #fff; font: bold 11px var(--font); text-align: left;
+  box-shadow: inset -1px -1px rgba(0,0,0,.5), inset 1px 1px rgba(255,255,255,.5); }
+.chan svg { width: 22px; height: 22px; flex: none; }
+.chan:active { box-shadow: inset 1px 1px rgba(0,0,0,.5); }
+#buddy { width: 170px; flex: none; }
+#buddy .bl { background: #fff; margin: 4px; padding: 4px; min-height: 160px; box-shadow: inset 1px 1px #808080, inset -1px -1px #fff; }
+#buddy .grp { font-weight: bold; margin: 2px 0; }
+#buddy .bud { padding: 1px 0 1px 14px; display: flex; gap: 4px; align-items: center; }
+#buddy .bud.away { color: #808080; font-style: italic; }
+#buddy .bud:hover { background: #000080; color: #fff; }
+/* chat */
+#chat { position: absolute; inset: 70px 20px 20px 20px; display: flex; flex-direction: column; z-index: 5; }
+#chat .cbody { flex: 1; display: flex; gap: 6px; padding: 6px; min-height: 0; }
+#log { flex: 1; overflow-y: auto; background: #fff; padding: 4px 6px; font: 12px/1.4 Arial, sans-serif; user-select: text; box-shadow: inset 1px 1px #808080, inset -1px -1px #fff; }
+#log .host { color: #000080; font-weight: bold; }
+#log .me b { color: #c00000; }
+#people { width: 140px; overflow-y: auto; background: #fff; padding: 4px; box-shadow: inset 1px 1px #808080, inset -1px -1px #fff; }
+#chatForm { display: flex; gap: 6px; padding: 0 6px 6px; }
+#chatForm input { flex: 1; }
+.ptitle .px { margin-left: auto; min-width: 0; width: 16px; height: 14px; padding: 0; font: bold 10px Arial; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="titlebar"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="#ffd84a" stroke="#0a3d7a"/><path d="M3 9 L8 4 L13 9 Z" fill="#0a3d7a"/></svg><span class="tt">dom Online</span></div>
+  <div id="menu"></div>
+  <div id="stage">
+    <!-- Sign On -->
+    <div class="screen" id="signon">
+      <div class="panel">
+        <div class="ptitle">Welcome</div>
+        <div class="brand"><svg viewBox="0 0 72 72" id="logo"></svg>
+          <div><div class="wm"><b>dom</b> Online</div><div class="tag">Version 3.0 for dom 95 · The whole world, at 28.8 kbps</div></div></div>
+        <div class="fields">
+          <label for="sn">Select Screen Name:</label><select class="field" id="sn"><option>Guest</option><option>New User</option><option>dom95fan</option></select>
+          <label for="pw">Enter Password:</label><input class="field" id="pw" type="password" value="dom95" autocomplete="off">
+          <label for="loc">Select Location:</label><select class="field" id="loc"><option>Home</option><option>Grandma's House</option><option>School Library</option></select>
+        </div>
+        <div class="sbtns">
+          <div style="display:flex;gap:6px"><button class="big" id="setup"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="9" fill="#c0c0c0" stroke="#000" stroke-width="2" stroke-dasharray="4 3"/><circle cx="20" cy="20" r="4" fill="#fff" stroke="#000"/></svg><b>SETUP</b></button>
+          <button class="big" id="help"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="15" fill="#ffd84a" stroke="#000"/><text x="20" y="27" text-anchor="middle" font="bold 20px Georgia" font-family="Georgia" font-weight="bold" font-size="20">?</text></svg><b>HELP</b></button></div>
+          <button class="btn def" id="go">SIGN ON</button>
+        </div>
+      </div>
+    </div>
+    <!-- Connecting -->
+    <div class="screen" id="connect" hidden>
+      <div class="panel">
+        <div class="ptitle">Sign On</div>
+        <div class="steps"><div class="step" id="s1"></div><div class="step" id="s2"></div><div class="step" id="s3"></div></div>
+        <div id="cstat">Step 1: Dialing...</div>
+        <div class="progress sunken cprog" id="cbar"></div>
+        <div style="display:flex;justify-content:flex-end;padding:0 14px 12px"><button class="btn" id="cancel">Cancel</button></div>
+      </div>
+    </div>
+    <!-- Online -->
+    <div class="screen" id="online" hidden>
+      <div id="otb"></div>
+      <form id="kw"><b>Keyword:</b><input class="field" id="kwIn" placeholder="mail, internet, chat, navigator, games, news..." aria-label="Keyword"><button class="btn">Go</button></form>
+      <div id="desk">
+        <div class="oww" id="welcome">
+          <div class="ptitle">Welcome,&nbsp;<span id="who">Guest</span>!</div>
+          <div class="wgrid">
+            <div>
+              <div class="hello"><h2>Hey there, <span id="who2">Guest</span>.</h2>
+                Thanks for dialing in. Pull up a beanbag; the house is open.
+                <button class="mailbtn" id="mailBtn"><svg viewBox="0 0 46 40"><rect x="22" y="22" width="3" height="18" fill="#6b4a20"/><path d="M6 10 h28 a6 6 0 0 1 6 6 v10 H6z" fill="#2a5ad8" stroke="#000"/><path d="M6 10 a6 6 0 0 0 -6 6 v10 h12 V16 a6 6 0 0 0 -6 -6z" fill="#1a3a98" stroke="#000"/><rect x="34" y="4" width="3" height="14" fill="#000"/><rect x="34" y="4" width="10" height="6" fill="#e8402a" stroke="#000" id="flag"/></svg>
+                  <span><b>You have mail!</b><br><span style="color:#404040">3 new letters from dom</span></span></button>
+              </div>
+              <div class="story"><h4>Top Story</h4><b>Local man rebuilds his childhood computer in a web browser.</b> "I just wanted the house back," he said, standing in a Navigator living room that never existed. <a href="#" id="story">More…</a></div>
+            </div>
+            <div class="chans" id="chans"></div>
+          </div>
+        </div>
+        <div class="oww" id="buddy">
+          <div class="ptitle">Buddy List</div>
+          <div class="bl" id="buddies"></div>
+          <div style="display:flex;gap:4px;justify-content:center;padding:0 4px 4px"><button class="btn" style="min-width:0" id="imBtn">Send IM</button><button class="btn" style="min-width:0" id="chatBtn">Chat</button></div>
+        </div>
+      </div>
+      <div class="oww" id="chat" hidden>
+        <div class="ptitle"><span id="roomName">Chat Room: Lobby 95</span><button class="btn px" id="chatX" aria-label="Close chat">×</button></div>
+        <div class="cbody"><div id="log" aria-live="polite"></div><div id="people"></div></div>
+        <form id="chatForm"><input class="field" id="say" maxlength="200" placeholder="Say something... (be nice, it's 1996)" aria-label="Chat message"><button class="btn def">Send</button></form>
+      </div>
+    </div>
+  </div>
+  <div class="statusbar"><span id="status">Not connected</span><span id="clock">00:00</span></div>
+</div>
+<script src="modem.js"></script>
+<script src="w95app.js"></script>
+<script>
+const { esc, h, dialog } = W95;
+const $ = s => document.querySelector(s);
+const show = id => ["signon", "connect", "online"].forEach(s => ($("#" + s).hidden = s !== id));
+
+// ------------------------------------------------------------ original artwork
+$("#logo").innerHTML = `<circle cx="36" cy="36" r="30" fill="#ffd84a" stroke="#0a3d7a" stroke-width="3"/>
+  <path d="M16 40 L36 20 L56 40 Z" fill="#0a3d7a"/><rect x="22" y="40" width="28" height="16" fill="#e8402a"/><rect x="32" y="45" width="8" height="11" fill="#ffd84a"/>
+  <ellipse cx="36" cy="36" rx="35" ry="11" fill="none" stroke="#2a8ad8" stroke-width="3" stroke-dasharray="10 5" transform="rotate(-18 36 36)"/>`;
+const STEP = [
+  `<svg viewBox="0 0 96 80"><rect width="96" height="80" fill="#1a2a6a"/><rect x="10" y="40" width="40" height="22" fill="#c0c0c0" stroke="#fff"/><rect x="14" y="44" width="32" height="12" fill="#000"/><text x="30" y="53" fill="#0f0" font-size="8" text-anchor="middle" font-family="monospace">555-0195</text><path d="M60 30 q10 -14 22 0" stroke="#ffd84a" stroke-width="3" fill="none"/><path d="M64 36 q6 -8 14 0" stroke="#ffd84a" stroke-width="3" fill="none"/><rect x="62" y="44" width="22" height="14" rx="3" fill="#ddd"/><rect x="58" y="40" width="30" height="5" rx="2" fill="#333"/></svg>`,
+  `<svg viewBox="0 0 96 80"><rect width="96" height="80" fill="#1a2a6a"/><circle cx="20" cy="40" r="10" fill="#ffd84a"/><circle cx="76" cy="40" r="10" fill="#2a8ad8"/><path d="M30 40 H66" stroke="#fff" stroke-width="2" stroke-dasharray="4 3"><animate attributeName="stroke-dashoffset" from="14" to="0" dur=".6s" repeatCount="indefinite"/></path><text x="48" y="66" fill="#fff" font-size="9" text-anchor="middle" font-family="Arial">28,800 bps</text></svg>`,
+  `<svg viewBox="0 0 96 80"><rect width="96" height="80" fill="#1a2a6a"/><path d="M28 50 L48 30 L68 50 Z" fill="#e8402a"/><rect x="33" y="50" width="30" height="18" fill="#ffd84a"/><rect x="44" y="56" width="8" height="12" fill="#6b4a20"/><g fill="#fff"><circle cx="18" cy="16" r="1.5"/><circle cx="80" cy="12" r="1.5"/><circle cx="70" cy="26" r="1"/><circle cx="26" cy="30" r="1"/></g><text x="48" y="22" fill="#ffd84a" font-size="9" text-anchor="middle" font-family="Arial" font-weight="bold">WELCOME</text></svg>`
+];
+["s1", "s2", "s3"].forEach((s, i) => ($("#" + s).innerHTML = STEP[i]));
+const BTN = b => `<svg viewBox="0 0 26 26" shape-rendering="crispEdges">${b}</svg>`;
+const TB = [
+  ["Read", BTN(`<rect x="2" y="6" width="22" height="15" fill="#fff" stroke="#000"/><path d="M2 6l11 8 11-8" fill="none" stroke="#000"/><rect x="18" y="2" width="6" height="6" fill="#e8402a"/>`), () => W95.openApp("inbox")],
+  ["Write", BTN(`<rect x="3" y="3" width="16" height="20" fill="#fff" stroke="#000"/><path d="M6 8h10M6 12h10M6 16h6" stroke="#808080"/><path d="M14 22 L24 6 L26 8 L16 24 Z" fill="#ffd84a" stroke="#000"/>`), () => W95.openApp("inbox")],
+  ["Internet", BTN(`<circle cx="13" cy="13" r="10" fill="#1e6fd8" stroke="#000"/><path d="M3 10h20M3 16h20M13 3c-4 5-4 15 0 20M13 3c4 5 4 15 0 20" stroke="#9fd2ff" fill="none"/>`), () => W95.openApp("iexplore")],
+  ["Channels", BTN(`<rect x="2" y="4" width="22" height="16" fill="#404040" stroke="#000"/><rect x="4" y="6" width="18" height="12" fill="#2a8ad8"/><path d="M8 24 L13 20 L18 24" stroke="#000" fill="none"/>`), () => flash("chans")],
+  ["People", BTN(`<circle cx="9" cy="8" r="4" fill="#ffd0a0" stroke="#000"/><rect x="3" y="13" width="12" height="10" fill="#e8402a" stroke="#000"/><circle cx="18" cy="9" r="4" fill="#c08060" stroke="#000"/><rect x="12" y="14" width="12" height="9" fill="#2a5ad8" stroke="#000"/>`), () => openChat()],
+  ["Navigator", BTN(`<path d="M2 12 L13 3 L24 12 Z" fill="#e8402a" stroke="#000"/><rect x="5" y="12" width="16" height="11" fill="#2a6ad8" stroke="#000"/><rect x="11" y="16" width="4" height="7" fill="#ffd84a"/>`), () => W95.openApp("navigator39")],
+  ["Weather", BTN(`<circle cx="10" cy="10" r="6" fill="#ffd84a" stroke="#806000"/><path d="M8 20 a5 5 0 0 1 4-8 a6 6 0 0 1 11 3 a4 4 0 0 1 -1 8 H9 a4 4 0 0 1 -1-3z" fill="#fff" stroke="#000"/>`), () => dialog("Weather", "<p><b>Your town, today:</b> 72° and sunny inside your monitor.</p><p>Tomorrow: chance of a dial tone.</p>", { icon: "info" })],
+  ["Sign Off", BTN(`<rect x="4" y="3" width="12" height="20" fill="#c0c0c0" stroke="#000"/><path d="M14 13 H25 M20 8 L25 13 L20 18" stroke="#c00000" stroke-width="2.5" fill="none"/>`), () => signOff()]
+];
+$("#otb").innerHTML = TB.map((t, i) => `<button class="tb" data-i="${i}">${t[1]}<span>${t[0]}</span></button>`).join("");
+$("#otb").addEventListener("click", e => { const b = e.target.closest("[data-i]"); if (b) TB[+b.dataset.i][2](); });
+
+const CH = [
+  ["Today's News", "#c00000", "news"], ["Internet", "#1e6fd8", "internet"], ["Games", "#2a8a2a", "games"], ["Kids Only", "#e08000", "kids"],
+  ["People Connection", "#8030a0", "chat"], ["Navigator", "#0a3d7a", "navigator"], ["Computing", "#404080", "computing"], ["Personal Finance", "#206060", "finance"],
+  ["Entertainment", "#a02060", "entertainment"], ["My Apps", "#606020", "apps"]
+];
+const CHI = `<svg viewBox="0 0 22 22"><circle cx="11" cy="11" r="9" fill="rgba(255,255,255,.25)" stroke="#fff"/><path d="M8 6 L16 11 L8 16 Z" fill="#fff"/></svg>`;
+$("#chans").innerHTML = CH.map(c => `<button class="chan" style="background:${c[1]}" data-kw="${c[2]}">${CHI}${esc(c[0])}</button>`).join("");
+$("#chans").addEventListener("click", e => { const b = e.target.closest("[data-kw]"); if (b) keyword(b.dataset.kw); });
+function flash(id) { const e = $("#" + id); e.animate([{ outline: "3px solid #ffd84a" }, { outline: "3px solid transparent" }], { duration: 700, iterations: 2 }); }
+
+// ------------------------------------------------------------ voice (synthesised, never recorded)
+function say(text) {
+  if (W95.muted() || !("speechSynthesis" in window)) return;
+  try { const u = new SpeechSynthesisUtterance(text); u.rate = 0.95; u.pitch = 0.9; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch (e) {}
+}
+
+// ------------------------------------------------------------ sign on
+let signedOnAt = 0, idleT = 0, clockT = 0;
+$("#go").addEventListener("click", signOn);
+$("#pw").addEventListener("keydown", e => { if (e.key === "Enter") signOn(); });
+$("#setup").addEventListener("click", () => dialog("dom Online Setup", `<p>Modem: <b>Generic 28.8 Data/Fax Modem</b> on COM2</p><p>Access number: <b>555-0195</b> (local, probably)</p><label><input type="checkbox" checked> Dial 9 to reach an outside line</label><label><input type="checkbox"> Disable call waiting (*70)</label><label><input type="checkbox" id="spk" ${W95.muted() ? "" : "checked"}> Modem speaker on</label>`, { buttons: ["OK", "Cancel"] }).then(r => {}));
+$("#help").addEventListener("click", () => dialog("dom Online Help", "<p>Click <b>SIGN ON</b> to dial in. Your modem will make some noise. That's normal. That's the best part.</p><p>Once you're on: read your mail, browse the Web, chat in the Lobby, or type a Keyword.</p><p style='color:#808080'>dom Online is a parody for this site. It isn't, and never was, a real online service.</p>", { icon: "info" }));
+
+async function signOn() {
+  const name = $("#sn").value;
+  if (name === "New User") {
+    const r = await dialog("New Member", `<p>Pick a screen name. Make it embarrassing; that's tradition.</p><label>Screen name: <input class="field" id="newSn" maxlength="16" value="xXdom95Xx" style="flex:1"></label>`, { buttons: ["Continue", "Cancel"] });
+    if (r !== 0) return;
+    const v = (document.getElementById("newSn") || {}).value;
+    const nn = (v || "Guest").replace(/[^\w ]/g, "").slice(0, 16) || "Guest";
+    const o = document.createElement("option"); o.textContent = nn; $("#sn").insertBefore(o, $("#sn").firstChild); $("#sn").value = nn;
+  }
+  show("connect");
+  const bar = $("#cbar"); bar.innerHTML = "";
+  ["s1", "s2", "s3"].forEach(s => $("#" + s).classList.remove("on")); $("#s1").classList.add("on");
+  $("#status").textContent = "Dialing 555-0195...";
+  const steps = ["Step 1: Dialing 555-0195...", "Step 2: Waiting for answer...", "Step 3: Connecting at 28,800 bps...", "Step 4: Checking password...", "Step 5: Loading dom Online..."];
+  const ok = await Modem.play("95550195", (txt, i) => {
+    $("#cstat").textContent = steps[i]; $("#status").textContent = steps[i].replace(/^Step \d: /, "");
+    if (i >= 2) $("#s2").classList.add("on"); if (i >= 4) $("#s3").classList.add("on");
+    for (let k = 0; k < 4; k++) bar.appendChild(document.createElement("i"));
+  });
+  if (!ok) { show("signon"); $("#status").textContent = "Not connected"; return; }
+  enter($("#sn").value);
+}
+$("#cancel").addEventListener("click", () => Modem.stop());
+
+function enter(name) {
+  $("#who").textContent = $("#who2").textContent = name;
+  show("online"); signedOnAt = Date.now();
+  sessionStorage.setItem("w95.online", "1");
+  if (W95.EMBEDDED) try { parent.postMessage({ type: "net-online" }, location.origin); } catch (e) {}
+  $("#status").textContent = "Connected at 28,800 bps";
+  W95.title("dom Online - Welcome, " + name + "!");
+  setTimeout(() => say("Welcome! You have mail."), 300);
+  $("#flag").animate([{ transform: "translateY(0)" }, { transform: "translateY(-2px)" }], { duration: 300, iterations: 6, direction: "alternate" });
+  renderBuddies();
+  clearInterval(clockT); clockT = setInterval(tickClock, 1000); tickClock(); poke();
+}
+function tickClock() { const s = Math.floor((Date.now() - signedOnAt) / 1000); $("#clock").textContent = String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0"); }
+function signOff(silent) {
+  Modem.stop(); clearInterval(clockT); clearTimeout(idleT);
+  stopChat();
+  if (!silent) say("Goodbye!");
+  sessionStorage.removeItem("w95.online");
+  if (W95.EMBEDDED) try { parent.postMessage({ type: "net-offline" }, location.origin); } catch (e) {}
+  show("signon"); $("#status").textContent = "Not connected"; $("#clock").textContent = "00:00";
+  W95.title("dom Online");
+}
+// classic idle warning
+function poke() {
+  clearTimeout(idleT);
+  if ($("#online").hidden) return;
+  idleT = setTimeout(async () => {
+    const r = await dialog("dom Online", "<p>You've been idle for a while. Do you want to stay online?</p><p style='color:#808080'>(Somebody might need to use the phone.)</p>", { buttons: ["Stay Online", "Sign Off"], icon: "warn" });
+    if (r === 1) signOff(); else poke();
+  }, 4 * 60 * 1000);
+}
+["pointerdown", "keydown"].forEach(ev => document.addEventListener(ev, poke));
+
+// ------------------------------------------------------------ mail + keywords
+$("#mailBtn").addEventListener("click", () => W95.openApp("inbox"));
+$("#story").addEventListener("click", e => { e.preventDefault(); W95.openApp("about"); });
+const KW = {
+  mail: () => W95.openApp("inbox"), email: () => W95.openApp("inbox"),
+  internet: () => W95.openApp("iexplore"), web: () => W95.openApp("iexplore"), www: () => W95.openApp("iexplore"),
+  chat: () => openChat(), people: () => openChat(), lobby: () => openChat(),
+  navigator: () => W95.openApp("navigator39"), house: () => W95.openApp("navigator"),
+  games: () => W95.openApp("games"), solitaire: () => W95.openApp("solitaire"), doom: () => W95.openApp("doom"),
+  kids: () => dialog("Kids Only", "<p>KidSpace is upstairs in the Navigator house. Take your shoes off.</p>", { buttons: ["Go there", "Not now"] }).then(r => r === 0 && W95.openApp("navigator")),
+  news: () => W95.openApp("about"), about: () => W95.openApp("about"), linkedin: () => W95.openApp("linkedin"),
+  apps: () => W95.openApp("apps"), computing: () => W95.openApp("toolbox"), toolbox: () => W95.openApp("toolbox"),
+  finance: () => dialog("Personal Finance", "<p>Today's quote:</p><p style='font:bold 14px Courier New'>DOM95 ▲ 0.95 (+95%)</p><p style='color:#808080'>Not financial advice. Not even a real stock.</p>", { icon: "info" }),
+  entertainment: () => W95.openApp("pinball"), weather: () => TB[6][2]()
+};
+function keyword(k) {
+  k = String(k || "").trim().toLowerCase();
+  if (!k) return;
+  if (KW[k]) return KW[k]();
+  dialog("Keyword", `<p>The keyword "<b>${esc(k)}</b>" is not a valid keyword.</p><p>Try: mail, internet, chat, navigator, games, kids, news, finance.</p>`, { icon: "info" });
+}
+$("#kw").addEventListener("submit", e => { e.preventDefault(); keyword($("#kwIn").value); $("#kwIn").value = ""; });
+
+// ------------------------------------------------------------ buddy list
+const BUDS = [["Buddies", [["dom95", "away", "brb, building a website"], ["ModemKid95", "on"], ["NavigatorFan", "on"]]], ["Family", [["Mom", "away", "Get off the phone!!"]]], ["Co-Workers", [["Clippy_Not", "off"]]]];
+function renderBuddies() {
+  $("#buddies").innerHTML = BUDS.map(([g, list]) => `<div class="grp">${esc(g)} (${list.filter(b => b[1] !== "off").length}/${list.length})</div>` + list.filter(b => b[1] !== "off").map(b => `<div class="bud ${b[1]}" data-b="${esc(b[0])}" title="${esc(b[2] || "")}">${esc(b[0])}</div>`).join("")).join("");
+}
+let selBud = null;
+$("#buddies").addEventListener("click", e => { const b = e.target.closest("[data-b]"); if (!b) return; document.querySelectorAll(".bud").forEach(x => (x.style.outline = "")); b.style.outline = "1px dotted #000"; selBud = b.dataset.b; });
+$("#buddies").addEventListener("dblclick", () => im());
+$("#imBtn").addEventListener("click", () => im());
+$("#chatBtn").addEventListener("click", () => openChat());
+function im() {
+  const who = selBud || "dom95";
+  const b = BUDS.flatMap(g => g[1]).find(x => x[0] === who);
+  if (b && b[1] === "away") return dialog("Away Message from " + who, `<p><i>${esc(b[2])}</i></p>${who === "dom95" ? "<p>Leave him a note through Mail instead; he reads it on LinkedIn.</p>" : ""}`, { buttons: who === "dom95" ? ["Write Mail", "OK"] : ["OK"] }).then(r => { if (who === "dom95" && r === 0) W95.openApp("inbox"); });
+  dialog("Instant Message: " + who, `<p><b>${esc(who)}:</b> ${esc(BOTLINES[Math.floor(Math.random() * BOTLINES.length)][1])}</p>`, { icon: "info" });
+}
+
+// ------------------------------------------------------------ chat room
+const BOTS = ["ModemKid95", "Tamagotchi_Mom", "xXSk8rXx", "NavigatorFan", "CDROMguy", "WebmasterSteve", "PixelPrincess"];
+const BOTLINES = [
+  ["ModemKid95", "anyone here play Myst? i'm stuck on the library"], ["Tamagotchi_Mom", "brb my tamagotchi is hungry AGAIN"],
+  ["xXSk8rXx", "a/s/l"], ["CDROMguy", "i have 47 free trial CDs. making a mobile out of them"], ["NavigatorFan", "the Software Room in Navigator 3.9 is so good"],
+  ["WebmasterSteve", "my homepage has 3 animated gifs now. it's done. it's perfect"], ["PixelPrincess", "did everyone see the dancing baby email"],
+  ["ModemKid95", "my mom needs the phone in 5 min"], ["xXSk8rXx", "lol"], ["NavigatorFan", "KidSpace is upstairs if anyone's looking"],
+  ["CDROMguy", "Encarta says penguins can't fly. betrayed"], ["Tamagotchi_Mom", "anybody know a good GeoCities neighborhood? I'm thinking Area51"],
+  ["PixelPrincess", "who else got 'press any key' and looked for the ANY key"], ["WebmasterSteve", "sign my guestbook!!!"],
+  ["ModemKid95", "28.8 gang"], ["xXSk8rXx", "brb dinner"], ["NavigatorFan", "there's something weird about the house when you type curiosity..."]
+];
+const REPLIES = [
+  [/\b(hi|hey|hello|sup|yo)\b/i, ["hiya!", "heyyy", "welcome to the lobby!"]], [/a\/s\/l|asl/i, ["no thanks lol", "nice try"]],
+  [/dom/i, ["dom built this whole computer lol", "dom's away, he's probably fixing the wallpaper again"]],
+  [/navigator|house/i, ["the Navigator house is double-click on the desktop", "go to the Info Center, the red i explains everything"]],
+  [/doom/i, ["DOOM is in the Games folder. iddqd"]], [/mail|email/i, ["you have mail! (it's from dom)"]],
+  [/\?$/, ["good question", "idk try Ask Jeeves", "hmm"]], [/lol|haha/i, ["lol", "rofl"]]
+];
+let chatT = 0, chatOn = false;
+function addLine(who, text, cls = "") {
+  const log = $("#log"); const d = document.createElement("div"); d.className = cls;
+  d.innerHTML = cls === "host" ? esc(text) : `<b>${esc(who)}:</b> ${esc(text)}`;
+  log.appendChild(d); while (log.children.length > 200) log.firstChild.remove(); log.scrollTop = log.scrollHeight;
+}
+function openChat() {
+  $("#chat").hidden = false; $("#say").focus();
+  if (chatOn) return; chatOn = true;
+  $("#log").innerHTML = ""; addLine("", `*** You are in "Lobby 95". ***`, "host");
+  $("#people").innerHTML = `<b>People Here: ${BOTS.length + 1}</b>` + [$("#who").textContent, ...BOTS].map(b => `<div>${esc(b)}</div>`).join("");
+  const loop = () => { const l = BOTLINES[Math.floor(Math.random() * BOTLINES.length)]; addLine(l[0], l[1]); chatT = setTimeout(loop, 3500 + Math.random() * 5000); };
+  chatT = setTimeout(loop, 1200);
+}
+function stopChat() { chatOn = false; clearTimeout(chatT); $("#chat").hidden = true; }
+$("#chatX").addEventListener("click", stopChat);
+$("#chatForm").addEventListener("submit", e => {
+  e.preventDefault(); const v = $("#say").value.trim(); if (!v) return; $("#say").value = "";
+  addLine($("#who").textContent, v, "me");
+  const r = REPLIES.find(([re]) => re.test(v));
+  if (r) setTimeout(() => addLine(BOTS[Math.floor(Math.random() * BOTS.length)], r[1][Math.floor(Math.random() * r[1].length)]), 900 + Math.random() * 1500);
+});
+
+// ------------------------------------------------------------ menus
+W95.menubar($("#menu"), {
+  File: [["Sign Off", () => !$("#online").hidden ? signOff() : null], "-", ["Exit", W95.EMBEDDED ? () => { if (!$("#online").hidden) signOff(true); W95.exit(); } : null]],
+  Mail: [["Read Mail", () => W95.openApp("inbox")], ["Write Mail", () => W95.openApp("inbox")]],
+  Members: [["Chat in the Lobby", () => !$("#online").hidden ? openChat() : dialog("dom Online", "<p>Sign on first.</p>", { icon: "info" })], ["Buddy List", () => flash("buddy")]],
+  Help: [["About dom Online", () => dialog("About dom Online", "<p><b>dom Online 3.0</b></p><p>A loving parody of 1990s dial-up online services, made for dom 95. The modem and the voice are synthesised in your browser.</p><p style='color:#808080'>Not affiliated with any real online service, past or present.</p>", { icon: "info" })]]
+});
+
+// already online elsewhere on the desktop? still make them sign on (that's the fun part)
+show("signon");
+window.addEventListener("pagehide", () => { Modem.stop(); });
+window.addEventListener("message", e => { if (e.origin === location.origin && e.data && e.data.type === "net-hangup" && !$("#online").hidden) { signOff(true); dialog("dom Online", "<p>You have been disconnected.</p>", { icon: "warn" }); } });
+</script>
+</body>
+</html>

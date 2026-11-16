@@ -6,6 +6,7 @@ import { ICONS } from "./icons.js";
 import { paint, WALLPAPERS, PATTERNS, ERAS, isDark } from "./wallpapers.js";
 import { PROFILE, APPS, TRINKETS, CERTIFICATIONS, VOLUNTEERING, ARCHIVE } from "../data.js";
 import { sfx, isMuted, setMuted } from "../audio.js";
+import { SCHEMES, curScheme, applyScheme, SAVERS, curSaver, curWait, runSaver } from "./screensaver.js";
 
 const $ = (s, r = document) => r.querySelector(s);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -76,19 +77,28 @@ here so I remember I made it.
 `;
 
 const P = {
-  mycomputer: { title: "My Computer", icon: "computer", folder: ["navigator", "navigator39", "apps", "games", "toolbox", "floppy", "controlpanel", "recycle"], w: 440, h: 300 },
+  mycomputer: { title: "My Computer", icon: "computer", folder: ["navigator", "navigator39", "apps", "games", "accessories", "toolbox", "floppy", "controlpanel", "recycle"], w: 460, h: 300 },
   navigator: { title: "Navigator 3.5", icon: "navigator", url: "navigator.html?v=3.5", w: 646, h: 482, label: "Navigator 3.5", desc: "Packard Bell Navigator 3.5-style house (1995)" },
   navigator39: { title: "Navigator 3.9", icon: "navigator39", url: "navigator.html?v=3.9", w: 806, h: 602, label: "Navigator 3.9", desc: "Packard Bell Navigator 3.9-style house (1997)" },
   linkedin: { title: "Dominic Cerchio — LinkedIn", icon: "linkedin", view: "linkedin", w: 480, h: 560, label: "LinkedIn" },
   about: { title: "ABOUT.TXT - Notepad", icon: "textfile", view: "notepad", text: ABOUT, w: 580, h: 440, label: "ABOUT.TXT" },
-  notepad: { title: "Untitled - Notepad", icon: "notepad", view: "notepad", text: "", w: 480, h: 340 },
+  notepad: { title: "Untitled - Notepad", icon: "notepad", view: "notepad", text: "", w: 480, h: 340, label: "Notepad" },
   solitaire: { title: "Solitaire", icon: "solitaire", url: "apps/win95/solitaire.html?embed=1", w: 720, h: 540 },
   minesweeper: { title: "Minesweeper", icon: "minesweeper", url: "apps/win95/minesweeper.html?embed=1", w: 260, h: 360 },
   pinball: { title: "Space Pinball", icon: "pinball", url: "apps/win95/pinball.html?embed=1", w: 820, h: 640, label: "3D Pinball" },
   paint: { title: "untitled - Paint", icon: "paint", url: "apps/win95/paint.html?embed=1", w: 820, h: 600, label: "Paint" },
   doom: { title: "DOOM", icon: "doom", url: "apps/doom/index.html", w: 660, h: 470 },
+  iexplore: { title: "dom 95 Start Page - Internet Explorer", icon: "iexplore", url: "apps/win95/iexplore.html?embed=1", w: 820, h: 600, label: "Internet Explorer", desc: "Browse the 1990s web through the Internet Archive's Wayback Machine" },
+  domonline: { title: "dom Online", icon: "domonline", url: "apps/win95/domonline.html?embed=1", w: 780, h: 560, label: "dom Online", desc: "Dial in to dom Online (a parody of 90s online services). Speakers up." },
+  inbox: { title: "Inbox - Outlook Express", icon: "inbox", url: "apps/win95/inbox.html?embed=1", w: 760, h: 540, label: "Inbox", desc: "Letters from Dom. Write back through LinkedIn." },
+  freecell: { title: "FreeCell", icon: "freecell", url: "apps/win95/freecell.html?embed=1", w: 640, h: 480 },
+  hearts: { title: "Hearts", icon: "hearts", url: "apps/win95/hearts.html?embed=1", w: 640, h: 520 },
+  ski: { title: "SkiDom", icon: "ski", url: "apps/win95/ski.html?embed=1", w: 640, h: 480, desc: "Ski downhill. Don't stop. Something is out there." },
+  calc: { title: "Calculator", icon: "calc", url: "apps/win95/calc.html?embed=1", w: 262, h: 236 },
+  wordpad: { title: "Document - WordPad", icon: "wordpad", url: "apps/win95/wordpad.html?embed=1", w: 646, h: 462, label: "WordPad" },
   apps: { title: "My Apps", icon: "apps", folder: [], w: 480, h: 300 },
-  games: { title: "Games", icon: "folder", folder: ["solitaire", "minesweeper", "pinball", "doom", "app-kojima", "app-lostatsea", "app-everybodyisjohn"], w: 480, h: 280 },
+  games: { title: "Games", icon: "folder", folder: ["solitaire", "freecell", "hearts", "minesweeper", "pinball", "ski", "doom", "app-kojima", "app-lostatsea", "app-everybodyisjohn"], w: 500, h: 300 },
+  accessories: { title: "Accessories", icon: "folder", folder: ["calc", "notepad", "paint", "wordpad", "iexplore", "inbox", "domonline"], w: 460, h: 260 },
   toolbox: { title: "Toolbox", icon: "toolbox", folder: [], w: 560, h: 380 },
   recycle: { title: "Recycle Bin", icon: "recycle", folder: ["archivedfolder", "oldsite"], w: 400, h: 250 },
   archivedfolder: { title: "Archived", icon: "folder", folder: [], w: 420, h: 250, desc: "Apps I've retired. Each one left a note." },
@@ -116,7 +126,7 @@ TRINKETS.forEach(t => {
 });
 P.apps.folder.push("toolbox", "navigator", "navigator39");
 
-const DESKTOP = ["mycomputer", "navigator", "navigator39", "linkedin", "about", "solitaire", "minesweeper", "pinball", "paint", "doom", "app-juicer", "apps", "toolbox", "recycle"];
+const DESKTOP = ["mycomputer", "navigator", "navigator39", "linkedin", "about", "iexplore", "inbox", "domonline", "solitaire", "minesweeper", "pinball", "paint", "doom", "app-juicer", "apps", "toolbox", "recycle"];
 
 // ---------------------------------------------------------------- wallpaper
 const wp = $("#wallpaper");
@@ -289,7 +299,7 @@ function open(id, opts = {}) {
   if (p.url) {
     const f = document.createElement("iframe");
     f.src = p.url; f.title = p.title; f.allow = "autoplay; fullscreen; clipboard-write"; f.loading = "eager";
-    win.body.appendChild(f); win.frame = f;
+    win.body.appendChild(f); win.frame = f; f.addEventListener("load", () => watchFrame(f));
   } else if (p.folder) folderView(win);
   else VIEWS[p.view](win, opts);
   // taskbar button
@@ -374,7 +384,7 @@ window.addEventListener("message", e => {
     w.el.style.width = cw + "px"; w.el.style.height = ch + "px";
     w.el.style.left = Math.min(parseFloat(w.el.style.left), window.innerWidth - cw - 4) + "px";
   }
-  if (e.data.type === "win-title" && typeof e.data.title === "string") { $(".ttext", w.el).textContent = e.data.title.slice(0, 80); }
+  if (e.data.type === "win-title" && typeof e.data.title === "string") { const t = e.data.title.slice(0, 80); $(".ttext", w.el).textContent = t; if (w.task) { $("span", w.task).textContent = t; w.task.title = t; } }
   if (e.data.type === "win-open" && has(e.data.id)) open(e.data.id);
 });
 
@@ -447,10 +457,10 @@ const VIEWS = {
       <button class="btn" data-open="navigator">Tour my house →</button></div></div>`;
     win.body.querySelectorAll("[data-open]").forEach(b => b.addEventListener("click", () => open(b.dataset.open)));
   },
-  display(win) {
-    let selWp = curWallpaper(), selPat = curPattern();
+  display(win, opts = {}) {
+    let selWp = curWallpaper(), selPat = curPattern(), selSaver = curSaver(), selScheme = curScheme(), stopPrev = null;
     win.body.innerHTML = `<div class="dlg props">
-      <div class="tabs"><button class="tab on" data-tab="bg">Background</button><button class="tab" data-tab="snd">Sound</button></div>
+      <div class="tabs"><button class="tab on" data-tab="bg">Background</button><button class="tab" data-tab="ss">Screen Saver</button><button class="tab" data-tab="ap">Appearance</button><button class="tab" data-tab="snd">Sound</button></div>
       <div class="tabpane" data-pane="bg">
         <div class="monitor"><div class="bezel"><canvas id="wpPrev"></canvas></div><div class="stand"></div></div>
         <div class="lists">
@@ -462,6 +472,18 @@ const VIEWS = {
         </div>
         <p class="hint" id="wpHint"></p>
       </div>
+      <div class="tabpane" data-pane="ss" hidden>
+        <div class="monitor"><div class="bezel"><canvas id="ssPrev" width="152" height="114"></canvas></div><div class="stand"></div></div>
+        <fieldset><legend>Screen Saver</legend>
+          <div class="saverbox"><select class="field" id="ssList">${SAVERS.map(s => `<option value="${s.id}" ${s.id === selSaver ? "selected" : ""}>${esc(s.name)}</option>`).join("")}</select>
+          <button class="btn" id="ssPreview">Preview</button></div>
+          <div class="wait">Wait: <input class="field" type="number" min="1" max="60" id="ssWait" value="${curWait()}"> minutes</div>
+        </fieldset>
+      </div>
+      <div class="tabpane" data-pane="ap" hidden>
+        <div class="schemeprev" id="schPrev"></div>
+        <label class="col">Scheme:<select class="field" id="schList">${Object.keys(SCHEMES).map(s => `<option ${s === selScheme ? "selected" : ""}>${esc(s)}</option>`).join("")}</select></label>
+      </div>
       <div class="tabpane" data-pane="snd" hidden><fieldset><legend>Sound</legend><label><input type="checkbox" id="snd" ${isMuted() ? "" : "checked"}> Play sounds</label></fieldset></div>
       <div class="btns"><button class="btn default" data-ok>OK</button><button class="btn" data-x>Cancel</button><button class="btn" data-apply>Apply</button></div></div>`;
     const cv = $("#wpPrev", win.body), hint = $("#wpHint", win.body);
@@ -471,25 +493,53 @@ const VIEWS = {
       hint.textContent = selWp === "none" ? (selPat === "(None)" ? "Plain desktop colour." : "Pattern: " + selPat) : w.name + " · in the style of " + w.era;
       $("#patList", win.body).disabled = selWp !== "none";
     };
+    const ssCv = $("#ssPrev", win.body);
+    const ssPreview = () => {
+      if (stopPrev) stopPrev();
+      const g = ssCv.getContext("2d"); g.fillStyle = selSaver === "none" ? getComputedStyle(document.body).backgroundColor : "#000"; g.fillRect(0, 0, ssCv.width, ssCv.height);
+      stopPrev = selSaver === "none" ? null : runSaver(ssCv, selSaver);
+    };
+    const schPrev = () => {
+      const s = SCHEMES[selScheme], box = $("#schPrev", win.body);
+      const bev = `box-shadow:inset -1px -1px #000,inset 1px 1px #fff,inset -2px -2px ${s.shadow},inset 2px 2px ${s.light};background:${s.face}`;
+      box.style.background = s.desk;
+      box.innerHTML = `<div class="sw" style="left:10px;top:10px;width:62%;height:70px;${bev}"><div class="st" style="background:${s.shadow}">Inactive Window</div></div>
+        <div class="sw" style="left:28px;top:36px;width:66%;height:98px;${bev}"><div class="st" style="background:${s.title}">Active Window</div>
+          <div class="sb">Normal <span style="color:#808080">Disabled</span> <span class="ssel" style="background:${s.sel}">Selected</span>
+          <div style="margin-top:8px;display:flex;gap:6px"><span style="padding:2px 10px;${bev}">OK</span></div></div></div>`;
+    };
     $("#wpList", win.body).addEventListener("change", e => { selWp = e.target.value; preview(); });
     $("#patList", win.body).addEventListener("change", e => { selPat = e.target.value; preview(); });
+    $("#ssList", win.body).addEventListener("change", e => { selSaver = e.target.value; ssPreview(); });
+    $("#ssPreview", win.body).addEventListener("click", () => startSaver(selSaver === "none" ? "blank" : selSaver));
+    $("#schList", win.body).addEventListener("change", e => { selScheme = e.target.value; schPrev(); });
     win.body.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => {
       win.body.querySelectorAll(".tab").forEach(x => x.classList.toggle("on", x === t));
       win.body.querySelectorAll(".tabpane").forEach(p => (p.hidden = p.dataset.pane !== t.dataset.tab));
+      if (t.dataset.tab === "ss") ssPreview(); else if (stopPrev) { stopPrev(); stopPrev = null; }
     }));
-    const apply = () => { localStorage.setItem("w95.wallpaper", selWp); localStorage.setItem("w95.pattern", selPat); setMuted(!$("#snd", win.body).checked); syncSound(); applyWallpaper(); };
-    $("[data-ok]", win.body).addEventListener("click", () => { apply(); close(win); });
+    const apply = () => {
+      localStorage.setItem("w95.wallpaper", selWp); localStorage.setItem("w95.pattern", selPat); setMuted(!$("#snd", win.body).checked); syncSound(); applyWallpaper();
+      localStorage.setItem("w95.saver", selSaver); localStorage.setItem("w95.saverWait", String(Math.max(1, Math.min(60, +$("#ssWait", win.body).value || 5)))); armSaver();
+      localStorage.setItem("w95.scheme", selScheme); applyScheme(selScheme);
+    };
+    const done = () => { if (stopPrev) stopPrev(); close(win); };
+    $("[data-ok]", win.body).addEventListener("click", () => { apply(); done(); });
     $("[data-apply]", win.body).addEventListener("click", apply);
-    $("[data-x]", win.body).addEventListener("click", () => close(win));
-    preview();
+    $("[data-x]", win.body).addEventListener("click", done);
+    $(".tbtn.close", win.el).addEventListener("click", () => { if (stopPrev) stopPrev(); });
+    preview(); schPrev();
+    if (opts.tab) { const t = win.body.querySelector(`.tab[data-tab="${opts.tab}"]`); t && t.click(); }
   },
   help(win) {
     win.body.innerHTML = `<div class="profile sunken"><h2>dom 95 Help</h2>
       <p><b>Getting around.</b> Double-click a desktop icon to open it (tap on phones). Drag windows by their title bars; resize from the bottom-right corner. Use the taskbar to switch between windows.</p>
       <p><b>The Start menu</b> has everything: Programs, Documents, Settings, Run… and Shut Down.</p>
       <p><b>Navigator 3.5 and 3.9</b> are 2D homages to Packard Bell Navigator, the house-shaped shell that came on 1990s family PCs. Every room holds some of my projects. Point at things to see what they are; click to use them; the red "i" InfoGuide explains anything. KidSpace is in there too.</p>
-      <p><b>Games.</b> Solitaire, Minesweeper and Space Pinball are original recreations written for this site. DOOM is the freely-distributable shareware episode running on <a href="https://github.com/jacobenget/doom.wasm" target="_blank" rel="noopener">doom.wasm</a>.</p>
-      <p><b>Run commands:</b> help, navigator, kidspace, notepad, paint, doom, pinball, solitaire, winmine, linkedin, juice, dos, about.</p>
+      <p><b>Games.</b> Solitaire, FreeCell, Hearts, Minesweeper, SkiDom and Space Pinball are original recreations written for this site. DOOM is the freely-distributable shareware episode running on <a href="https://github.com/jacobenget/doom.wasm" target="_blank" rel="noopener">doom.wasm</a>.</p>
+      <p><b>Getting online.</b> Internet Explorer visits the 1990s web through the Internet Archive's Wayback Machine: pick a year next to the address bar and type any site. dom Online dials in (speakers up), and the Inbox has letters from me. Writing back goes through LinkedIn.</p>
+      <p><b>Screen savers and colour schemes</b> are in Display Properties (right-click the desktop, then Properties).</p>
+      <p><b>Run commands:</b> help, navigator, kidspace, notepad, wordpad, calc, paint, iexplore, mail, aol, doom, pinball, solitaire, freecell, hearts, ski, winmine, linkedin, juice, dos, about.</p>
       <p style="color:#555">A fan-made homage. Windows is a trademark of Microsoft; Packard Bell Navigator was made by Ark Interface/Packard Bell. Not affiliated. All artwork here is original.</p></div>`;
   },
   run(win) {
@@ -521,6 +571,9 @@ const VIEWS = {
       "You can drag desktop icons wherever you like, or drag across the desktop to select a few at once.",
       "Right-click the desktop and choose Properties to try wallpapers from Windows 3.1 all the way to XP.",
       "Start > Run… understands a few commands. Try typing kidspace.",
+      "Internet Explorer has a time machine. Pick a year next to the address bar, type any website, and see it the way it looked back then.",
+      "dom Online will dial in for you. Turn your speakers up for the modem.",
+      "Display Properties has screen savers and colour schemes now. Hot Dog Stand is in there. I'm sorry.",
       "My old green-screen homepage and a few retired apps are in the Recycle Bin. I couldn't bring myself to empty it.",
       "Minesweeper: right-click to flag. Click a number with both buttons to chord. Good luck on Expert.",
       "Something about the Navigator house is… curious. Keep a journal."
@@ -550,7 +603,7 @@ function download(name, text) {
 }
 
 // ---------------------------------------------------------------- Run command
-const ALIASES = { winmine: "minesweeper", mines: "minesweeper", sol: "solitaire", mspaint: "paint", pbrush: "paint", paintbrush: "paint", cmd: "terminal", command: "terminal", dos: "terminal", explorer: "mycomputer", control: "controlpanel", kidspace: "navigator#kidspace", nav: "navigator", "doom.exe": "doom", pinball: "pinball", about: "about", "about.txt": "about", readme: "about", "readme.txt": "about", nav35: "navigator", "navigator3.5": "navigator", nav39: "navigator39", "navigator3.9": "navigator39", linkedin: "linkedin", calc: "tk-pmpcalc", juice: "app-juicer", juicer: "app-juicer", nama: "app-juicer" };
+const ALIASES = { winmine: "minesweeper", mines: "minesweeper", sol: "solitaire", mspaint: "paint", pbrush: "paint", paintbrush: "paint", cmd: "terminal", command: "terminal", dos: "terminal", explorer: "mycomputer", control: "controlpanel", kidspace: "navigator#kidspace", nav: "navigator", "doom.exe": "doom", pinball: "pinball", about: "about", "about.txt": "about", readme: "about", "readme.txt": "about", nav35: "navigator", "navigator3.5": "navigator", nav39: "navigator39", "navigator3.9": "navigator39", linkedin: "linkedin", calc: "calc", juice: "app-juicer", juicer: "app-juicer", nama: "app-juicer", iexplore: "iexplore", ie: "iexplore", internet: "iexplore", msie: "iexplore", outlook: "inbox", msimn: "inbox", mail: "inbox", inbox: "inbox", email: "inbox", aol: "domonline", online: "domonline", domonline: "domonline", dialup: "domonline", rasphone: "domonline", wordpad: "wordpad", write: "wordpad", freecell: "freecell", hearts: "hearts", mshearts: "hearts", ski: "ski", skifree: "ski", skidom: "ski", calculator: "calc", pmpcalc: "tk-pmpcalc", desk: "controlpanel", "desk.cpl": "controlpanel", ssaver: "controlpanel#ss", screensaver: "controlpanel#ss", accessories: "accessories", games: "games" };
 function runCommand(v) {
   const c = v.toLowerCase().replace(/\.exe$/, "");
   if (!c) return;
@@ -560,6 +613,7 @@ function runCommand(v) {
   if (c === "shutdown") return shutdownDialog();
   const target = Object.prototype.hasOwnProperty.call(ALIASES, c) ? ALIASES[c] : c;
   if (target === "navigator#kidspace") return openNavRoom("navigator", "kidspace");
+  if (target === "controlpanel#ss") return open("controlpanel", { tab: "ss" });
   if (has(target)) return open(target);
   if (/^https?:\/\//.test(v)) return window.open(v, "_blank", "noopener");
   msgbox(v, `Cannot find the file '${esc(v)}' (or one of its components). Make sure the path and filename are correct and that all required libraries are available.`, { icon: "warn" });
@@ -576,12 +630,13 @@ function openNavRoom(id, room) {
 const startBtn = $("#startBtn"), startMenu = $("#startMenu");
 const START = [
   { label: "Programs", icon: "apps", sub: [
-    { label: "Accessories", icon: "folder", sub: ["paint", "notepad", "find"] },
-    { label: "Games", icon: "folder", sub: ["solitaire", "minesweeper", "pinball", "doom"] },
+    { label: "Accessories", icon: "folder", sub: [{ label: "Games", icon: "folder", sub: ["freecell", "hearts", "minesweeper", "solitaire", "ski"] }, "-", "calc", "notepad", "paint", "wordpad", "find"] },
+    { label: "Games", icon: "folder", sub: ["solitaire", "freecell", "hearts", "minesweeper", "pinball", "ski", "doom"] },
     { label: "My Apps", icon: "folder", sub: Object.keys(APPS).map(k => "app-" + k) },
-    { label: "Packard Bell", icon: "folder", sub: ["navigator", "navigator39"] }, "linkedin", "toolbox", "terminal"] },
+    { label: "Online Services", icon: "folder", sub: ["domonline"] },
+    { label: "Packard Bell", icon: "folder", sub: ["navigator", "navigator39"] }, "iexplore", "inbox", "linkedin", "toolbox", "terminal"] },
   { label: "Documents", icon: "documents", sub: ["about", ...ARCHIVE.map((a, i) => "arc-" + i)] },
-  { label: "Settings", icon: "settings", sub: ["controlpanel"] },
+  { label: "Settings", icon: "settings", sub: ["controlpanel", { label: "Screen Saver", icon: "screensaver", fn: () => open("controlpanel", { tab: "ss" }) }, { label: "Appearance", icon: "settings", fn: () => open("controlpanel", { tab: "ap" }) }] },
   { label: "Find", icon: "find", id: "find" },
   { label: "Help", icon: "help", id: "help" },
   { label: "Run...", icon: "run", id: "run" },
@@ -669,6 +724,68 @@ function syncSound() { soundBtn.style.opacity = isMuted() ? 0.4 : 1; soundBtn.ti
 soundBtn.innerHTML = ICONS.speaker; syncSound();
 soundBtn.addEventListener("click", () => { setMuted(!isMuted()); syncSound(); sfx.click(); });
 startBtn.insertAdjacentHTML("afterbegin", ICONS.start);
+
+// dial-up "connected" and "new mail" tray icons
+const tray = $("#tray");
+const netBtn = h(`<button id="netTray" aria-label="Dial-up connection" hidden>${ICONS.dialup}</button>`);
+const mailBtn = h(`<button id="mailTray" aria-label="New mail" title="You have new mail" hidden>${ICONS.inbox}</button>`);
+tray.insertBefore(netBtn, soundBtn); tray.insertBefore(mailBtn, netBtn);
+let netSince = 0;
+function setOnline(on) {
+  if (on) { if (!netSince) netSince = Date.now(); sessionStorage.setItem("w95.online", "1"); } else { netSince = 0; sessionStorage.removeItem("w95.online"); }
+  netBtn.hidden = !on; netBtn.title = "Connected to dom Online at 28,800 bps";
+}
+setOnline(sessionStorage.getItem("w95.online") === "1");
+netBtn.addEventListener("click", async () => {
+  const s = Math.floor((Date.now() - netSince) / 1000), dur = `${String(Math.floor(s / 3600)).padStart(2, "0")}:${String(Math.floor(s / 60) % 60).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
+  const r = await msgbox("Connected to dom Online", `Connected at 28,800 bps<br>Duration: ${dur}<br>Bytes received: ${(s * 2817).toLocaleString()}<br>Bytes sent: ${(s * 412).toLocaleString()}`, { buttons: ["OK", "Disconnect"] });
+  if (r === 1) { setOnline(false); wins.forEach(w => { try { w.frame && w.frame.contentWindow.postMessage({ type: "net-hangup" }, location.origin); } catch (e) {} }); }
+});
+const mailUnread = () => { try { const st = JSON.parse(localStorage.getItem("w95.mail") || "{}"); return ["welcome", "tips", "contact"].filter(id => !(st.read || []).includes(id)).length; } catch (e) { return 0; } };
+function syncMail(n = mailUnread()) { mailBtn.hidden = !n; mailBtn.title = `You have ${n} new message${n === 1 ? "" : "s"}`; }
+syncMail();
+mailBtn.addEventListener("click", () => open("inbox"));
+window.addEventListener("message", e => {
+  if (e.origin !== location.origin || !e.data) return;
+  if (e.data.type === "net-online") setOnline(true);
+  if (e.data.type === "net-offline") setOnline(false);
+  if (e.data.type === "mail-unread") syncMail(+e.data.n || 0);
+});
+
+// ---------------------------------------------------------------- screen saver
+let saverT = 0, saverEl = null, saverStop = null, lastAct = Date.now();
+function startSaver(id = curSaver()) {
+  if (saverEl || id === "none") return;
+  closeStart(); closeMenus();
+  saverEl = h(`<div id="saver"><canvas></canvas></div>`); document.body.appendChild(saverEl);
+  const cv = $("canvas", saverEl), dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+  cv.width = Math.round(window.innerWidth * dpr); cv.height = Math.round(window.innerHeight * dpr);
+  saverStop = runSaver(cv, id);
+  const armedAt = Date.now();
+  // ignore the tiny mouse jiggle from the click that started a preview
+  const wake = ev => { if (Date.now() - armedAt < 600 && ev.type === "pointermove") return; stopSaver(); };
+  ["pointermove", "pointerdown", "keydown", "wheel", "touchstart"].forEach(t => saverEl.addEventListener(t, wake));
+  saverEl._wake = wake; document.addEventListener("keydown", wake, true);
+}
+function stopSaver() {
+  if (!saverEl) return;
+  saverStop && saverStop(); document.removeEventListener("keydown", saverEl._wake, true);
+  saverEl.remove(); saverEl = null; saverStop = null; armSaver();
+}
+function armSaver() {
+  clearTimeout(saverT);
+  if (curSaver() === "none") return;
+  const due = curWait() * 60000 - (Date.now() - lastAct);
+  saverT = setTimeout(() => { if (Date.now() - lastAct >= curWait() * 60000 - 50 && !document.hidden) startSaver(); else armSaver(); }, Math.max(1000, due));
+}
+const activity = () => { lastAct = Date.now(); };
+["pointermove", "pointerdown", "keydown", "wheel", "touchstart"].forEach(t => document.addEventListener(t, activity, { capture: true, passive: true }));
+// same-origin apps (games, Notepad, IE's chrome) count as activity too
+function watchFrame(f) {
+  try { const d = f.contentDocument; if (!d || d._w95watched) return; d._w95watched = true; ["pointermove", "pointerdown", "keydown", "wheel", "touchstart"].forEach(t => d.addEventListener(t, activity, { capture: true, passive: true })); } catch (e) {}
+}
+armSaver();
+applyScheme();
 
 // startup chime on the first interaction (browsers block audio before that)
 let chimed = sessionStorage.getItem("w95.chimed") === "1";

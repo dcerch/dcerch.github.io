@@ -5,11 +5,11 @@
   --face: #c0c0c0; --shadow: #808080; --dark: #000; --hi: #fff; --light: #dfdfdf;
   --title: linear-gradient(90deg, #000080, #1084d0); --title-off: linear-gradient(90deg, #808080, #b5b5b5);
   --font: "MS Sans Serif", "Microsoft Sans Serif", "Pixelated MS Sans Serif", Tahoma, "Segoe UI", Geneva, sans-serif;
-  --tb-h: 30px;
+  --tb-h: 30px; --sel: #000080; --desk: #008080;
 }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
-html, body { margin: 0; height: 100%; overflow: hidden; font: 12px/1.3 var(--font); color: #000; background: #008080; user-select: none; -webkit-user-select: none; }
+html, body { margin: 0; height: 100%; overflow: hidden; font: 12px/1.3 var(--font); color: #000; background: var(--desk); user-select: none; -webkit-user-select: none; }
 button, input, select, textarea { font: inherit; color: inherit; }
 #wallpaper { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; }
 body.wp-teal #wallpaper { display: none; }
@@ -40,7 +40,7 @@ body.wp-teal #wallpaper { display: none; }
 .dicon .ico svg { width: 32px; height: 32px; display: block; }
 .dicon .lbl { padding: 0 2px; font-size: 11px; line-height: 13px; text-shadow: 1px 1px 0 rgba(0,0,0,.65); overflow-wrap: normal; word-break: normal; white-space: normal; }
 .dicon:focus { outline: none; }
-.dicon.sel .lbl, .dicon:focus-visible .lbl { background: #000080; outline: 1px dotted #ffff7f; text-shadow: none; }
+.dicon.sel .lbl, .dicon:focus-visible .lbl { background: var(--sel); outline: 1px dotted #ffff7f; text-shadow: none; }
 .dicon.sel .ico { filter: drop-shadow(0 0 0 #000080) brightness(.6) sepia(1) hue-rotate(190deg) saturate(4); }
 body.wp-teal .dicon .lbl { text-shadow: none; }
 
@@ -75,7 +75,7 @@ body.dragging iframe { pointer-events: none; }
 .menubar > button:hover, .menubar > button.open { box-shadow: inset -1px -1px var(--shadow), inset 1px 1px var(--hi); }
 .menu { position: absolute; z-index: 5000; min-width: 160px; padding: 3px; }
 .menu button { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; border: 0; background: none; padding: 3px 20px 3px 22px; white-space: nowrap; }
-.menu button:hover, .menu button:focus { background: #000080; color: #fff; outline: none; }
+.menu button:hover, .menu button:focus { background: var(--sel); color: #fff; outline: none; }
 .menu hr { border: 0; border-top: 1px solid var(--shadow); border-bottom: 1px solid #fff; margin: 3px 1px; }
 
 /* folder (explorer) view */
@@ -162,7 +162,7 @@ legend { padding: 0 3px; background: var(--face); }
 .smenu.sub button { height: 22px; padding: 2px 22px 2px 4px; }
 .smenu button svg { width: 24px; height: 24px; flex: 0 0 24px; }
 .smenu.sub button svg { width: 16px; height: 16px; flex: 0 0 16px; }
-.smenu button:hover, .smenu button.open, .smenu button:focus { background: #000080; color: #fff; outline: none; }
+.smenu button:hover, .smenu button.open, .smenu button:focus { background: var(--sel); color: #fff; outline: none; }
 .smenu button.has-sub::after { content: ""; position: absolute; right: 6px; top: 50%; translate: 0 -50%; border: 4px solid transparent; border-left-color: currentColor; }
 .smenu hr { border: 0; border-top: 1px solid var(--shadow); border-bottom: 1px solid #fff; margin: 2px 1px; width: calc(100% - 2px); }
 .flyout { position: fixed; z-index: 9600; padding: 3px; }
@@ -179,3 +179,20 @@ legend { padding: 0 3px; background: var(--face); }
   .grip { display: none; }
   #startMenu .smenu button { height: 38px; }
 }
+
+/* ---------------- screen saver + extras ---------------- */
+#saver { position: fixed; inset: 0; z-index: 2147483000; background: #000; cursor: none; }
+#saver canvas { width: 100%; height: 100%; display: block; }
+.props .saverbox { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+.props .saverbox select { flex: 1; min-width: 140px; }
+.props .wait { display: flex; align-items: center; gap: 6px; margin-top: 8px; }
+.props .wait input { width: 46px; }
+.schemeprev { width: 100%; align-self: stretch; margin: 6px 0 8px; padding: 8px; height: 150px; position: relative; box-shadow: inset -1px -1px var(--hi), inset 1px 1px var(--shadow), inset -2px -2px var(--light), inset 2px 2px var(--dark); }
+.schemeprev .sw { position: absolute; padding: 3px; display: flex; flex-direction: column; }
+.schemeprev .st { height: 16px; color: #fff; font-weight: bold; padding: 1px 4px; font-size: 11px; white-space: nowrap; overflow: hidden; }
+.schemeprev .sb { flex: 1; padding: 6px; font-size: 11px; }
+.schemeprev .ssel { color: #fff; padding: 0 3px; }
+#netTray { width: 20px; height: 20px; padding: 0; border: 0; background: none; display: flex; align-items: center; justify-content: center; }
+#netTray svg { width: 16px; height: 16px; }
+#mailTray { width: 20px; height: 20px; padding: 0; border: 0; background: none; display: flex; align-items: center; justify-content: center; }
+#mailTray svg { width: 16px; height: 16px; }.props .tabpane > label.col { align-self: stretch; flex: none; display: flex; }

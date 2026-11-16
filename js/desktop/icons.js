@@ -144,7 +144,50 @@ export const ICONS = {
     <rect x="5" y="15" width="22" height="14" fill="#2a6ad8" stroke="#000"/>
     <rect x="8" y="18" width="6" height="5" fill="#f2c400" stroke="#000"/>
     <rect x="18" y="19" width="6" height="10" fill="#3aa43a" stroke="#000"/>`),
-  speaker: svg(`<path d="M3 11 L9 11 L16 5 L16 27 L9 21 L3 21 Z" fill="#c0c0c0" stroke="#000"/><path d="M20 11 Q24 16 20 21 M23 8 Q29 16 23 24" stroke="#000" fill="none" stroke-width="2" shape-rendering="geometricPrecision"/>`)
+  speaker: svg(`<path d="M3 11 L9 11 L16 5 L16 27 L9 21 L3 21 Z" fill="#c0c0c0" stroke="#000"/><path d="M20 11 Q24 16 20 21 M23 8 Q29 16 23 24" stroke="#000" fill="none" stroke-width="2" shape-rendering="geometricPrecision"/>`),
+  // an original "browser" icon: a globe with a page behind it (no IE logo)
+  iexplore: svg(`
+    <rect x="3" y="3" width="20" height="24" fill="#fff" stroke="#000"/><path d="M6 8h14M6 11h10" stroke="#808080"/>
+    <circle cx="20" cy="19" r="9" fill="#1e6fd8" stroke="#000" shape-rendering="geometricPrecision"/>
+    <path d="M11.5 16h17M11.5 22h17M20 10c-4 5-4 13 0 18M20 10c4 5 4 13 0 18" stroke="#9fd2ff" fill="none" shape-rendering="geometricPrecision"/>
+    <path d="M10 22 Q20 12 31 15" stroke="#ffd84a" stroke-width="2" fill="none" shape-rendering="geometricPrecision"/>`),
+  domonline: svg(`
+    <circle cx="16" cy="16" r="13" fill="#ffd84a" stroke="#0a3d7a" stroke-width="2" shape-rendering="geometricPrecision"/>
+    <path d="M7 17 L16 8 L25 17 Z" fill="#0a3d7a"/><rect x="10" y="17" width="12" height="8" fill="#e8402a"/><rect x="14" y="20" width="4" height="5" fill="#ffd84a"/>
+    <ellipse cx="16" cy="16" rx="15" ry="5" fill="none" stroke="#2a8ad8" stroke-width="1.6" stroke-dasharray="4 2" transform="rotate(-18 16 16)" shape-rendering="geometricPrecision"/>`),
+  inbox: svg(`
+    <path d="M3 16 L7 6 H25 L29 16 V27 H3 Z" fill="#ffd84a" stroke="#806000"/>
+    <path d="M3 16 H10 L12 19 H20 L22 16 H29" fill="none" stroke="#806000"/>
+    <rect x="9" y="8" width="14" height="9" fill="#fff" stroke="#000"/><path d="M9 8 l7 5 7-5" fill="none" stroke="#000"/>`),
+  dialup: svg(`
+    <rect x="2" y="14" width="13" height="10" fill="#c0c0c0" stroke="#000"/><rect x="4" y="16" width="9" height="6" fill="#008080"/>
+    <rect x="17" y="6" width="13" height="10" fill="#c0c0c0" stroke="#000"/><rect x="19" y="8" width="9" height="6" fill="#008080"/>
+    <path d="M9 24 Q12 30 23 16" stroke="#000" fill="none" shape-rendering="geometricPrecision"/>`),
+  freecell: svg(`
+    <rect x="4" y="5" width="14" height="20" fill="#fff" stroke="#000"/><text x="7" y="13" font-size="7" font-family="Arial" font-weight="bold" fill="#d00">A</text>
+    <rect x="13" y="8" width="14" height="20" fill="#fff" stroke="#000"/><text x="16" y="16" font-size="7" font-family="Arial" font-weight="bold">K</text>
+    <path d="M20 19 l3 5 h-6 z" fill="#000" shape-rendering="geometricPrecision"/>`),
+  hearts: svg(`
+    <rect x="5" y="4" width="16" height="22" fill="#fff" stroke="#000" transform="rotate(-10 13 15)"/>
+    <rect x="11" y="6" width="16" height="22" fill="#fff" stroke="#000"/>
+    <path d="M19 24 C12 18 13 13 16 13 C18 13 19 15 19 16 C19 15 20 13 22 13 C25 13 26 18 19 24 Z" fill="#d00" shape-rendering="geometricPrecision"/>`),
+  ski: svg(`
+    <rect x="0" y="0" width="32" height="32" fill="#fff"/>
+    <path d="M4 26 L9 14 L14 26 Z M22 12 L26 4 L30 12 Z" fill="#1a7a2a" stroke="#0a400a"/>
+    <circle cx="17" cy="11" r="2.5" fill="#e8b080" stroke="#000" shape-rendering="geometricPrecision"/><rect x="15" y="13" width="4" height="7" fill="#d82020" stroke="#000"/>
+    <path d="M12 23 L22 19 M13 25 L23 21" stroke="#000" stroke-width="1.5"/>`),
+  calc: svg(`
+    <rect x="6" y="2" width="20" height="28" fill="#c0c0c0" stroke="#000"/><rect x="9" y="5" width="14" height="6" fill="#d8f0d0" stroke="#000"/>
+    <g fill="#fff" stroke="#000"><rect x="9" y="14" width="4" height="3"/><rect x="14" y="14" width="4" height="3"/><rect x="9" y="19" width="4" height="3"/><rect x="14" y="19" width="4" height="3"/><rect x="9" y="24" width="4" height="3"/><rect x="14" y="24" width="4" height="3"/></g>
+    <g fill="#e0a0a0" stroke="#000"><rect x="19" y="14" width="4" height="3"/><rect x="19" y="19" width="4" height="8"/></g>`),
+  wordpad: svg(`
+    <rect x="5" y="3" width="20" height="26" fill="#fff" stroke="#000"/>
+    <path d="M8 8h14M8 11h14M8 14h10M8 17h14M8 20h8" stroke="#000080"/>
+    <path d="M17 27 L28 12 L30 14 L19 29 Z" fill="#ffd84a" stroke="#000"/><path d="M17 27 L19 29 L16 30 Z" fill="#000"/>`),
+  screensaver: svg(`
+    <rect x="3" y="4" width="26" height="19" fill="#c0c0c0" stroke="#000"/><rect x="6" y="7" width="20" height="13" fill="#000"/>
+    <g fill="#fff"><rect x="9" y="9" width="1" height="1"/><rect x="20" y="10" width="2" height="2"/><rect x="14" y="15" width="1" height="1"/><rect x="11" y="17" width="2" height="2"/></g>
+    <rect x="12" y="23" width="8" height="3" fill="#808080" stroke="#000"/><rect x="8" y="26" width="16" height="3" fill="#c0c0c0" stroke="#000"/>`)
 };
 
 // Generic per-app icon for tools that live in the toolbox folder.
