@@ -1,0 +1,55 @@
+// Every program in the house, as boxed software for the Software Room / Library shelves.
+// `open` is the desktop program id (see js/desktop/desktop.js); c35/c39 are the shelf categories.
+export const SOFTWARE = [
+  { open: "app-rankedchoicevoting", title: "Ranked Choice Voting", glyph: "🗳️", color: "#1a4a9a", color2: "#0a1a4a", c35: "Productivity", c39: "Productivity", info: "An official-style instant-runoff election simulator: create polls, rank choices and watch the round-by-round tally." },
+  { open: "app-secretsanta", title: "Secret Santa", glyph: "🎁", color: "#b81a1a", color2: "#4a0a0a", c35: "Productivity", c39: "Passions", info: "A pass-the-phone gift-exchange organizer: draw names so nobody gets themselves, then reveal privately." },
+  { open: "tk-pmpcalc", title: "PMP Calculator", glyph: "🧮", color: "#3a6a8a", color2: "#123048", c35: "Productivity", c39: "Productivity", info: "Estimate project hours and split them across the PMP phases." },
+  { open: "tk-timewrap", title: "Time Wrap", glyph: "⏱️", color: "#5a5a6a", color2: "#1a1a2a", c35: "Productivity", c39: "Productivity", info: "Run multiple labeled timers and track the total time." },
+  { open: "tk-ticketgenerator", title: "Ticket Maker", glyph: "🎟️", color: "#c84a1a", color2: "#5a1a0a", c35: "Productivity", c39: "Accessories", info: "Generate event tickets with unique IDs and a barcode." },
+  { open: "app-juicer", title: "Squeeze Play", glyph: "🍹", color: "#e8801a", color2: "#6a2a0a", c35: "Home & Health", c39: "Passions", info: "Cold-press juice recipes for the Nama J2: tick what's in your fridge and see what you can make right now." },
+  { open: "tk-weatheradvisor", title: "Weather Advisor", glyph: "🌡️", color: "#2a8ac8", color2: "#0a3a5a", c35: "Home & Health", c39: "Passions", info: "Suggests what to wear based on how you like your room temperature." },
+  { open: "tk-picturespacer", title: "Picture Spacer", glyph: "🖼️", color: "#8a6a3a", color2: "#3a2a10", c35: "Home & Health", c39: "Passions", info: "Evenly space artwork on a wall: the exact gap between each piece." },
+  { open: "tk-incomesavings", title: "Savings Planner", glyph: "🐷", color: "#d86a9a", color2: "#5a1a3a", c35: "Home & Health", c39: "Productivity", info: "Project compound interest on a savings balance." },
+  { open: "tk-bankrewards", title: "Bank Rewards", glyph: "💳", color: "#2a6a4a", color2: "#0a2a1a", c35: "Home & Health", c39: "Productivity", info: "Compare the redemption value of your bank reward points across cards." },
+  { open: "tk-crypto", title: "Crypto Tracker", glyph: "🪙", color: "#c8a01a", color2: "#5a400a", c35: "Home & Health", c39: "Productivity", info: "Track crypto gains and losses from your buys and a current price." },
+  { open: "tk-pmpref", title: "PMP Study Sheet", glyph: "📇", color: "#4a3a8a", color2: "#1a1040", c35: "Reference", c39: "Reference & Learning", info: "A condensed PMP study sheet: process groups, knowledge areas and formulas." },
+  { open: "tk-explorerails", title: "Explore Rails", glyph: "🚆", color: "#1a6a8a", color2: "#0a2a3a", c35: "Reference", c39: "Reference & Learning", info: "Opportunities and points of interest near NJ Transit stops." },
+  { open: "tk-elderscrolls", title: "Blades Guide", glyph: "📜", color: "#7a5a2a", color2: "#2a1a0a", c35: "Reference", c39: "Reference & Learning", info: "The best weapon and element pairings in Elder Scrolls: Blades." },
+  { open: "tk-hades", title: "Boon Guide", glyph: "🍎", color: "#8a1a2a", color2: "#2a0a10", c35: "Reference", c39: "Reference & Learning", info: "Which gods' boons pair best with each weapon in Hades." },
+  { open: "tk-deviceenvironment", title: "Device Check", glyph: "💾", color: "#3a3a3a", color2: "#0a0a0a", c35: "Tools", c39: "Accessories", info: "Detect your device, browser, OS and connection." },
+  { open: "solitaire", title: "Solitaire", glyph: "🂡", color: "#1a7a3a", color2: "#0a3a1a", c35: "Games", c39: "Fun & Games", info: "Klondike solitaire. Deal again as many times as you like." },
+  { open: "minesweeper", title: "Minesweeper", glyph: "💣", color: "#6a6a7a", color2: "#2a2a3a", c35: "Games", c39: "Fun & Games", info: "Find the mines without stepping on one. Right-click to flag." },
+  { open: "pinball", title: "Space Pinball", glyph: "🚀", color: "#2a1a6a", color2: "#0a0a2a", c35: "Games", c39: "Fun & Games", info: "A space-themed pinball table, written for this site." },
+  { open: "doom", title: "DOOM", glyph: "👹", color: "#8a1a0a", color2: "#2a0400", c35: "Games", c39: "Fun & Games", info: "The freely distributable shareware episode of DOOM." },
+  { open: "app-kojima", title: "Kojima Names", glyph: "📦", color: "#4a5a3a", color2: "#1a2010", c35: "Games", c39: "Fun & Games", info: "A codec-style generator that forges your true Kojima codename." },
+  { open: "app-lostatsea", title: "Lost at Sea", glyph: "🛟", color: "#0a5a8a", color2: "#022a40", c35: "Games", c39: "Fun & Games", info: "Stranded! Rank 15 salvaged items before the clock runs out." },
+  { open: "app-everybodyisjohn", title: "Everybody is John", glyph: "🎲", color: "#6a2a6a", color2: "#2a0a2a", c35: "Games", c39: "Fun & Games", info: "A companion app for the tabletop RPG where every player is a voice in John's head." },
+  { open: "tk-oneshot", title: "One Shot", glyph: "🐉", color: "#5a1a5a", color2: "#1a041a", c35: "Games", c39: "Fun & Games", info: "A hub for short, self-contained tabletop adventures." },
+  { open: "tk-pointkeeper", title: "Point Keeper", glyph: "📝", color: "#3a7a7a", color2: "#0a2a2a", c35: "Games", c39: "Fun & Games", info: "A multi-player score keeper that remembers between visits." },
+  { open: "tk-randomizer", title: "Randomizer", glyph: "🎲", color: "#7a3a1a", color2: "#2a1004", c35: "Games", c39: "Fun & Games", info: "Pit a homemade random number generator against Math.random." },
+  { open: "kidspace", title: "KidSpace", glyph: "🚀", color: "#e83a8a", color2: "#3a0a6a", c35: "Kids", c39: "Kid's Corner", info: "The fun place to work and play." },
+  { open: "paint", title: "Paint", glyph: "🎨", color: "#e8c01a", color2: "#6a4a00", c35: "Kids", c39: "Kid's Corner", info: "Go on, draw something." },
+  { open: "drawers", title: "KidSpace Drawers", glyph: "🗄️", color: "#8a3ad0", color2: "#2a0a50", c35: "Kids", c39: "Kid's Corner", info: "A little filing cabinet of drawers to put things in." },
+  { open: "tk-mailto", title: "Mail Composer", glyph: "✉️", color: "#1a5ab8", color2: "#0a1a4a", c35: "Communications", c39: "Communication Tools", info: "Compose a draft email and generate a ready-to-use mailto link." },
+  { open: "tk-phonename", title: "Phone Words", glyph: "📞", color: "#2a8a5a", color2: "#0a2a1a", c35: "Communications", c39: "Communication Tools", info: "Find the names and words a phone number can spell." },
+  { open: "tk-package", title: "Package Tracker", glyph: "📦", color: "#a0701a", color2: "#3a2004", c35: "Communications", c39: "Communication Tools", info: "Jump straight to a carrier's tracking page." },
+  { open: "linkedin", title: "LinkedIn", glyph: "💼", color: "#0a66c2", color2: "#02284a", c35: "Communications", c39: "Online", info: "Dominic's professional side." },
+  { open: "oldsite", title: "Old Homepage", glyph: "📟", color: "#0a3a0a", color2: "#000", c35: "Communications", c39: "Online", info: "The green-screen homepage this site used to be." },
+  { open: "arcade", title: "404 Arcade", glyph: "👾", color: "#3a0a6a", color2: "#0a0020", c35: "Games", c39: "Online", info: "Every way to get lost on this site, in one machine." },
+  { open: "tk-cookie", title: "Cookie Jar", glyph: "🍪", color: "#a0602a", color2: "#3a1a04", c35: "Tools", c39: "Accessories", info: "A tiny demo of creating, reading and deleting a browser cookie." },
+  { open: "tk-strobe", title: "Strobe Light", glyph: "🔦", color: "#d8d81a", color2: "#4a4a00", c35: "Tools", c39: "Accessories", info: "A configurable color strobe. Photosensitivity warning inside." },
+  { open: "terminal", title: "MS-DOS Prompt", glyph: "⌨️", color: "#1a1a1a", color2: "#000", c35: "Tools", c39: "Accessories", info: "A command prompt. Type help." },
+  { open: "toolbox", title: "Toolbox", glyph: "🧰", color: "#b0301a", color2: "#3a0a04", c35: "Tools", c39: "Accessories", info: "All the little web tools in one window." }
+];
+export const CATS35 = ["Productivity", "Home & Health", "Reference", "Games", "Kids", "Communications", "Tools"];
+export const CATS39 = ["Productivity", "Reference & Learning", "Passions", "Kid's Corner", "Fun & Games", "Communication Tools", "Accessories", "Online"];
+export const CAT_INFO = {
+  "Productivity": "Holds productivity tools for business, personal and financial management.",
+  "Home & Health": "Resources for optimizing your health and home.",
+  "Reference": "Holds reference and learning titles.", "Reference & Learning": "Holds reference and learning titles.",
+  "Games": "Holds entertainment titles.", "Fun & Games": "Holds entertainment titles.",
+  "Kids": "Fun and educational programs for children.", "Kid's Corner": "Fun and educational programs for children.",
+  "Communications": "Holds tools for mail, phone and online communications.", "Communication Tools": "Holds tools for mail, phone and online communications.",
+  "Tools": "Holds software accessories.", "Accessories": "Holds software accessories.",
+  "Passions": "Titles for hobbies and the things you love.", "Online": "Places to visit on the Internet."
+};

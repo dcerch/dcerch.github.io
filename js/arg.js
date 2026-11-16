@@ -13,10 +13,10 @@ const SECRET = "curiosity";
 const SECRET_DIGITS = "287467489"; // C-U-R-I-O-S-I-T-Y on a phone keypad
 
 const JOURNAL = [
-  { step: 0, text: "Something about this house feels… curious. A book in the Den looks like it's been read a lot." },
+  { step: 0, text: "Something about this house feels… curious. One of the manuals on the bookshelf looks like it's been read a lot more than the others." },
   { step: 1, text: "Hobbes, Leviathan: a word has been scratched out — “____ is the lust of the mind.” The margin says to say it to the house. Type it anywhere, or dial it on the phone." },
   { step: 2, text: "The TV crackled to life: “You decide to click the symbols.” Where in this house are there symbols?" },
-  { step: 3, text: "The symbols blazed green. Then — a rustle by the living-room fireplace. Someone has come to visit." },
+  { step: 3, text: "The symbols blazed green. Then — a rustle in the Living Room. Someone has come to visit." },
   { step: 4, text: "A travelling merchant cat: “Khajiit has wares, if you have coin.” You've solved the Curiosity Protocol. 💰" }
 ];
 

@@ -3,106 +3,24 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>dominiccerchio — Navigator</title>
-  <meta name="description" content="Dominic Cerchio's personal site: a 3D, explorable house inspired by 1990s Packard Bell Navigator. Click around to find his apps, tools, accomplishments, and a secret or two.">
-  <meta property="og:title" content="dominiccerchio — Navigator">
-  <meta property="og:description" content="A 3D house you can explore, inspired by 90s Packard Bell Navigator. Apps, tools, and a hidden ARG.">
-  <meta property="og:url" content="https://dominiccerchio.com/">
-  <meta property="og:type" content="website">
-  <meta name="theme-color" content="#14306e">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
-  <link rel="stylesheet" href="css/navigator.css">
-  <script type="importmap">
-    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/" } }
-  </script>
+  <title>Navigator</title>
+  <meta name="description" content="Dominic Cerchio's projects, arranged in a house: a 2D homage to the Packard Bell Navigator 3.5 and 3.9 shells that came on 1990s family PCs.">
+  <meta property="og:title" content="Navigator — dom 95">
+  <meta property="og:description" content="A 2D homage to Packard Bell Navigator 3.5 and 3.9: rooms full of clickable things, an InfoGuide, KidSpace, and a hidden ARG.">
+  <meta name="theme-color" content="#000000">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M2 15 L16 3 L30 15 Z' fill='%23c8402a'/><rect x='5' y='15' width='22' height='14' fill='%23e8dcc0'/><rect x='18' y='19' width='6' height='10' fill='%235a2a14'/></svg>">
+  <link rel="stylesheet" href="css/nav2d.css">
 </head>
 <body>
-  <canvas id="scene" aria-label="A 3D house you can explore. Use the Menu button for a list of everything inside."></canvas>
-
-  <!-- ===================== Navigator top bar ===================== -->
-  <header id="topbar" class="chrome">
-    <button id="mapBtn" class="tile house" title="Map of the house" aria-label="Map of the house">
-      <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M4 20 L20 6 L36 20 L32 20 L32 34 L8 34 L8 20 Z" fill="#f2e2b8" stroke="#3a2a1a" stroke-width="2"/><path d="M2 21 L20 5 L38 21" fill="none" stroke="#2d6a3a" stroke-width="4" stroke-linecap="round"/><rect x="17" y="23" width="7" height="11" fill="#7a2a14"/><rect x="11" y="22" width="5" height="5" fill="#9fd8ff" stroke="#3a2a1a"/><rect x="26" y="22" width="5" height="5" fill="#9fd8ff" stroke="#3a2a1a"/></svg>
-    </button>
-    <div class="brand"><b>Navigator</b><span id="roomName">Living Room</span></div>
-    <nav class="tiles" aria-label="Rooms and tools">
-      <button class="tile" data-room="living" title="Living Room (1)" aria-label="Living Room">🛋️</button>
-      <button class="tile" data-room="kitchen" title="Kitchen (2)" aria-label="Kitchen">🍳</button>
-      <button class="tile" data-room="den" title="Den (3)" aria-label="Den">🏆</button>
-      <button class="tile" data-room="rec" title="Rec Room (4)" aria-label="Rec Room">🕹️</button>
-      <button class="tile kid" data-room="kidspace" title="Ark KidSpace (5)" aria-label="Ark KidSpace">🚀</button>
-      <span class="sep"></span>
-      <button class="tile" id="journalBtn" title="Journal" aria-label="Journal" data-count="1">📓</button>
-      <button class="tile" id="soundBtn" title="Sound">🔊</button>
-      <button class="tile" id="helpBtn" title="Help" aria-label="Help">❓</button>
-      <a class="tile exit" href="index.html" data-exit title="Exit to Windows" aria-label="Exit to Windows">EXIT</a>
-    </nav>
-  </header>
-
-  <!-- ===================== Status bar ===================== -->
-  <footer id="statusbar" class="chrome">
-    <button id="infoBtn" class="infoguide" title="InfoGuide" aria-label="InfoGuide help"><span>i</span></button>
-    <p id="statusText" aria-live="polite">The Living Room, where the family keeps its favorite things.</p>
-    <button id="menuBtn" class="menubtn" title="Everything in the house">Menu</button>
-  </footer>
-
-  <div id="tooltip" hidden></div>
-  <div id="warp" hidden></div>
-  <div id="toast" hidden role="status"></div>
-  <div id="mapLabels" hidden></div>
-
-  <aside id="drawerPanel" hidden aria-label="Junk drawer contents">
-    <div class="dp-head"><b>🧰 Junk drawer</b><button id="drawerClose" class="nbtn small">Close drawer</button></div>
-    <div id="drawerList"></div>
-  </aside>
-
-  <!-- ===================== Window (Win95-style) ===================== -->
-  <div id="scrim" hidden></div>
-  <section id="win" hidden role="dialog" aria-modal="true" aria-labelledby="winTitle">
-    <div class="titlebar"><span id="winTitle"></span>
-      <span class="tb-btns"><a id="winExternal" class="tb" href="#" target="_blank" rel="noopener" title="Open in a new tab" hidden>↗</a><button id="winClose" class="tb" aria-label="Close">✕</button></span>
-    </div>
-    <div id="winBody"></div>
-  </section>
-
-  <!-- ===================== Boot sequence ===================== -->
-  <div id="boot" data-stage="win">
-    <div class="boot-splash">
-      <div class="logo">
-        <span class="logo-name">dominiccerchio</span>
-        <svg class="compass" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="44" fill="#fff" stroke="#c9a54a" stroke-width="5"/><path d="M50 8 L58 50 L50 92 L42 50 Z" fill="#b5121b"/><path d="M8 50 L50 42 L92 50 L50 58 Z" fill="#1a2a6a"/><circle cx="50" cy="50" r="6" fill="#c9a54a"/></svg>
-        <span class="logo-nav">Navigator</span>
-      </div>
-      <p class="version">Version 3.5 · Home Edition</p>
-      <div class="progress"><span id="bootBar"></span></div>
-      <p id="bootStatus">Loading the house…</p>
-      <div class="boot-actions">
-        <button id="enterBtn" class="bigbtn"><span class="num">1</span> Enter the House</button>
-        <a class="bigbtn alt" href="index.html" data-exit><span class="num">2</span> Back to Windows</a>
-      </div>
-      <button id="skipBtn" class="skip">skip ▸</button>
-      <p class="fineprint">A fan-made homage to the 1990s Packard Bell Navigator shell. Best with sound on 🔊</p>
-    </div>
+  <div id="stage">
+    <div id="room" aria-live="off"></div>
+    <header id="top"></header>
+    <footer id="bot"></footer>
+    <div id="fade"></div>
+    <div id="layer"></div>
+    <div id="splash" hidden></div>
   </div>
-
-  <!-- ===================== No-WebGL / no-JS fallback ===================== -->
-  <div id="fallback">
-    <h1>dominiccerchio</h1>
-    <p>This site is a 3D house you can explore. If it isn't loading, here's everything inside:</p>
-    <ul>
-      <li><a href="apps.html">Apps</a> — Ranked Choice Voting, Secret Santa, Kojima Name Generator, Lost at Sea, Everybody is John, The Archive</li>
-      <li><a href="toolbox.html">Toolbox</a> — the junk drawer of little web tools</li>
-      <li><a href="index.html">Windows desktop</a></li>
-      <li><a href="terminal.html">Classic terminal site</a></li>
-      <li><a href="https://www.linkedin.com/in/dcerch/">LinkedIn</a></li>
-    </ul>
-  </div>
-  <noscript><style>#boot{display:none}#fallback{display:block}</style></noscript>
-
-  <script>
-    // If the 3D engine can't load (offline CDN, old browser), show the plain directory instead.
-    setTimeout(function () { if (!window.__navReady) document.body.classList.add("no-webgl"); }, 15000);
-  </script>
-  <script type="module" src="js/main.js"></script>
+  <noscript><p style="color:#fff;padding:20px">Navigator needs JavaScript. Try the <a style="color:#ff0" href="apps.html">apps list</a> or the <a style="color:#ff0" href="toolbox.html">toolbox</a>.</p></noscript>
+  <script type="module" src="js/nav2d/main.js"></script>
 </body>
 </html>

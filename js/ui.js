@@ -153,7 +153,7 @@ export const panels = {
     return {
       title: "Menu — everything in the house", icon: "☰",
       html: order.map(r => `<h3>${esc(ROOMS[r].name)}</h3><ul class="dir">${(byRoom[r] || []).map(d => `<li><button data-hot="${esc(d.id)}">${esc(d.label)}</button><span>${esc(d.desc)}</span></li>`).join("")}</ul>`).join("") +
-        `<h3>Elsewhere</h3><ul class="dir"><li><a href="index.html" target="_top">Windows desktop</a><span>Back to dominiccerchio 95.</span></li><li><a href="terminal.html">Classic terminal site</a><span>The previous green-screen version of dominiccerchio.com.</span></li><li><a href="apps.html">All apps (list view)</a><span></span></li><li><a href="toolbox.html">Toolbox (list view)</a><span></span></li></ul>`
+        `<h3>Elsewhere</h3><ul class="dir"><li><a href="index.html" target="_top">Windows desktop</a><span>Back to dom 95.</span></li><li><a href="terminal.html">Classic terminal site</a><span>The previous green-screen version of dominiccerchio.com.</span></li><li><a href="apps.html">All apps (list view)</a><span></span></li><li><a href="toolbox.html">Toolbox (list view)</a><span></span></li></ul>`
     };
   },
   drawerList() {

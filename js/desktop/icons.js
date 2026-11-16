@@ -17,6 +17,19 @@ export const ICONS = {
     <rect x="18" y="19" width="5" height="9" fill="#7a2a14" stroke="#000"/>
     <circle cx="25" cy="7" r="5" fill="#fff" stroke="#c9a54a" stroke-width="1.5" shape-rendering="geometricPrecision"/>
     <path d="M25 3 L26.2 7 L25 11 L23.8 7 Z" fill="#b5121b" shape-rendering="geometricPrecision"/>`),
+  navigator39: svg(`
+    <path d="M3 15 L16 4 L29 15 Z" fill="#2d5a8a" stroke="#000" shape-rendering="geometricPrecision"/>
+    <rect x="6" y="15" width="20" height="13" fill="#e6dcc8" stroke="#000"/>
+    <rect x="9" y="18" width="5" height="5" fill="#ffe680" stroke="#000"/>
+    <rect x="18" y="19" width="5" height="9" fill="#3a5a2a" stroke="#000"/>
+    <rect x="18" y="1" width="13" height="10" fill="#000080" stroke="#000"/>
+    <text x="24.5" y="9" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="7.5" fill="#ff0" shape-rendering="geometricPrecision">3.9</text>`),
+  textfile: svg(`
+    <path d="M7 2 H21 L26 7 V30 H7 Z" fill="#fff" stroke="#000"/>
+    <path d="M21 2 V7 H26" fill="#c0c0c0" stroke="#000"/>
+    <rect x="10" y="10" width="13" height="1" fill="#000080"/><rect x="10" y="13" width="11" height="1" fill="#000080"/>
+    <rect x="10" y="16" width="13" height="1" fill="#000080"/><rect x="10" y="19" width="9" height="1" fill="#000080"/>
+    <rect x="10" y="22" width="12" height="1" fill="#000080"/>`),
   linkedin: svg(`
     <path d="M12 9 V6 H20 V9" fill="none" stroke="#000" stroke-width="2" shape-rendering="geometricPrecision"/>
     <rect x="3" y="9" width="26" height="18" rx="2" fill="#8a5a36" stroke="#000"/>

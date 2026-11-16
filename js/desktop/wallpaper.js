@@ -1,10 +1,7 @@
 // Original painted wallpaper in the spirit of the classic "green hill, blue sky" XP desktop.
 // Painted procedurally in the browser (no photo is used): a cobalt sky, big cumulus clouds,
 // and one smooth, saturated green hill lit from the upper left.
-export function paintWallpaper(canvas) {
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  const W = Math.round(window.innerWidth * dpr), H = Math.round(window.innerHeight * dpr);
-  canvas.width = W; canvas.height = H;
+export function paintHills(canvas, W, H, dpr) {
   const g0 = canvas.getContext("2d");
   let g = g0;
   let seed = 2001;

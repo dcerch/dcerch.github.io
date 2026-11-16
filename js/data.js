@@ -15,6 +15,16 @@ export const PROFILE = {
     "Studying IT sharpened the discipline and creativity I bring to technology, science, and art. Along the way I found what I care about most: using technology to help people — whether that's automating the tedious parts of how a company runs or building accessible tools that connect and teach.",
     "Today I'm a Program Manager working in the Data & AI space."
   ],
+  // ABOUT.TXT on the desktop: a note left for whoever finds it
+  note: [
+    "Hi there,",
+    "If you're reading this, you found the note I left on the desktop. I'm Dom.",
+    "I built this site because the computers I grew up with felt like places you could go. My dad handed me the keys to an old Dell Dimension: a humming CRT, a dial-up modem that screamed before it let you in, and more curiosity than I knew what to do with. My oldest brother showed me how to build my own PC and what software could really do. I've been chasing that feeling ever since.",
+    "That curiosity took me to Marist to study IT, then to UBS, and then to Microsoft, where today I'm a Program Manager in Data & AI. The part I care about most hasn't changed: using technology to help people, whether that's taking the tedious work off someone's plate or building small, friendly tools that connect and teach.",
+    "So this isn't a résumé (that's what the LinkedIn icon is for). It's the desktop I would have loved at twelve: a few games to lose an afternoon to, apps I made for friends and family, a junk drawer of tiny tools, and a Navigator house to wander through. Double-click things. Some of them are more curious than they look.",
+    "Thanks for visiting. Please leave the computer the way you found it. :)",
+    "— Dom"
+  ],
   career: [
     { org: "Microsoft", role: "Program Manager — Data & AI", when: "Today" },
     { org: "Microsoft", role: "Technical Account Manager / Customer Success Account Manager", when: "2019 →" },
@@ -52,10 +62,21 @@ export const APPS = {
   everybodyisjohn: { title: "Everybody is John", url: "apps/everybodyisjohn.html",
     desc: "A companion app for the simplest tabletop roleplaying game, where every player is a voice in John's head." },
   juicer: { title: "Squeeze Play", url: "apps/juicer.html",
-    desc: "Cold-press juice recipes for the Nama J2: tick what's in your fridge and see what you can make right now." },
-  archived: { title: "The Archive", url: "apps/archived.html",
-    desc: "A museum of retired apps: the Overwatch Workshop Repository, the Raspberry Pi Designer, and Garage to Table." }
+    desc: "Cold-press juice recipes for the Nama J2: tick what's in your fridge and see what you can make right now." }
 };
+
+// ---- Retired apps: they live in Recycle Bin > Archived as .TXT notes ----
+export const ARCHIVE = [
+  { file: "OVERWATCH.TXT", title: "Overwatch Workshop Repository", cat: "Games",
+    desc: "A community board for Blizzard's Overwatch Workshop. Players browsed shared custom game modes in a sortable table, copied a share code by clicking a cell, submitted their own \"forge\" through a pop-up form, swapped between several table themes, and exported the whole list as CSV, XLSX, PDF or JSON.",
+    stack: ["Bootstrap 4", "Tabulator.js", "Firebase Realtime DB", "Google Fonts"] },
+  { file: "PIDESIGN.TXT", title: "Raspberry Pi Designer", cat: "Tools",
+    desc: "A kit configurator for the Raspberry Pi. You picked a board (Pi Zero, 3 or 4), browsed parts across categories (cases, storage, power, controllers, travel and accessories), compared boards in a spec table, and followed links out for details and pricing.",
+    stack: ["Bootstrap 4", "Carousel + Modals", "Dropdowns"] },
+  { file: "G2T.TXT", title: "Garage to Table (G2T)", cat: "Tools",
+    desc: "A materials and price calculator for a line of 3D woodworking models. You chose a model, then saw its full bill of materials with per-item pricing and retail links to source each part.",
+    stack: ["Bootstrap 5", "Bootstrap Icons", "models.js / modelpicker.js"] }
+];
 
 // ---- Kitchen junk drawer: one trinket per toolbox snippet -----------
 //  id must match the snippet id in toolbox.html (opens toolbox.html?embed=1#id)

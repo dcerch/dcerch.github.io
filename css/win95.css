@@ -28,7 +28,10 @@ body.wp-teal #wallpaper { display: none; }
 
 /* ---------------- desktop icons ---------------- */
 #desktop { position: fixed; inset: 0 0 var(--tb-h) 0; }
-#icons { position: absolute; inset: 4px; display: flex; flex-direction: column; flex-wrap: wrap; align-content: flex-start; gap: 4px 6px; }
+#icons { position: absolute; inset: 0; }
+#icons > .dicon { position: absolute; }
+#icons > .dicon.moving { opacity: .65; z-index: 2; }
+#marquee { position: absolute; z-index: 1; border: 1px dotted #fff; mix-blend-mode: difference; pointer-events: none; }
 .dicon {
   width: 84px; height: 72px; padding: 2px; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: default;
   background: none; border: 0; color: #fff; text-align: center;
@@ -96,6 +99,25 @@ body.dragging iframe { pointer-events: none; }
 .dlg label { display: flex; align-items: center; gap: 6px; }
 fieldset { border: 0; padding: 10px 10px 8px; margin: 0; box-shadow: inset -1px -1px var(--hi), inset 1px 1px var(--shadow), inset -2px -2px var(--shadow), inset 2px 2px var(--hi); }
 legend { padding: 0 3px; background: var(--face); }
+
+/* display properties */
+.props { gap: 0; padding: 8px 8px 10px; }
+.props .tabs { display: flex; gap: 0; margin-bottom: -2px; position: relative; z-index: 1; padding-left: 2px; }
+.props .tab { border: 0; background: var(--face); padding: 3px 10px 4px; margin-top: 2px; box-shadow: inset 1px 1px var(--hi), inset -1px 0 var(--dark), inset -2px 0 var(--shadow); }
+.props .tab.on { margin-top: 0; padding-bottom: 6px; margin-left: -2px; margin-right: -2px; }
+.props .tabpane { padding: 12px 10px 8px; box-shadow: inset 1px 1px var(--hi), inset -1px -1px var(--dark), inset -2px -2px var(--shadow); display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 10px; }
+.props .tabpane[hidden] { display: none !important; }
+.props .tabpane fieldset { align-self: stretch; }
+.monitor { display: flex; flex-direction: column; align-items: center; }
+.monitor .bezel { padding: 10px 12px 18px; background: #c0c0c0; border-radius: 3px 3px 0 0; box-shadow: inset 1px 1px #fff, inset -1px -1px #000, inset -2px -2px #808080; position: relative; }
+.monitor .bezel::after { content: ""; position: absolute; right: 10px; bottom: 6px; width: 6px; height: 4px; background: #0c0; box-shadow: 0 0 0 1px #000; }
+.monitor canvas { display: block; width: 152px; height: auto; box-shadow: 0 0 0 1px #000, 0 0 0 2px #808080; image-rendering: auto; }
+.monitor .stand { width: 70px; height: 10px; background: linear-gradient(#a0a0a0, #c0c0c0); box-shadow: inset 1px 0 #fff, inset -1px -1px #000; }
+.props .lists { display: flex; gap: 10px; align-self: stretch; }
+.props .col { flex: 1; flex-direction: column; align-items: stretch !important; gap: 2px !important; }
+.props select { width: 100%; padding: 0; }
+.props select:disabled { color: #808080; }
+.props .hint { margin: 0; align-self: stretch; color: #444; min-height: 1.3em; }
 
 /* welcome / tips */
 .welcome { display: flex; gap: 10px; flex: 1; padding: 12px; }
