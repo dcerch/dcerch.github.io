@@ -133,5 +133,6 @@ export const ROOMS = {
   living: { name: "Living Room", blurb: "The Living Room, where the family keeps its favorite things.", view: { pos: [0, 1.7, 4.3], yaw: 0, pitch: -0.14 } },
   kitchen: { name: "Kitchen", blurb: "The Kitchen. Every house has a junk drawer…", view: { pos: [7.4, 1.65, 0], yaw: -Math.PI / 2, pitch: -0.14 }, door: [6, 1.65, 0] },
   den: { name: "Den", blurb: "The Den: certificates on the wall, good deeds on the shelf.", view: { pos: [-7.2, 1.7, 0], yaw: Math.PI / 2, pitch: -0.1 }, door: [-6, 1.65, 0] },
-  rec: { name: "Rec Room", blurb: "The Rec Room — games, gadgets, and a suspicious cardboard box.", view: { pos: [0, 1.65, -6.9], yaw: 0, pitch: -0.12 }, door: [4.5, 1.65, -6] }
+  rec: { name: "Rec Room", blurb: "The Rec Room — games, gadgets, and a suspicious cardboard box.", view: { pos: [0, 1.65, -6.9], yaw: 0, pitch: -0.12 }, door: [4.5, 1.65, -6] },
+  kidspace: { name: "Ark KidSpace", blurb: "KidSpace — the fun place to work and play! Click the surprise box for help.", view: { pos: [0, 1.6, -56.6], yaw: 0, pitch: -0.13 } }
 };

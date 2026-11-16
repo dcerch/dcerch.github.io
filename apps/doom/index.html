@@ -1,0 +1,114 @@
+<!doctype html>
+<!--
+  DOOM (shareware episode) running in WebAssembly.
+  Engine: jacobenget/doom.wasm v0.1.0 (GPL-2.0) — https://github.com/jacobenget/doom.wasm
+          built on doomgeneric / fbDoom / Chocolate Doom (GPL-2.0). Source: link above.
+  Game data: the DOOM shareware WAD built into doom.wasm. id Software: "The DOOM shareware wad is
+          freely distributable" (John Carmack, 1999). Unmodified, never sold.
+  This wrapper (scaling, focus overlay, WASD, mouse and touch controls) is adapted from the
+  upstream examples/browser/doom.html.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <title>DOOM (shareware)</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #000; overflow: hidden; font: 12px Tahoma, "MS Sans Serif", sans-serif; color: #c0c0c0; touch-action: none; user-select: none; }
+    #wrap { position: absolute; inset: 0 0 22px 0; display: grid; place-items: center; }
+    canvas#DoomGame { display: block; image-rendering: pixelated; image-rendering: crisp-edges; outline: none; background: #000; }
+    #overlay { position: absolute; inset: 0 0 22px 0; display: grid; place-items: center; background: rgba(0,0,0,.65); cursor: pointer; text-align: center; }
+    #overlay b { display: block; font: bold 28px Impact, "Arial Black", sans-serif; color: #c00; letter-spacing: 2px; text-shadow: 2px 2px 0 #300; }
+    #overlay span { color: #ddd; }
+    #bar { position: absolute; left: 0; right: 0; bottom: 0; height: 22px; display: flex; align-items: center; gap: 12px; padding: 0 8px; background: #c0c0c0; color: #000; white-space: nowrap; overflow: hidden; }
+    #bar a { color: #000080; }
+    #touch { position: absolute; inset: 0 0 22px 0; pointer-events: none; display: none; }
+    body.touch #touch { display: block; }
+    .pad { position: absolute; pointer-events: auto; width: 54px; height: 54px; border-radius: 10px; background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.35); color: #fff; font: bold 16px Arial; display: grid; place-items: center; }
+    .pad:active, .pad.on { background: rgba(255,255,255,.35); }
+  </style>
+</head>
+<body>
+  <div id="wrap"><canvas id="DoomGame" tabindex="0"></canvas></div>
+  <div id="overlay"><div><b>DOOM</b><span>Click to play · Ctrl/click = fire · Space = open doors</span></div></div>
+  <div id="touch">
+    <button class="pad" data-k="ArrowUp" style="left:70px;bottom:130px">▲</button>
+    <button class="pad" data-k="ArrowLeft" style="left:12px;bottom:72px">◀</button>
+    <button class="pad" data-k="ArrowRight" style="left:128px;bottom:72px">▶</button>
+    <button class="pad" data-k="ArrowDown" style="left:70px;bottom:14px">▼</button>
+    <button class="pad" data-k="Control" style="right:14px;bottom:72px;width:70px;height:70px;border-radius:35px;background:rgba(200,0,0,.35)">FIRE</button>
+    <button class="pad" data-k=" " style="right:96px;bottom:20px">USE</button>
+    <button class="pad" data-k="Enter" style="right:14px;top:12px;width:62px;height:34px">ENTER</button>
+    <button class="pad" data-k="Escape" style="left:12px;top:12px;width:62px;height:34px">MENU</button>
+  </div>
+  <div id="bar">
+    <span>Arrows/WASD move · , . strafe · Ctrl fire · Space use · Esc menu</span>
+    <span style="margin-left:auto">Shareware episode · engine <a href="https://github.com/jacobenget/doom.wasm" target="_blank" rel="noopener">doom.wasm</a> (GPL-2.0) · no sound</span>
+  </div>
+  <script>
+    "use strict";
+    const canvas = document.getElementById("DoomGame");
+    const ctx = canvas.getContext("2d");
+    const overlay = document.getElementById("overlay");
+    let mem = null, img = null, exportsRef = null;
+
+    function fit() {
+      if (!canvas.width) return;
+      const W = innerWidth, H = innerHeight - 22, ar = canvas.width / (canvas.height * 1.2); // DOOM's 320x200 used non-square pixels
+      let w = W, h = W / ar; if (h > H) { h = H; w = H * ar; }
+      canvas.style.width = Math.floor(w) + "px"; canvas.style.height = Math.floor(h) + "px";
+    }
+    addEventListener("resize", fit);
+
+    const str = (p, n) => new TextDecoder().decode(new Uint8Array(mem.buffer).slice(p, p + n));
+    const imports = {
+      loading: { onGameInit(w, h) { canvas.width = w; canvas.height = h; img = ctx.createImageData(w, h); fit(); }, wadSizes() {}, readWads() {} },
+      ui: {
+        drawFrame(ptr) {
+          const src = new Uint8Array(mem.buffer, ptr, canvas.width * canvas.height * 4), d = img.data;
+          for (let i = 0; i < d.length; i += 4) { d[i] = src[i + 2]; d[i + 1] = src[i + 1]; d[i + 2] = src[i]; d[i + 3] = 255; }
+          ctx.putImageData(img, 0, 0);
+        }
+      },
+      runtimeControl: { timeInMilliseconds: () => BigInt(Math.trunc(performance.now())) },
+      console: { onInfoMessage(p, n) {}, onErrorMessage(p, n) { console.warn("[DOOM]", str(p, n)); } },
+      gameSaving: { sizeOfSaveGame: () => 0, readSaveGame: () => 0, writeSaveGame: () => 0 }
+    };
+
+    WebAssembly.instantiateStreaming(fetch("assets/doom.wasm"), imports).then(({ instance }) => {
+      const ex = exportsRef = instance.exports; mem = ex.memory;
+      const map = new Map([
+        ["ArrowLeft", ex.KEY_LEFTARROW], ["ArrowRight", ex.KEY_RIGHTARROW], ["ArrowUp", ex.KEY_UPARROW], ["ArrowDown", ex.KEY_DOWNARROW],
+        ["w", ex.KEY_UPARROW], ["s", ex.KEY_DOWNARROW], ["a", ex.KEY_STRAFE_L], ["d", ex.KEY_STRAFE_R],
+        ["W", ex.KEY_UPARROW], ["S", ex.KEY_DOWNARROW], ["A", ex.KEY_STRAFE_L], ["D", ex.KEY_STRAFE_R],
+        [",", ex.KEY_STRAFE_L], [".", ex.KEY_STRAFE_R], ["Control", ex.KEY_FIRE], [" ", ex.KEY_USE], ["e", ex.KEY_USE],
+        ["Shift", ex.KEY_SHIFT], ["Tab", ex.KEY_TAB], ["Escape", ex.KEY_ESCAPE], ["Enter", ex.KEY_ENTER], ["Backspace", ex.KEY_BACKSPACE], ["Alt", ex.KEY_ALT]
+      ]);
+      const toDoom = k => map.has(k) ? map.get(k) : (k.length === 1 ? k.toLowerCase().charCodeAt(0) : null);
+      const handle = (e, down) => {
+        const k = toDoom(e.key); if (k === null) return;
+        e.preventDefault(); e.stopPropagation(); down ? ex.reportKeyDown(k) : ex.reportKeyUp(k);
+      };
+      canvas.addEventListener("keydown", e => handle(e, true));
+      canvas.addEventListener("keyup", e => handle(e, false));
+      canvas.addEventListener("mousedown", e => { if (e.button === 0) ex.reportKeyDown(ex.KEY_FIRE); });
+      addEventListener("mouseup", e => { if (e.button === 0) ex.reportKeyUp(ex.KEY_FIRE); });
+      // touch pad
+      document.querySelectorAll(".pad").forEach(b => {
+        const k = toDoom(b.dataset.k);
+        const on = e => { e.preventDefault(); b.classList.add("on"); ex.reportKeyDown(k); };
+        const off = e => { e.preventDefault(); b.classList.remove("on"); ex.reportKeyUp(k); };
+        b.addEventListener("pointerdown", on); b.addEventListener("pointerup", off); b.addEventListener("pointercancel", off); b.addEventListener("pointerleave", off);
+      });
+      ex.initGame();
+      setInterval(() => { if (!document.hidden) ex.tickGame(); }, 1000 / 35);
+    }).catch(err => { overlay.innerHTML = "<div><b>DOOM</b><span>Couldn't start: " + String(err.message || err) + "</span></div>"; });
+
+    const start = () => { overlay.hidden = true; canvas.focus(); };
+    overlay.addEventListener("click", start);
+    canvas.addEventListener("blur", () => { if (!document.body.classList.contains("touch")) overlay.hidden = false; });
+    addEventListener("focus", () => canvas.focus());
+    if (matchMedia("(pointer: coarse)").matches) document.body.classList.add("touch");
+  </script>
+</body>
+</html>

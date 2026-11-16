@@ -46,6 +46,12 @@ export const sfx = {
   static() { noise(0.6, { vol: 0.15, freq: 3000, q: 0.3 }); },
   coin() { tone(988, 0.08, { type: "square", vol: 0.08 }); tone(1319, 0.3, { type: "square", vol: 0.08, at: 0.08 }); },
   secret() { [392, 523, 659, 784, 1047].forEach((f, i) => tone(f, 0.35, { type: "triangle", vol: 0.12, at: i * 0.09 })); },
+  beep() { [880, 660, 990, 520].forEach((f, i) => tone(f, 0.09, { type: "square", vol: 0.07, at: i * 0.1 })); },
+  bubble() { for (let i = 0; i < 6; i++) tone(300 + Math.random() * 500, 0.12, { type: "sine", vol: 0.08, at: i * 0.07, slide: 1.8 }); },
+  boing() { tone(180, 0.5, { type: "sine", vol: 0.16, slide: 3.2 }); tone(360, 0.35, { type: "triangle", vol: 0.06, slide: 2.4, at: 0.05 }); },
+  rocket() { noise(1.6, { vol: 0.2, freq: 400, q: 0.5, type: "lowpass" }); tone(120, 1.4, { type: "sawtooth", vol: 0.05, slide: 4 }); },
+  crumple() { for (let i = 0; i < 7; i++) noise(0.05, { vol: 0.18, freq: 1800 + Math.random() * 2000, q: 1, at: i * 0.05 + Math.random() * 0.03 }); },
+  talk() { for (let i = 0; i < 5; i++) tone(420 + Math.random() * 260, 0.06, { type: "square", vol: 0.035, at: i * 0.07 }); },
   // A short, original "welcome home" jingle in a mid-90s multimedia style.
   startup() {
     const notes = [[523, 0], [659, 0.18], [784, 0.36], [1047, 0.54], [988, 0.9], [784, 1.08], [880, 1.26], [1047, 1.6]];

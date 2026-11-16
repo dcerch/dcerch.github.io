@@ -6,10 +6,11 @@
 import * as THREE from "three";
 import * as T from "./textures.js";
 import { TRINKETS, CERTIFICATIONS, VOLUNTEERING, FAMILY, CATS } from "./data.js";
+import { pbr } from "./assets.js";
 
 const H = 3.2;          // wall height
 const WT = 0.16;        // wall thickness
-const FACE = { s: 0, n: Math.PI, e: Math.PI / 2, w: -Math.PI / 2 }; // which way a prop's front faces: s=+z, e=+x
+export const FACE = { s: 0, n: Math.PI, e: Math.PI / 2, w: -Math.PI / 2 }; // which way a prop's front faces: s=+z, e=+x
 
 // ---------------------------------------------------------------- helpers
 export function M(color, o = {}) {
@@ -19,26 +20,32 @@ export function M(color, o = {}) {
     transparent: !!o.t, opacity: o.op ?? 1, side: o.side ?? THREE.FrontSide, flatShading: !!o.flat
   });
 }
-const B = (w, h, d) => new THREE.BoxGeometry(w, h, d);
-const C = (rt, rb, h, s = 20, ...rest) => new THREE.CylinderGeometry(rt, rb, h, s, ...rest);
-const S = (r, w = 20, h = 14, ...rest) => new THREE.SphereGeometry(r, w, h, ...rest);
-function add(parent, geo, mat, x = 0, y = 0, z = 0, shadow = true) {
+export const B = (w, h, d) => new THREE.BoxGeometry(w, h, d);
+export const C = (rt, rb, h, s = 20, ...rest) => new THREE.CylinderGeometry(rt, rb, h, s, ...rest);
+export const S = (r, w = 20, h = 14, ...rest) => new THREE.SphereGeometry(r, w, h, ...rest);
+export function add(parent, geo, mat, x = 0, y = 0, z = 0, shadow = true) {
   const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z);
   m.castShadow = shadow; m.receiveShadow = true; parent.add(m); return m;
 }
-function group(parent, x = 0, y = 0, z = 0, face = 0) {
+export function group(parent, x = 0, y = 0, z = 0, face = 0) {
   const g = new THREE.Group(); g.position.set(x, y, z); g.rotation.y = face; parent.add(g); return g;
 }
-function scaleUV(geo, su, sv) {
+export function scaleUV(geo, su, sv) {
   const uv = geo.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * su, uv.getY(i) * sv);
   uv.needsUpdate = true; return geo;
 }
+
+/** Glossy varnished wood, the signature Navigator look. */
+export function varnish(map, { color = 0xffffff, rough = 0.5, coat = 0.75 } = {}) {
+  return new THREE.MeshPhysicalMaterial({ color, map, roughness: rough, clearcoat: coat, clearcoatRoughness: 0.14, envMapIntensity: 0.9 });
+}
+const swap = g => { g.traverse(c => { if (c.isMesh && !c.userData.keepMat) c.userData.swap = true; }); return g; };
 
 // ---------------------------------------------------------------- world
 export function buildWorld(scene) {
   const hotspots = [];
   const updaters = [];
-  const refs = { ceilings: [], roomFloors: {} };
+  const refs = { ceilings: [], roomFloors: {}, certFrames: [] };
 
   /** Mark an object as clickable. def: { id, label, desc, action, focus:[dx,dy,dz], room } */
   function hot(obj, def) {
@@ -48,19 +55,19 @@ export function buildWorld(scene) {
 
   // ---------- materials
   const mat = {
-    cherry: M(0xffffff, { map: T.woodTex("#7a2a14", 7, [1, 1]), r: 0.55 }),
-    cherryDark: M(0xffffff, { map: T.woodTex("#4f1a0b", 9, [1, 1]), r: 0.5 }),
-    oak: M(0xffffff, { map: T.woodTex("#a8743d", 5, [1, 1]), r: 0.6 }),
-    cream: M(0xffffff, { map: T.wallTex("living") }),
-    kitchenWall: M(0xffffff, { map: T.wallTex("kitchen") }),
-    denWall: M(0xffffff, { map: T.wallTex("den") }),
-    recWall: M(0xffffff, { map: T.wallTex("rec") }),
-    stucco: M(0xe9d7ae, { r: 0.95 }),
-    ceiling: M(0xf4ecdc, { r: 1 }),
+    cherry: varnish(T.woodTex("#7a2a14", 7, [1, 1])),
+    cherryDark: varnish(T.woodTex("#4f1a0b", 9, [1, 1]), { rough: 0.45 }),
+    oak: varnish(T.woodTex("#a8743d", 5, [1, 1]), { rough: 0.55, coat: 0.5 }),
+    cream: pbr("beige_wall_001", { color: 0xfbefd2 }),
+    kitchenWall: new THREE.MeshStandardMaterial({ color: 0xf7efd8, roughness: 0.92, normalMap: pbr("beige_wall_001").normalMap }),
+    denWall: pbr("beige_wall_001", { color: 0x6f9478 }),
+    recWall: pbr("beige_wall_001", { color: 0x7484c8 }),
+    stucco: pbr("white_plaster_02", { color: 0xf1e2bd }),
+    ceiling: M(0xfbf5e8, { r: 0.95 }),
     black: M(0x161616, { r: 0.4 }),
     metal: M(0xb8bcc4, { r: 0.3, m: 0.8 }),
     brass: M(0xc9a54a, { r: 0.35, m: 0.85 }),
-    glass: M(0xbfe3ff, { t: true, op: 0.18, r: 0.05 }),
+    glass: new THREE.MeshPhysicalMaterial({ color: 0xdff0ff, transparent: true, opacity: 0.16, roughness: 0.02, metalness: 0, envMapIntensity: 1.4 }),
     beige: M(0xd9d0b8, { r: 0.6 }),
     white: M(0xf4f1ea, { r: 0.5 })
   };
@@ -144,17 +151,17 @@ export function buildWorld(scene) {
   // floors + ceilings
   function floor(name, x0, x1, z0, z1, m) {
     const w = x1 - x0, d = z1 - z0;
-    const f = add(scene, scaleUV(new THREE.PlaneGeometry(w, d), w / 3, d / 3), m, (x0 + x1) / 2, 0, (z0 + z1) / 2, false);
+    const f = add(scene, scaleUV(new THREE.PlaneGeometry(w, d), w / 2, d / 2), m, (x0 + x1) / 2, 0, (z0 + z1) / 2, false);
     f.rotation.x = -Math.PI / 2; refs.roomFloors[name] = f;
     const c = add(scene, new THREE.PlaneGeometry(w, d), mat.ceiling, (x0 + x1) / 2, H, (z0 + z1) / 2, false);
     c.rotation.x = Math.PI / 2; c.castShadow = true; refs.ceilings.push(c);
     // baseboard-ish foundation slab visible from outside
     add(scene, B(w + 0.3, 0.25, d + 0.3), M(0x8d8578, { r: 1 }), (x0 + x1) / 2, -0.13, (z0 + z1) / 2, false);
   }
-  floor("living", -6, 6, -6, 6, M(0xffffff, { map: T.woodTex("#7a2a14", 3, [1, 1], 8), r: 0.9 }));
-  floor("kitchen", 6, 14, -5, 5, M(0xffffff, { map: T.tileTex(), r: 0.8 }));
-  floor("den", -14, -6, -5, 5, M(0xffffff, { map: T.woodTex("#5a2410", 13, [1, 1], 8), r: 0.9 }));
-  floor("rec", -6, 6, -14, -6, M(0x4a5b7a, { r: 1 }));
+  floor("living", -6, 6, -6, 6, pbr("rectangular_parquet", { color: 0xffb680, roughness: 1.15 }));
+  floor("kitchen", 6, 14, -5, 5, M(0xffffff, { map: T.tileTex(), r: 0.45 }));
+  floor("den", -14, -6, -5, 5, pbr("herringbone_parquet", { color: 0xd88a5c, roughness: 1.15 }));
+  floor("rec", -6, 6, -14, -6, pbr("velour_velvet", { color: 0x7a86c8 }));
   // roof cap rim (for the map view)
   const rim = M(0xd9c48f, { r: 1 });
   [[0, 0, 12.3, 12.3], [10, 0, 8.3, 10.3], [-10, 0, 8.3, 10.3], [0, -10, 12.3, 8.3]].forEach(([x, z, w, d]) => {
@@ -163,11 +170,43 @@ export function buildWorld(scene) {
   // ceiling beams (Navigator 3.5 had dark wood beams)
   for (let x = -4; x <= 4; x += 4) add(scene, B(0.22, 0.26, 12), mat.cherryDark, x, H - 0.13, 0);
   // wainscot rail in living room
-  [[0, -5.9, 12, 0], [0, 5.9, 12, 0]].forEach(([x, z, w]) => add(scene, B(w, 0.06, 0.04), mat.cherryDark, x, 0.95, z));
+  // ---------- architectural trim: baseboards, crown molding, and cherry wainscoting (Navigator's paneled look)
+  const trimWhite = M(0xf3ead6, { r: 0.5 });
+  function trim(x0, x1, z0, z1, gaps, { wains = false, baseMat = trimWhite } = {}) {
+    const inset = WT / 2;
+    const sides = [
+      ["x", z0 + inset, x0, x1, 1], ["x", z1 - inset, x0, x1, -1],
+      ["z", x0 + inset, z0, z1, 1], ["z", x1 - inset, z0, z1, -1]
+    ];
+    sides.forEach(([axis, fixed, a, b, sgn], si) => {
+      const holes = (gaps[si] || []).slice().sort((p, q) => p[0] - q[0]);
+      const runs = []; let u = a + inset;
+      holes.forEach(([h0, h1]) => { runs.push([u, h0 - 0.08]); u = h1 + 0.08; }); runs.push([u, b - inset]);
+      const strip = (u0, u1, y, h, d, m) => {
+        if (u1 - u0 < 0.02) return;
+        const len = u1 - u0, mid = (u0 + u1) / 2, off = fixed + sgn * d / 2;
+        add(scene, axis === "x" ? B(len, h, d) : B(d, h, len), m, axis === "x" ? mid : off, y, axis === "x" ? off : mid, false);
+      };
+      runs.forEach(([u0, u1]) => {
+        strip(u0, u1, 0.07, 0.14, 0.03, baseMat);
+        if (wains) {
+          strip(u0, u1, 0.5, 0.86, 0.02, mat.cherry);            // the panel field
+          strip(u0, u1, 0.95, 0.07, 0.045, mat.cherryDark);      // chair rail
+          for (let p = u0 + 0.3; p < u1 - 0.2; p += 0.7) strip(p, p + 0.04, 0.5, 0.86, 0.035, mat.cherryDark); // stiles
+        }
+      });
+      strip(a + inset, b - inset, H - 0.06, 0.12, 0.06, trimWhite); // crown molding (runs over door heads)
+    });
+  }
+  // gaps per side: [z0 wall (north), z1 wall (south), x0 wall (west), x1 wall (east)]
+  trim(-6, 6, -6, 6, [[[3.6, 5.4]], [[-0.55, 0.55]], [[-1, 1]], [[-1, 1]]], { wains: true, baseMat: mat.cherryDark });
+  trim(6, 14, -5, 5, [[], [], [[-1, 1]], []]);
+  trim(-14, -6, -5, 5, [[], [], [], [[-1, 1]]], { wains: true, baseMat: mat.cherryDark });
+  trim(-6, 6, -14, -6, [[], [[3.6, 5.4]], [], []]);
 
   // ---------- lights (warm, room by room)
   function lamp(x, z, color = 0xffd9a0, intensity = 9, dist = 11) {
-    const l = new THREE.PointLight(color, intensity, dist, 1.4); l.position.set(x, H - 0.45, z); scene.add(l);
+    const l = new THREE.PointLight(color, intensity * 0.6, dist, 1.4); l.position.set(x, H - 0.45, z); scene.add(l);
     const shade = add(scene, C(0.18, 0.32, 0.22, 16), M(0xf5e1b0, { e: 0xffd28a, ei: 0.7 }), x, H - 0.35, z, false);
     add(scene, C(0.01, 0.01, 0.25, 4), mat.brass, x, H - 0.12, z, false);
     return l;
@@ -183,16 +222,16 @@ export function buildWorld(scene) {
 
   // fireplace + mantle + portrait + candle
   const fp = group(living, -2.8, 0, -5.7, FACE.s);
-  add(fp, scaleUV(B(2.6, H, 0.5), 1.4, 1.6), M(0xffffff, { map: T.brickTex(), r: 0.95 }), 0, H / 2, 0);
+  add(fp, scaleUV(B(2.6, H, 0.5), 1.3, 1.6), pbr("red_brick_03", { color: 0xffe2d0 }), 0, H / 2, 0);
   add(fp, B(1.2, 0.85, 0.3), M(0x0d0806), 0, 0.5, 0.12);
   add(fp, B(1.6, 0.08, 0.6), M(0x6d6a66), 0, 0.04, 0.4);
   add(fp, B(2.9, 0.1, 0.42), mat.cherry, 0, 1.25, 0.3);
   const embers = add(fp, B(0.8, 0.12, 0.2), M(0x330800, { e: 0xff5a10, ei: 1.4 }), 0, 0.15, 0.18, false);
-  const fireLight = new THREE.PointLight(0xff7a2a, 3, 5, 1.6); fireLight.position.set(0, 0.5, 0.6); fp.add(fireLight);
-  updaters.push(t => { fireLight.intensity = 2.4 + Math.sin(t * 9) * 0.4 + Math.sin(t * 23) * 0.3; embers.material.emissiveIntensity = 1.1 + Math.sin(t * 7) * 0.3; });
+  const fireLight = new THREE.PointLight(0xff7a2a, 1, 4, 2); fireLight.position.set(0, 0.45, 0.45); fp.add(fireLight);
+  updaters.push(t => { fireLight.intensity = 0.8 + Math.sin(t * 9) * 0.15 + Math.sin(t * 23) * 0.1; embers.material.emissiveIntensity = 1.1 + Math.sin(t * 7) * 0.3; });
 
   const portrait = group(fp, 0, 2.15, 0.27);
-  add(portrait, B(1.5, 1.14, 0.06), mat.brass);
+  swap(add(portrait, B(1.5, 1.14, 0.06), mat.brass));
   const pc = T.portraitCanvas(FAMILY, CATS); refs.portraitCanvas = pc;
   add(portrait, new THREE.PlaneGeometry(1.36, 1.0), M(0xffffff, { map: T.tex(pc), r: 0.6 }), 0, 0, 0.035, false);
   hot(portrait, { id: "family", label: "Family portrait", desc: "Picture day, 1996. Dad, Mom, the big sister, two big brothers, me — and the three cats who ran the house.", action: { type: "panel", panel: "family" }, focus: [0, -0.1, 1.9] });
@@ -215,6 +254,7 @@ export function buildWorld(scene) {
   const tv = group(ent, 0.15, 0.7, 0);
   add(tv, B(1.0, 0.82, 0.62), M(0x2b2b2e, { r: 0.45 }), 0, 0.41, -0.02);
   add(tv, B(0.12, 0.05, 0.02), M(0xff3030, { e: 0xff2020, ei: 0.8 }), 0.38, 0.06, 0.3, false);
+  swap(tv);
   const tvScreen = new T.CanvasScreen(512, 384); refs.tvScreen = tvScreen;
   const tvGlass = add(tv, new THREE.PlaneGeometry(0.82, 0.6), new THREE.MeshBasicMaterial({ map: tvScreen.texture }), 0, 0.45, 0.295, false);
   tvGlass.userData.keepMat = true;
@@ -224,6 +264,7 @@ export function buildWorld(scene) {
   const ct = group(living, 0, 0, -0.5, FACE.s);
   add(ct, B(1.7, 0.07, 0.85), mat.cherry, 0, 0.44, 0);
   [[-0.75, -0.35], [0.75, -0.35], [-0.75, 0.35], [0.75, 0.35]].forEach(([x, z]) => add(ct, B(0.07, 0.42, 0.07), mat.cherryDark, x, 0.21, z));
+  swap(ct);
   const ballot = group(ct, -0.2, 0.475, 0);
   add(ballot, B(0.42, 0.36, 0.32), M(0x1f3f7a, { r: 0.5 }), 0, 0.18, 0);
   add(ballot, B(0.25, 0.012, 0.03), mat.black, 0, 0.365, 0, false);
@@ -243,9 +284,7 @@ export function buildWorld(scene) {
     for (let i = 0; i < Math.round(w / 0.8); i++) add(g, B(w / Math.round(w / 0.8) - 0.05, 0.12, 0.62), M(color, { r: 1 }), -w / 2 + 0.2 + (i + 0.5) * ((w - 0.4) / Math.round(w / 0.8)), 0.48, 0.05);
     return g;
   }
-  couch(living, -3.2, 5.35, FACE.n, 2.5, 0x2f5a52);
-  couch(living, -2.9, -0.4, FACE.e, 1.05, 0x8a5a2b);
-  couch(living, 2.9, -0.4, FACE.w, 1.05, 0x8a5a2b);
+
 
   // family PC desk (classic terminal site) on west wall
   const desk = group(living, -5.45, 0, -4.35, FACE.e);
@@ -264,6 +303,7 @@ export function buildWorld(scene) {
   const chair = group(desk, 0, 0, 0.75);
   add(chair, B(0.45, 0.06, 0.45), M(0x333333), 0, 0.46, 0); add(chair, C(0.03, 0.03, 0.44, 8), mat.metal, 0, 0.22, 0);
   add(chair, B(0.45, 0.45, 0.05), M(0x333333), 0, 0.72, 0.21);
+  swap(chair);
 
   // LinkedIn dress form wearing a suit
   const form = group(living, -5.15, 0, -2.6, Math.PI / 4 + Math.PI / 6);
@@ -285,6 +325,7 @@ export function buildWorld(scene) {
   const st = group(living, 5.45, 0, -3.0, FACE.w);
   add(st, C(0.3, 0.3, 0.04, 20), mat.cherry, 0, 0.66, 0); add(st, C(0.04, 0.06, 0.64, 10), mat.cherryDark, 0, 0.32, 0);
   add(st, C(0.2, 0.2, 0.02, 20), mat.cherryDark, 0, 0.01, 0);
+  swap(st);
   const phone = group(st, 0, 0.68, 0);
   const red = M(0xa01c1c, { r: 0.35 });
   add(phone, B(0.24, 0.1, 0.2), red, 0, 0.05, 0);
@@ -298,6 +339,7 @@ export function buildWorld(scene) {
   const plant = group(living, 5.3, 0, 5.3);
   add(plant, C(0.22, 0.17, 0.4, 14), M(0xb5653a), 0, 0.2, 0);
   for (let i = 0; i < 9; i++) { const l = add(plant, S(0.25, 6, 5), M(0x3d7a3a, { flat: true }), Math.sin(i) * 0.2, 0.6 + (i % 3) * 0.25, Math.cos(i) * 0.2); l.scale.set(0.6, 1.4, 0.3); l.rotation.set(i, i * 2, 0.3); }
+  swap(plant);
   // front door
   const fdoor = group(scene, -0.54, 0, 5.98, FACE.n); // pivots on its hinge
   add(fdoor, B(1.08, 2.33, 0.05), mat.cherry, -0.54, 1.165, 0);
@@ -380,6 +422,7 @@ export function buildWorld(scene) {
   const bowl = group(kt, 0, 0.78, 0);
   add(bowl, S(0.18, 16, 8, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), M(0x2f6aa3, { side: THREE.DoubleSide }), 0, 0.17, 0).rotation.x = Math.PI;
   [[0xd33, -0.05, 0.03], [0xfa0, 0.06, -0.02], [0x6c3, 0, 0.07]].forEach(([c, x, z]) => add(bowl, S(0.055, 10, 8), M(c), x, 0.08, z));
+  swap(kt);
   // wall clock
   const clk = group(kitchen, 10, 2.3, -4.9, FACE.s);
   add(clk, C(0.25, 0.25, 0.05, 28), M(0xffffff), 0, 0, 0).rotation.x = Math.PI / 2;
@@ -400,7 +443,8 @@ export function buildWorld(scene) {
     const col = i % 3, row = Math.floor(i / 3);
     const f = group(certWall, (col - 1) * 1.05, 2.3 - row * 0.85, 0);
     add(f, B(0.82, 0.64, 0.04), mat.cherryDark);
-    add(f, new THREE.PlaneGeometry(0.72, 0.54), M(0xffffff, { map: T.certificateTex(c), r: 0.7 }), 0, 0, 0.022, false);
+    const cp = add(f, new THREE.PlaneGeometry(0.72, 0.54), M(0xffffff, { map: T.certificateTex(c), r: 0.7 }), 0, 0, 0.022, false);
+    swap(f); f.userData.certTex = cp.material.map; refs.certFrames.push(f);
     hot(f, { id: "cert-" + i, label: c.name + (c.code ? " (" + c.code + ")" : ""), desc: c.issuer + " — click to open the trophy room record.", action: { type: "panel", panel: "accomplishments" }, focus: [0, 0, 1.3] });
   });
   add(certWall, new THREE.PlaneGeometry(1.5, 0.24), M(0xffffff, { map: T.labelTex("CERTIFICATIONS", { bg: "#3a2414", fg: "#e9c46a", font: "bold 54px Georgia", w: 600, h: 96 }) }), 0, 2.98, 0.01, false);
@@ -462,7 +506,7 @@ export function buildWorld(scene) {
   add(mc, new THREE.PlaneGeometry(0.5, 0.12), M(0xffffff, { map: T.labelTex("THE ARCHIVE", { bg: "#c9a54a", fg: "#1c1c1c", font: "bold 60px Georgia" }) }), 0, 0.8, 0.452, false);
   hot(mc, { id: "archived", label: "The Archive (museum case)", desc: "Retired apps, preserved: Overwatch Workshop Repository, Raspberry Pi Designer, Garage to Table.", action: { type: "app", app: "archived" }, focus: [0, 1.2, 1.6] });
   // leather chair
-  couch(den, -9.7, -3.2, FACE.e + 0.7, 1.0, 0x5a2a14);
+
 
   // =====================================================================
   // REC ROOM
@@ -488,13 +532,14 @@ export function buildWorld(scene) {
   const boxM = add(kb, B(0.9, 0.7, 0.7), cardboard, 0, 0.35, 0);
   add(kb, B(0.9, 0.02, 0.06), M(0xc8a16a), 0, 0.705, 0, false);
   add(kb, new THREE.PlaneGeometry(0.4, 0.2), M(0xffffff, { map: T.labelTex("FRAGILE", { bg: null, fg: "#7a1a1a", font: "bold 70px Arial" }), t: true }), 0.1, 0.4, 0.351, false);
+  swap(kb);
   const codec = group(kb, -0.1, 0.71, 0.05);
   add(codec, B(0.22, 0.05, 0.14), M(0x2a2f2a, { r: 0.4 }), 0, 0.025, 0);
   add(codec, new THREE.PlaneGeometry(0.15, 0.08), M(0x0, { e: 0x38ff9a, ei: 0.7 }), 0, 0.0505, 0.0, false).rotation.x = -Math.PI / 2;
   add(codec, C(0.004, 0.004, 0.18, 4), mat.metal, 0.09, 0.12, -0.04);
   const bang = add(kb, new THREE.PlaneGeometry(0.25, 0.35), new THREE.MeshBasicMaterial({ map: T.labelTex("!", { bg: null, fg: "#ff2a2a", font: "bold 220px Impact", w: 128, h: 192 }), transparent: true, depthWrite: false }), 0, 1.35, 0, false);
   bang.visible = false; bang.userData.keepMat = true; refs.bang = bang;
-  hot(kb, { id: "kojima", label: "A suspicious cardboard box", desc: "Kojima Name Generator — tune the codec and forge your true codename.", action: { type: "app", app: "kojima" }, focus: [0, 0.8, 1.6], onHover: on => { bang.visible = on; boxM.position.y = on ? 0.38 : 0.35; } });
+  hot(kb, { id: "kojima", label: "A suspicious cardboard box", desc: "Kojima Name Generator — tune the codec and forge your true codename.", action: { type: "app", app: "kojima" }, focus: [0, 0.8, 1.6], onHover: on => { bang.visible = on; kb.position.y = on ? 0.04 : 0; } });
 
   // card table: Everybody is John
   const tt = group(rec, 2.0, 0, -10.6);
@@ -514,6 +559,7 @@ export function buildWorld(scene) {
   const ls = group(rec, 5.9, 0, -9.6, FACE.w);
   const ring = add(ls, new THREE.TorusGeometry(0.3, 0.09, 12, 28), M(0xf04a2a, { r: 0.6 }), 0, 1.75, 0.08);
   for (let i = 0; i < 4; i++) { const b = add(ls, new THREE.TorusGeometry(0.3, 0.095, 6, 6, 0.35), M(0xffffff), 0, 1.75, 0.08, false); b.rotation.z = i * Math.PI / 2 + 0.6; }
+  swap(ls);
   add(ls, B(0.6, 0.05, 0.3), M(0x9a8a6a, { r: 1 }), 0, 0.9, 0.15);
   const bottle = group(ls, 0, 0.93, 0.15, 0); bottle.rotation.z = Math.PI / 2;
   add(bottle, C(0.06, 0.06, 0.24, 14), M(0x5aa080, { t: true, op: 0.55, r: 0.1 }), 0, 0, 0).userData.keepMat = false;
@@ -600,7 +646,9 @@ export function buildWorld(scene) {
   doorway("den", -6, 0, "z", "→ Den");
   doorway("living", -6.02, 0, "z", "→ Living Room");
 
-  return { hotspots, updaters, refs };
+  refs.g = { living, kitchen, den, rec, fp, portrait, ent, tv, ct, ballot, desk, chair, st, plant, kt, run, dd, kb, codec, ls, tt, mc, bs, vs, form, xt, arc, clk };
+  refs.mat = mat;
+  return { hotspots, updaters, refs, hot };
 }
 
 // ---------------------------------------------------------------- cats

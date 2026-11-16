@@ -1,0 +1,17 @@
+DOOM on dominiccerchio.com
+==========================
+
+Engine: doom.wasm v0.1.0 by Jacob Enget
+        https://github.com/jacobenget/doom.wasm
+        License: GNU General Public License v2.0 (GPL-2.0)
+        Built on doomgeneric, fbDoom and Chocolate Doom (all GPL-2.0).
+        Complete corresponding source code is available at the URL above
+        (release v0.1.0). assets/doom.wasm is the unmodified release binary.
+
+Game data: the DOOM shareware episode ("Knee-Deep in the Dead"), DOOM1.WAD,
+        compiled into doom.wasm. Copyright id Software. The shareware WAD may be
+        freely distributed unmodified and free of charge ("The DOOM shareware wad
+        is freely distributable." — John Carmack, 1999). It is never sold here.
+
+index.html in this folder is a small wrapper (scaling, focus overlay, WASD,
+mouse and touch controls) adapted from doom.wasm's examples/browser/doom.html.

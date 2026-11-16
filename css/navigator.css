@@ -181,6 +181,20 @@ body:not(.in-house) .chrome { opacity: 0; pointer-events: none; }
 .dir span { font-size: 13px; color: #555; }
 .journal ol { padding-left: 22px; } .journal li { margin-bottom: 10px; font-family: "Comic Sans MS", "Segoe Print", cursive; }
 
+/* ---------------- KidSpace ---------------- */
+#warp { position: fixed; inset: 0; z-index: 30; pointer-events: none; opacity: 0; transition: opacity .4s;
+  background: radial-gradient(circle at 50% 50%, #fff 0 8%, #b8e6ff 25%, #5a3ad8 60%, #0a0a2a 100%); }
+#warp.on { opacity: 1; }
+#kidBubble {
+  position: fixed; z-index: 15; transform: translate(-50%, calc(-100% - 18px)); max-width: min(300px, 70vw); padding: 14px 18px;
+  background: #fff; color: #7a1010; border: 3px solid #222; border-radius: 50% / 40%; font: bold 18px/1.25 "Comic Sans MS", "Chalkboard SE", "Segoe Print", cursive;
+  text-align: center; pointer-events: none; box-shadow: 3px 4px 0 rgba(0,0,0,.35);
+}
+#kidBubble::after { content: ""; position: absolute; left: 50%; bottom: -16px; border: 10px solid transparent; border-top: 16px solid #222; translate: -50% 0; }
+body.in-kidspace #topbar { background: linear-gradient(180deg, rgba(40,30,110,.85), rgba(20,10,60,.8)); }
+body.in-kidspace #statusbar { background: #120a3a; }
+.tile.kid { background: linear-gradient(145deg, #4a3ab8, #1a1050); }
+
 /* ---------------- Boot ---------------- */
 #boot { position: fixed; inset: 0; z-index: 100; background: #000; transition: opacity .7s; }
 #boot.gone { opacity: 0; pointer-events: none; }

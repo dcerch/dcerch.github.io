@@ -1,0 +1,159 @@
+/* ==================================================================
+   win95.css — a hand-built Windows 95-style desktop (no Microsoft assets)
+   ================================================================== */
+:root {
+  --face: #c0c0c0; --shadow: #808080; --dark: #000; --hi: #fff; --light: #dfdfdf;
+  --title: linear-gradient(90deg, #000080, #1084d0); --title-off: linear-gradient(90deg, #808080, #b5b5b5);
+  --font: "MS Sans Serif", "Microsoft Sans Serif", "Pixelated MS Sans Serif", Tahoma, "Segoe UI", Geneva, sans-serif;
+  --tb-h: 30px;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; height: 100%; overflow: hidden; font: 12px/1.3 var(--font); color: #000; background: #008080; user-select: none; -webkit-user-select: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+#wallpaper { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; }
+body.wp-teal #wallpaper { display: none; }
+
+/* ---------------- bevel helpers ---------------- */
+.raised { background: var(--face); box-shadow: inset -1px -1px var(--dark), inset 1px 1px var(--hi), inset -2px -2px var(--shadow), inset 2px 2px var(--light); }
+.sunken { box-shadow: inset -1px -1px var(--hi), inset 1px 1px var(--shadow), inset -2px -2px var(--light), inset 2px 2px var(--dark); }
+.btn {
+  min-width: 75px; min-height: 23px; padding: 3px 12px; border: 0; background: var(--face); cursor: default;
+  box-shadow: inset -1px -1px var(--dark), inset 1px 1px var(--hi), inset -2px -2px var(--shadow), inset 2px 2px var(--light);
+}
+.btn:active, .btn.pressed { box-shadow: inset -1px -1px var(--hi), inset 1px 1px var(--dark), inset -2px -2px var(--light), inset 2px 2px var(--shadow); padding: 4px 11px 2px 13px; }
+.btn:focus-visible { outline: 1px dotted #000; outline-offset: -5px; }
+.btn.default { outline: 1px solid #000; }
+.field { background: #fff; padding: 3px 4px; border: 0; box-shadow: inset -1px -1px var(--hi), inset 1px 1px var(--shadow), inset -2px -2px var(--light), inset 2px 2px var(--dark); outline: none; }
+
+/* ---------------- desktop icons ---------------- */
+#desktop { position: fixed; inset: 0 0 var(--tb-h) 0; }
+#icons { position: absolute; inset: 4px; display: flex; flex-direction: column; flex-wrap: wrap; align-content: flex-start; gap: 4px 6px; }
+.dicon {
+  width: 84px; height: 72px; padding: 2px; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: default;
+  background: none; border: 0; color: #fff; text-align: center;
+}
+.dicon .ico { width: 32px; height: 32px; flex: 0 0 32px; }
+.dicon .ico svg { width: 32px; height: 32px; display: block; }
+.dicon .lbl { padding: 0 2px; font-size: 11px; line-height: 13px; text-shadow: 1px 1px 0 rgba(0,0,0,.65); overflow-wrap: normal; word-break: normal; white-space: normal; }
+.dicon:focus { outline: none; }
+.dicon.sel .lbl, .dicon:focus-visible .lbl { background: #000080; outline: 1px dotted #ffff7f; text-shadow: none; }
+.dicon.sel .ico { filter: drop-shadow(0 0 0 #000080) brightness(.6) sepia(1) hue-rotate(190deg) saturate(4); }
+body.wp-teal .dicon .lbl { text-shadow: none; }
+
+/* ---------------- windows ---------------- */
+.window { position: absolute; display: flex; flex-direction: column; padding: 3px; min-width: 160px; min-height: 80px; }
+.window.maximized { border-radius: 0; }
+.titlebar { height: 18px; display: flex; align-items: center; gap: 3px; padding: 0 2px 0 3px; background: var(--title-off); color: #c0c0c0; font-weight: bold; flex: 0 0 auto; }
+.window.active .titlebar { background: var(--title); color: #fff; }
+.titlebar .ticon { width: 16px; height: 16px; flex: 0 0 16px; }
+.titlebar .ticon svg { width: 16px; height: 16px; display: block; }
+.titlebar .ttext { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.titlebar .tbtn {
+  width: 16px; height: 14px; padding: 0; border: 0; display: grid; place-items: center; background: var(--face); color: #000; flex: 0 0 auto;
+  box-shadow: inset -1px -1px var(--dark), inset 1px 1px var(--hi), inset -2px -2px var(--shadow), inset 2px 2px var(--light);
+}
+.titlebar .tbtn:active { box-shadow: inset -1px -1px var(--hi), inset 1px 1px var(--dark), inset -2px -2px var(--light), inset 2px 2px var(--shadow); }
+.titlebar .tbtn svg { width: 8px; height: 7px; display: block; }
+.titlebar .tbtn.close { margin-left: 2px; }
+.wbody { flex: 1; position: relative; display: flex; flex-direction: column; margin-top: 2px; min-height: 0; }
+.wbody iframe { flex: 1; width: 100%; border: 0; display: block; background: #c0c0c0; }
+body.dragging iframe { pointer-events: none; }
+/* clicks into a background program's iframe never reach us; this cover catches the first click so the window comes to front */
+.window:not(.active) .wbody::after { content: ""; position: absolute; inset: 0; }
+.titlebar, .grip { touch-action: none; }
+.grip { position: absolute; right: 2px; bottom: 2px; width: 14px; height: 14px; cursor: nwse-resize;
+  background: linear-gradient(135deg, transparent 0 45%, #fff 45% 52%, #808080 52% 60%, transparent 60% 70%, #fff 70% 76%, #808080 76% 84%, transparent 84%); }
+.window.maximized .grip { display: none; }
+
+/* menubar inside windows */
+.menubar { display: flex; gap: 0; padding: 1px 0 2px; flex: 0 0 auto; }
+.menubar > button { background: none; border: 0; padding: 2px 7px; }
+.menubar > button:hover, .menubar > button.open { box-shadow: inset -1px -1px var(--shadow), inset 1px 1px var(--hi); }
+.menu { position: absolute; z-index: 5000; min-width: 160px; padding: 3px; }
+.menu button { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; border: 0; background: none; padding: 3px 20px 3px 22px; white-space: nowrap; }
+.menu button:hover, .menu button:focus { background: #000080; color: #fff; outline: none; }
+.menu hr { border: 0; border-top: 1px solid var(--shadow); border-bottom: 1px solid #fff; margin: 3px 1px; }
+
+/* folder (explorer) view */
+.folder { flex: 1; overflow: auto; background: #fff; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 6px; padding: 8px; }
+.folder .dicon { color: #000; }
+.folder .dicon .lbl { text-shadow: none; }
+.statusbar { display: flex; gap: 2px; padding-top: 2px; flex: 0 0 auto; }
+.statusbar > span { flex: 1; padding: 2px 4px; box-shadow: inset -1px -1px var(--hi), inset 1px 1px var(--shadow); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* notepad */
+.notepad { flex: 1; resize: none; border: 0; padding: 4px; font: 13px/1.35 "Fixedsys Excelsior", "Lucida Console", "Courier New", monospace; user-select: text; -webkit-user-select: text; }
+
+/* dialog contents */
+.dlg { padding: 12px 12px 10px; display: flex; flex-direction: column; gap: 10px; flex: 1; overflow: auto; }
+.dlg .row { display: flex; gap: 12px; align-items: flex-start; }
+.dlg .row .big svg { width: 32px; height: 32px; }
+.dlg .btns { display: flex; justify-content: flex-end; gap: 6px; margin-top: auto; }
+.dlg .btns.center { justify-content: center; }
+.dlg p { margin: 0 0 6px; }
+.dlg a { color: #000080; }
+.dlg label { display: flex; align-items: center; gap: 6px; }
+fieldset { border: 0; padding: 10px 10px 8px; margin: 0; box-shadow: inset -1px -1px var(--hi), inset 1px 1px var(--shadow), inset -2px -2px var(--shadow), inset 2px 2px var(--hi); }
+legend { padding: 0 3px; background: var(--face); }
+
+/* welcome / tips */
+.welcome { display: flex; gap: 10px; flex: 1; padding: 12px; }
+.welcome .main { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+.welcome h1 { margin: 0; font: bold 22px/1 Georgia, "Times New Roman", serif; }
+.welcome h1 b { font-weight: 900; } .welcome h1 span { margin-left: 3px; color: #fff; text-shadow: -1px -1px #000, 1px 1px #808080; font-style: italic; }
+.welcome .tip { flex: 1; display: flex; gap: 10px; background: #ffffe1; padding: 10px; }
+.welcome .tip .bulb { font-size: 26px; }
+.welcome .side { display: flex; flex-direction: column; gap: 6px; padding-top: 30px; }
+
+/* profile (LinkedIn) */
+.profile { flex: 1; background: #fff; overflow: auto; padding: 14px; user-select: text; -webkit-user-select: text; }
+.profile .card { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; }
+.profile .badge { width: 56px; height: 56px; background: #0a66c2; color: #fff; font: bold 34px Arial; display: grid; place-items: center; }
+.profile h2 { margin: 0; font: bold 18px Arial; }
+.profile ul { padding-left: 18px; margin: 6px 0 12px; }
+.profile li { margin-bottom: 4px; }
+
+/* ---------------- taskbar ---------------- */
+#taskbar { position: fixed; left: 0; right: 0; bottom: 0; height: var(--tb-h); display: flex; align-items: center; gap: 3px; padding: 2px 2px 2px; z-index: 9000;
+  background: var(--face); box-shadow: inset 0 1px var(--light), inset 0 2px var(--hi); }
+#startBtn { display: flex; align-items: center; gap: 3px; min-width: 0; padding: 2px 5px; height: 24px; font-weight: bold; }
+#startBtn svg { width: 18px; height: 18px; }
+#tasks { flex: 1; display: flex; gap: 3px; min-width: 0; overflow: hidden; }
+.task { flex: 0 1 160px; min-width: 40px; height: 24px; display: flex; align-items: center; gap: 4px; text-align: left; padding: 2px 6px; }
+.task svg { width: 16px; height: 16px; flex: 0 0 16px; }
+.task span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.task.active { font-weight: bold; background-image: repeating-conic-gradient(#fff 0 25%, #c0c0c0 0 50%); background-size: 2px 2px;
+  box-shadow: inset -1px -1px var(--hi), inset 1px 1px var(--dark), inset -2px -2px var(--light), inset 2px 2px var(--shadow); }
+#tray { display: flex; align-items: center; gap: 6px; height: 24px; padding: 0 8px 0 6px; box-shadow: inset -1px -1px var(--hi), inset 1px 1px var(--shadow); }
+#tray button { background: none; border: 0; padding: 0; width: 16px; height: 16px; }
+#tray svg { width: 16px; height: 16px; display: block; }
+
+/* ---------------- start menu ---------------- */
+#startMenu { position: fixed; left: 2px; bottom: calc(var(--tb-h) - 2px); z-index: 9500; display: flex; padding: 3px; }
+#startMenu .banner { width: 22px; background: linear-gradient(0deg, #000080, #1084d0); position: relative; }
+#startMenu .banner span { position: absolute; left: 50%; bottom: 6px; transform: rotate(-90deg); transform-origin: left bottom; translate: 11px 0; white-space: nowrap;
+  color: #c0c0c0; font: bold 18px Arial, sans-serif; letter-spacing: 0; }
+#startMenu .banner span b { color: #fff; font-weight: 900; }
+.smenu { display: flex; flex-direction: column; min-width: 170px; }
+.smenu button { position: relative; display: flex; align-items: center; gap: 8px; border: 0; background: none; padding: 3px 22px 3px 4px; text-align: left; white-space: nowrap; height: 32px; }
+.smenu.sub button { height: 22px; padding: 2px 22px 2px 4px; }
+.smenu button svg { width: 24px; height: 24px; flex: 0 0 24px; }
+.smenu.sub button svg { width: 16px; height: 16px; flex: 0 0 16px; }
+.smenu button:hover, .smenu button.open, .smenu button:focus { background: #000080; color: #fff; outline: none; }
+.smenu button.has-sub::after { content: ""; position: absolute; right: 6px; top: 50%; translate: 0 -50%; border: 4px solid transparent; border-left-color: currentColor; }
+.smenu hr { border: 0; border-top: 1px solid var(--shadow); border-bottom: 1px solid #fff; margin: 2px 1px; width: calc(100% - 2px); }
+.flyout { position: fixed; z-index: 9600; padding: 3px; }
+
+/* ---------------- shutdown screen ---------------- */
+#shutdown { position: fixed; inset: 0; z-index: 99999; background: #000; display: grid; place-items: center; cursor: pointer; }
+#shutdown p { color: #ff8a00; font: bold 28px/1.4 "Courier New", monospace; text-align: center; padding: 20px; }
+#dim { position: fixed; inset: 0; background-image: repeating-conic-gradient(rgba(0,0,0,.5) 0 25%, transparent 0 50%); background-size: 2px 2px; }
+
+/* ---------------- small screens ---------------- */
+@media (max-width: 700px) {
+  .dicon { width: 72px; }
+  .window { inset: 0 0 0 0 !important; width: auto !important; height: auto !important; }
+  .grip { display: none; }
+  #startMenu .smenu button { height: 38px; }
+}

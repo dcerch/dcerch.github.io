@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Minesweeper</title>
+<style>
+:root{--b3:3px;--b2:2px;--pad:6px;--hpad:4px;--font:"MS Sans Serif","Microsoft Sans Serif",Tahoma,"Segoe UI",Geneva,Verdana,sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%}
+body{background:#c0c0c0;font:11px/1.2 var(--font);color:#000;overflow:hidden;
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;cursor:default}
+body.standalone{background:#008080;display:flex;overflow:auto}
+canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges}
+
+#app{display:flex;flex-direction:column;height:100%;background:#c0c0c0}
+body.standalone #app{flex:none;height:auto;margin:auto;padding:3px;
+  box-shadow:inset -1px -1px #000,inset 1px 1px #dfdfdf,inset -2px -2px #808080,inset 2px 2px #fff}
+#titlebar{display:none}
+body.standalone #titlebar{display:flex;align-items:center;gap:4px;height:18px;padding:0 3px;background:#000080;color:#fff;font-weight:bold;white-space:nowrap}
+
+/* ---------- menu bar ---------- */
+#menubar{display:flex;flex:none;padding:1px 0 2px;position:relative;z-index:20;background:#c0c0c0}
+.mtop{position:relative;padding:3px 7px;line-height:13px;white-space:nowrap}
+.mtop.open{background:#000080;color:#fff}
+.drop{display:none;position:absolute;left:0;top:100%;min-width:168px;background:#c0c0c0;color:#000;padding:2px;
+  border:1px solid;border-color:#dfdfdf #000 #000 #dfdfdf;box-shadow:inset 1px 1px #fff,inset -1px -1px #808080}
+.mtop.open .drop{display:block}
+.mi{display:flex;align-items:center;padding:3px 18px 3px 2px;white-space:nowrap;line-height:13px}
+.mi .chk{width:18px;flex:none;display:flex;justify-content:center;align-items:center;height:13px}
+.mi .lbl{flex:1}
+.mi .key{padding-left:28px}
+.mi:hover{background:#000080;color:#fff}
+.mi.disabled{color:#808080;text-shadow:1px 1px 0 #fff}
+.mi.disabled:hover{text-shadow:none}
+.sep{height:2px;margin:3px 1px;border-top:1px solid #808080;border-bottom:1px solid #fff}
+u{text-decoration:underline}
+
+/* ---------- game ---------- */
+#stage{flex:1;display:flex;overflow:auto;min-height:0}
+body.standalone #stage{flex:none;overflow:visible}
+#game{flex:none;margin:auto;background:#c0c0c0;padding:var(--pad);
+  border:var(--b3) solid;border-color:#fff #808080 #808080 #fff}
+#header{display:flex;align-items:center;justify-content:space-between;padding:var(--hpad) calc(var(--hpad) + 1px);
+  margin-bottom:var(--pad);border:var(--b2) solid;border-color:#808080 #fff #fff #808080}
+.led{border:1px solid;border-color:#808080 #fff #fff #808080}
+#face{cursor:default;touch-action:manipulation}
+#boardwrap{border:var(--b3) solid;border-color:#808080 #fff #fff #808080;line-height:0}
+#board{touch-action:manipulation}
+#touchbar{display:none;justify-content:center;margin-top:var(--pad)}
+body.touch #touchbar{display:flex}
+#flagbtn{display:flex;align-items:center;gap:6px;min-width:0;height:26px;padding:0 10px}
+#flagbtn.on{box-shadow:inset -1px -1px #fff,inset 1px 1px #000,inset -2px -2px #dfdfdf,inset 2px 2px #808080;
+  background:repeating-conic-gradient(#c0c0c0 0 25%,#fff 0 50%) 0 0/2px 2px;padding-top:2px;padding-left:11px}
+
+/* ---------- controls ---------- */
+button.w95{font:inherit;color:#000;min-width:75px;height:23px;padding:0 8px;background:#c0c0c0;border:none;border-radius:0;outline:none;
+  box-shadow:inset -1px -1px #000,inset 1px 1px #fff,inset -2px -2px #808080,inset 2px 2px #dfdfdf}
+button.w95.def{box-shadow:inset 0 0 0 1px #000,inset -2px -2px #000,inset 2px 2px #fff,inset -3px -3px #808080,inset 3px 3px #dfdfdf}
+button.w95:active{box-shadow:inset 0 0 0 1px #000,inset 1px 1px #808080,inset -1px -1px #808080;padding-top:2px;padding-left:10px}
+button.w95:focus-visible{outline:1px dotted #000;outline-offset:-5px}
+input.w95in{font:inherit;height:21px;padding:3px 4px;border:none;border-radius:0;background:#fff;color:#000;outline:none;
+  -webkit-user-select:text;user-select:text;
+  box-shadow:inset -1px -1px #fff,inset 1px 1px #808080,inset -2px -2px #dfdfdf,inset 2px 2px #000}
+
+/* ---------- dialogs ---------- */
+.overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:100}
+.dlg{position:relative;background:#c0c0c0;padding:3px;max-width:calc(100vw - 8px);
+  box-shadow:inset -1px -1px #000,inset 1px 1px #dfdfdf,inset -2px -2px #808080,inset 2px 2px #fff,2px 2px 0 rgba(0,0,0,.25)}
+.dtitle{display:flex;align-items:center;justify-content:space-between;gap:8px;height:18px;padding:0 2px 0 4px;
+  background:#000080;color:#fff;font-weight:bold;white-space:nowrap;touch-action:none}
+.tbtn{width:16px;height:14px;padding:0;display:flex;align-items:center;justify-content:center;background:#c0c0c0;border:none;
+  box-shadow:inset -1px -1px #000,inset 1px 1px #fff,inset -2px -2px #808080,inset 2px 2px #dfdfdf}
+.tbtn:active{box-shadow:inset 1px 1px #000,inset -1px -1px #fff,inset 2px 2px #808080,inset -2px -2px #dfdfdf}
+.dbody{padding:12px 12px 10px}
+.btnrow{display:flex;justify-content:center;gap:8px;margin-top:14px}
+.msg{display:flex;gap:14px;align-items:flex-start;max-width:330px}
+.msg p{margin:2px 0 0;line-height:1.45}
+.custom{display:flex;gap:18px;align-items:flex-start}
+.custom .fields{display:grid;grid-template-columns:auto 52px;gap:9px 10px;align-items:center;margin-top:4px}
+.custom .btncol{display:flex;flex-direction:column;gap:8px;margin-top:2px}
+.besttbl{display:grid;grid-template-columns:auto auto auto;gap:6px 22px;margin:4px 6px 0}
+.besttbl .t{text-align:right}
+.namebox{width:210px;text-align:center}
+.namebox p{margin:0 0 10px;line-height:1.45}
+.namebox input{width:170px}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="titlebar"><canvas id="ticon"></canvas><span>Minesweeper</span></div>
+  <div id="menubar" role="menubar">
+    <div class="mtop" data-menu="game" role="menuitem"><u>G</u>ame
+      <div class="drop" role="menu">
+        <div class="mi" data-act="new"><span class="chk"></span><span class="lbl"><u>N</u>ew</span><span class="key">F2</span></div>
+        <div class="sep"></div>
+        <div class="mi" data-act="beginner" data-check="beginner"><span class="chk"></span><span class="lbl"><u>B</u>eginner</span></div>
+        <div class="mi" data-act="intermediate" data-check="intermediate"><span class="chk"></span><span class="lbl"><u>I</u>ntermediate</span></div>
+        <div class="mi" data-act="expert" data-check="expert"><span class="chk"></span><span class="lbl"><u>E</u>xpert</span></div>
+        <div class="mi" data-act="custom" data-check="custom"><span class="chk"></span><span class="lbl"><u>C</u>ustom...</span></div>
+        <div class="sep"></div>
+        <div class="mi" data-act="marks" data-check="marks"><span class="chk"></span><span class="lbl"><u>M</u>arks (?)</span></div>
+        <div class="sep"></div>
+        <div class="mi" data-act="best"><span class="chk"></span><span class="lbl">Best <u>T</u>imes...</span></div>
+        <div class="sep" id="exitsep"></div>
+        <div class="mi" data-act="exit" id="exititem"><span class="chk"></span><span class="lbl">E<u>x</u>it</span></div>
+      </div>
+    </div>
+    <div class="mtop" data-menu="help" role="menuitem"><u>H</u>elp
+      <div class="drop" role="menu">
+        <div class="mi disabled"><span class="chk"></span><span class="lbl"><u>C</u>ontents</span><span class="key">F1</span></div>
+        <div class="mi disabled"><span class="chk"></span><span class="lbl"><u>S</u>earch for Help on...</span></div>
+        <div class="mi disabled"><span class="chk"></span><span class="lbl"><u>U</u>sing Help</span></div>
+        <div class="sep"></div>
+        <div class="mi" data-act="about"><span class="chk"></span><span class="lbl"><u>A</u>bout Minesweeper...</span></div>
+      </div>
+    </div>
+  </div>
+  <div id="stage">
+    <div id="game">
+      <div id="header">
+        <canvas id="ledMines" class="led" aria-label="Mines remaining"></canvas>
+        <canvas id="face" aria-label="New game" role="button"></canvas>
+        <canvas id="ledTime" class="led" aria-label="Seconds elapsed"></canvas>
+      </div>
+      <div id="boardwrap"><canvas id="board" aria-label="Minefield"></canvas></div>
+      <div id="touchbar"><button class="w95" id="flagbtn" aria-pressed="false"><canvas id="flagicon"></canvas><span>Flag mode</span></button></div>
+    </div>
+  </div>
+</div>
+<script>
+(function () {
+'use strict';
+
+/* ================= environment ================= */
+var qs = new URLSearchParams(location.search);
+var embedded = qs.has('embed');
+try { if (window.self !== window.top) embedded = true; } catch (e) { embedded = true; }
+var standalone = !embedded;
+if (standalone) document.body.classList.add('standalone');
+var isTouch = false;
+try { isTouch = matchMedia('(pointer: coarse)').matches || (navigator.maxTouchPoints > 0 && !matchMedia('(pointer: fine)').matches); } catch (e) {}
+if (isTouch) document.body.classList.add('touch');
+
+var $ = function (id) { return document.getElementById(id); };
+var appEl = $('app'), menubar = $('menubar'), gameEl = $('game');
+var boardCv = $('board'), faceCv = $('face'), ledM = $('ledMines'), ledT = $('ledTime');
+var bctx = boardCv.getContext('2d'), fctx = faceCv.getContext('2d');
+
+/* ================= settings ================= */
+var LEVELS = {
+  beginner: { w: 9, h: 9, m: 10 },
+  intermediate: { w: 16, h: 16, m: 40 },
+  expert: { w: 30, h: 16, m: 99 }
+};
+var STORE = 'win95.minesweeper.v1';
+function defaultBest() {
+  return { beginner: { t: 999, n: 'Anonymous' }, intermediate: { t: 999, n: 'Anonymous' }, expert: { t: 999, n: 'Anonymous' } };
+}
+var settings = { level: 'beginner', custom: { w: 9, h: 9, m: 10 }, marks: true, best: defaultBest() };
+try {
+  var raw = JSON.parse(localStorage.getItem(STORE) || 'null');
+  if (raw && typeof raw === 'object') {
+    if (raw.level === 'custom' || LEVELS[raw.level]) settings.level = raw.level;
+    if (raw.custom && raw.custom.w) settings.custom = clampCustom(raw.custom.h, raw.custom.w, raw.custom.m);
+    if (typeof raw.marks === 'boolean') settings.marks = raw.marks;
+    if (raw.best) ['beginner', 'intermediate', 'expert'].forEach(function (k) {
+      var b = raw.best[k];
+      if (b && typeof b.t === 'number') settings.best[k] = { t: Math.max(1, Math.min(999, b.t | 0)), n: String(b.n || 'Anonymous').slice(0, 32) };
+    });
+  }
+} catch (e) {}
+function save() { try { localStorage.setItem(STORE, JSON.stringify(settings)); } catch (e) {} }
+function clampCustom(h, w, m) {
+  h = Math.max(9, Math.min(24, parseInt(h, 10) || 9));
+  w = Math.max(9, Math.min(30, parseInt(w, 10) || 9));
+  m = Math.max(10, Math.min((h - 1) * (w - 1), parseInt(m, 10) || 10));
+  return { w: w, h: h, m: m };
+}
+function levelDims() { return settings.level === 'custom' ? settings.custom : LEVELS[settings.level]; }
+
+/* ================= pixel art ================= */
+function compile(rows) {
+  var runs = [], w = 0;
+  rows.forEach(function (r, y) {
+    w = Math.max(w, r.length);
+    var x = 0;
+    while (x < r.length) {
+      var c = r[x];
+      if (c === '.') { x++; continue; }
+      var e = x; while (e < r.length && r[e] === c) e++;
+      runs.push([x, y, e - x, c]); x = e;
+    }
+  });
+  return { w: w, h: rows.length, runs: runs };
+}
+var DIGITS = [null,
+  compile(['...###..', '..####..', '.#####..', '######..', '..####..', '..####..', '..####..', '..####..', '..####..', '########', '########']),
+  compile(['.########.', '##########', '###....###', '.......###', '.....####.', '...####...', '.####.....', '###.......', '###.......', '##########', '##########']),
+  compile(['#########.', '##########', '.......###', '.......###', '..#######.', '..#######.', '.......###', '.......###', '.......###', '##########', '#########.']),
+  compile(['###....###', '###....###', '###....###', '###....###', '##########', '##########', '.......###', '.......###', '.......###', '.......###', '.......###']),
+  compile(['##########', '##########', '###.......', '###.......', '#########.', '##########', '.......###', '.......###', '.......###', '##########', '#########.']),
+  compile(['.#########', '##########', '###.......', '###.......', '#########.', '##########', '###....###', '###....###', '###....###', '##########', '.########.']),
+  compile(['##########', '##########', '.......###', '.......###', '......###.', '.....###..', '....###...', '...###....', '...###....', '...###....', '...###....']),
+  compile(['.########.', '##########', '###....###', '###....###', '.########.', '.########.', '###....###', '###....###', '###....###', '##########', '.########.'])
+];
+var NUMCOL = [null, '#0000ff', '#008000', '#ff0000', '#000080', '#800000', '#008080', '#000000', '#808080'];
+var MINE = compile([
+  '......#......', '......#......', '..#.#####.#..', '...#######...', '..##ww#####..', '..##ww#####..',
+  '#############', '..#########..', '..#########..', '...#######...', '..#.#####.#..', '......#......', '......#......'
+]);
+var FLAG = compile([
+  '....rr#....', '..rrrr#....', 'rrrrrr#....', '..rrrr#....', '....rr#....', '......#....', '......#....',
+  '....#####..', '..#########', '..#########'
+]);
+var QMARK = compile(['.######.', '##....##', '##....##', '......##', '....###.', '...##...', '...##...', '........', '...##...', '...##...']);
+var CHECK = ['......#', '.....##', '#...###', '##.###.', '#####..', '.###...', '..#....'];
+var XMARK = ['##....##', '.##..##.', '..####..', '...##...', '..####..', '.##..##.', '##....##'];
+var FACE = (function () {
+  var rows = [];
+  for (var y = 0; y < 17; y++) {
+    var r = '';
+    for (var x = 0; x < 17; x++) {
+      var d = Math.hypot(x + 0.5 - 8.5, y + 0.5 - 8.5);
+      r += d < 7.4 ? 'y' : d < 8.6 ? '#' : '.';
+    }
+    rows.push(r);
+  }
+  return compile(rows);
+})();
+var COLORS = { '#': '#000000', 'w': '#ffffff', 'r': '#ff0000', 'y': '#ffff00' };
+
+var DPR = 1, P = 1, T = 16;
+function px(ctx, s, x, y, w, h, c) {
+  var X = Math.round(x * s), Y = Math.round(y * s);
+  ctx.fillStyle = c;
+  ctx.fillRect(X, Y, Math.round((x + w) * s) - X, Math.round((y + h) * s) - Y);
+}
+function blit(ctx, s, bm, ox, oy, colorOverride) {
+  for (var i = 0; i < bm.runs.length; i++) {
+    var r = bm.runs[i];
+    px(ctx, s, ox + r[0], oy + r[1], r[2], 1, colorOverride || COLORS[r[3]]);
+  }
+}
+function sizeCanvas(cv, wu, hu, scale) {
+  var s = scale * DPR;
+  cv.width = Math.max(1, Math.round(wu * s));
+  cv.height = Math.max(1, Math.round(hu * s));
+  cv.style.width = (cv.width / DPR) + 'px';
+  cv.style.height = (cv.height / DPR) + 'px';
+}
+function svgBitmap(rows, color) {
+  var ns = 'http://www.w3.org/2000/svg';
+  var svg = document.createElementNS(ns, 'svg');
+  svg.setAttribute('width', rows[0].length);
+  svg.setAttribute('height', rows.length);
+  svg.setAttribute('viewBox', '0 0 ' + rows[0].length + ' ' + rows.length);
+  svg.setAttribute('shape-rendering', 'crispEdges');
+  var d = '';
+  compile(rows).runs.forEach(function (r) { d += 'M' + r[0] + ' ' + r[1] + 'h' + r[2] + 'v1h-' + r[2] + 'z'; });
+  var p = document.createElementNS(ns, 'path');
+  p.setAttribute('d', d);
+  p.setAttribute('fill', color || 'currentColor');
+  svg.appendChild(p);
+  return svg;
+}
+function mineIcon(cv, size) {
+  var sc = size / 16;
+  sizeCanvas(cv, 16, 16, sc);
+  var c = cv.getContext('2d'), s = sc * DPR;
+  c.clearRect(0, 0, cv.width, cv.height);
+  blit(c, s, MINE, 1, 1);
+}
+
+/* ================= tile drawing ================= */
+function drawRaised(c, s, ox, oy) {
+  px(c, s, ox, oy, 16, 16, '#c0c0c0');
+  px(c, s, ox, oy + 14, 16, 2, '#808080');
+  px(c, s, ox + 14, oy, 2, 16, '#808080');
+  px(c, s, ox, oy, 15, 1, '#ffffff');
+  px(c, s, ox, oy + 1, 14, 1, '#ffffff');
+  px(c, s, ox, oy, 1, 15, '#ffffff');
+  px(c, s, ox + 1, oy, 1, 14, '#ffffff');
+}
+function drawFlat(c, s, ox, oy, bg) {
+  px(c, s, ox, oy, 16, 16, bg || '#c0c0c0');
+  px(c, s, ox, oy, 16, 1, '#808080');
+  px(c, s, ox, oy, 1, 16, '#808080');
+}
+function centerIn(bm, flat) {
+  return flat ? [1 + Math.floor((15 - bm.w) / 2), 1 + Math.floor((15 - bm.h) / 2)]
+              : [Math.floor((16 - bm.w) / 2), Math.floor((16 - bm.h) / 2)];
+}
+function glyph(c, s, bm, ox, oy, flat, col) {
+  var o = centerIn(bm, flat);
+  blit(c, s, bm, ox + o[0], oy + o[1], col);
+}
+
+/* ================= LED ================= */
+var SEG = {
+  a: [[2, 1, 9, 1], [3, 2, 7, 1], [4, 3, 5, 1]],
+  d: [[2, 21, 9, 1], [3, 20, 7, 1], [4, 19, 5, 1]],
+  g: [[3, 10, 7, 1], [2, 11, 9, 1], [3, 12, 7, 1]],
+  f: [[1, 2, 1, 9], [2, 3, 1, 7], [3, 4, 1, 5]],
+  b: [[11, 2, 1, 9], [10, 3, 1, 7], [9, 4, 1, 5]],
+  e: [[1, 12, 1, 9], [2, 13, 1, 7], [3, 14, 1, 5]],
+  c: [[11, 12, 1, 9], [10, 13, 1, 7], [9, 14, 1, 5]]
+};
+var DIGSEG = { '0': 'abcdef', '1': 'bc', '2': 'abged', '3': 'abgcd', '4': 'fgbc', '5': 'afgcd', '6': 'afgedc', '7': 'abc', '8': 'abcdefg', '9': 'abcdfg', '-': 'g' };
+function drawLED(cv, n) {
+  var c = cv.getContext('2d'), s = P * DPR;
+  n = Math.max(-99, Math.min(999, n | 0));
+  var str = n < 0 ? '-' + String(-n).padStart(2, '0') : String(n).padStart(3, '0');
+  px(c, s, 0, 0, 39, 23, '#000000');
+  for (var i = 0; i < 3; i++) {
+    var on = DIGSEG[str[i]], ox = i * 13;
+    'abcdefg'.split('').forEach(function (k) {
+      if (on.indexOf(k) < 0) SEG[k].forEach(function (r) { px(c, s, ox + r[0], r[1], r[2], r[3], '#2c0000'); });
+    });
+    on.split('').forEach(function (k) {
+      SEG[k].forEach(function (r) { px(c, s, ox + r[0], r[1], r[2], r[3], '#ff0000'); });
+    });
+  }
+}
+
+/* ================= game state ================= */
+var HID = 0, REV = 1, FLG = 2, QST = 3;
+var W, H, M, mine, st, cnt, placed, over, won, exploded, flags, revealed;
+var t0 = 0, elapsed = 0, timerId = 0;
+
+function newGame() {
+  var d = levelDims();
+  W = d.w; H = d.h; M = d.m;
+  var n = W * H;
+  mine = new Uint8Array(n); st = new Uint8Array(n); cnt = new Uint8Array(n);
+  placed = false; over = false; won = false; exploded = -1; flags = 0; revealed = 0;
+  stopTimer(); elapsed = 0;
+  L = R = Mid = chord = ignore = false; hover = -1; touchPress = -1;
+}
+function neighbors(i, fn) {
+  var x = i % W, y = (i / W) | 0;
+  for (var dy = -1; dy <= 1; dy++) for (var dx = -1; dx <= 1; dx++) {
+    if (!dx && !dy) continue;
+    var nx = x + dx, ny = y + dy;
+    if (nx >= 0 && ny >= 0 && nx < W && ny < H) fn(ny * W + nx);
+  }
+}
+function placeMines(safe) {
+  var pool = [];
+  for (var i = 0; i < W * H; i++) if (i !== safe) pool.push(i);
+  for (var k = 0; k < M; k++) {
+    var j = k + Math.floor(Math.random() * (pool.length - k));
+    var t = pool[k]; pool[k] = pool[j]; pool[j] = t;
+    mine[pool[k]] = 1;
+  }
+  for (var c = 0; c < W * H; c++) {
+    var n = 0; neighbors(c, function (q) { n += mine[q]; }); cnt[c] = n;
+  }
+  placed = true;
+  startTimer();
+}
+function startTimer() {
+  t0 = performance.now(); elapsed = 1;
+  clearInterval(timerId);
+  timerId = setInterval(tick, 200);
+}
+function tick() {
+  var e = Math.min(999, 1 + Math.floor((performance.now() - t0) / 1000));
+  if (e !== elapsed) { elapsed = e; drawLED(ledT, elapsed); }
+}
+function stopTimer() { clearInterval(timerId); timerId = 0; }
+
+function flood(start) {
+  var stack = [start];
+  while (stack.length) {
+    var j = stack.pop();
+    if (st[j] === REV || st[j] === FLG) continue;
+    st[j] = REV; revealed++;
+    if (cnt[j] === 0) neighbors(j, function (q) { if (st[q] !== REV && st[q] !== FLG && !mine[q]) stack.push(q); });
+  }
+}
+function reveal(i) {
+  if (over || i < 0 || st[i] === FLG || st[i] === REV) return;
+  if (!placed) placeMines(i);
+  if (mine[i]) { lose(i); return; }
+  flood(i);
+  checkWin();
+}
+function doChord(i) {
+  if (over || i < 0 || st[i] !== REV || cnt[i] === 0) return;
+  var f = 0; neighbors(i, function (q) { if (st[q] === FLG) f++; });
+  if (f !== cnt[i]) return;
+  var hit = -1;
+  neighbors(i, function (q) {
+    if (st[q] === FLG || st[q] === REV) return;
+    if (mine[q]) { if (hit < 0) hit = q; } else flood(q);
+  });
+  if (hit >= 0) lose(hit); else checkWin();
+}
+function cycleMark(i) {
+  if (over || i < 0 || st[i] === REV) return;
+  if (st[i] === HID) { st[i] = FLG; flags++; }
+  else if (st[i] === FLG) { st[i] = settings.marks ? QST : HID; flags--; }
+  else st[i] = HID;
+  drawLED(ledM, M - flags);
+}
+function lose(i) {
+  over = true; won = false; exploded = i;
+  if (timerId) tick();
+  stopTimer();
+}
+function checkWin() {
+  if (revealed !== W * H - M) return;
+  over = true; won = true;
+  tick(); stopTimer();
+  for (var i = 0; i < W * H; i++) if (mine[i]) st[i] = FLG;
+  flags = M;
+  var lvl = settings.level;
+  if (lvl !== 'custom' && elapsed < settings.best[lvl].t) {
+    var time = elapsed;
+    setTimeout(function () { askName(lvl, time); }, 30);
+  }
+}
+
+/* ================= input state ================= */
+var L = false, R = false, Mid = false, chord = false, ignore = false, hover = -1, touchPress = -1;
+var facePressed = false, faceHover = false;
+var flagMode = false;
+
+function pressedCells() {
+  var set = {};
+  if (over) return set;
+  if (touchPress >= 0) { set[touchPress] = 1; return set; }
+  if (ignore || hover < 0) return set;
+  if (chord) { set[hover] = 1; neighbors(hover, function (q) { set[q] = 1; }); }
+  else if (L) set[hover] = 1;
+  return set;
+}
+function boardPressing() {
+  return !over && (touchPress >= 0 || ((L || chord) && !ignore));
+}
+
+/* ================= rendering ================= */
+function drawBoard() {
+  var c = bctx, s = P * DPR, pr = pressedCells();
+  c.imageSmoothingEnabled = false;
+  for (var y = 0; y < H; y++) for (var x = 0; x < W; x++) {
+    var i = y * W + x, ox = x * 16, oy = y * 16, v = st[i];
+    if (over && !won) {
+      if (mine[i]) {
+        if (v === FLG) { drawRaised(c, s, ox, oy); glyph(c, s, FLAG, ox, oy, false); }
+        else { drawFlat(c, s, ox, oy, i === exploded ? '#ff0000' : '#c0c0c0'); glyph(c, s, MINE, ox, oy, true); }
+        continue;
+      }
+      if (v === FLG) {
+        drawFlat(c, s, ox, oy); glyph(c, s, MINE, ox, oy, true);
+        for (var k = 0; k < 11; k++) {
+          px(c, s, ox + 3 + k, oy + 3 + k, 1.5, 1, '#ff0000');
+          px(c, s, ox + 12.5 - k, oy + 3 + k, 1.5, 1, '#ff0000');
+        }
+        continue;
+      }
+    }
+    if (v === REV) {
+      drawFlat(c, s, ox, oy);
+      if (cnt[i]) glyph(c, s, DIGITS[cnt[i]], ox, oy, true, NUMCOL[cnt[i]]);
+    } else if (pr[i] && v !== FLG) {
+      drawFlat(c, s, ox, oy);
+      if (v === QST) glyph(c, s, QMARK, ox, oy, true);
+    } else {
+      drawRaised(c, s, ox, oy);
+      if (v === FLG) glyph(c, s, FLAG, ox, oy, false);
+      else if (v === QST) glyph(c, s, QMARK, ox, oy, false);
+    }
+  }
+}
+function drawFace() {
+  var c = fctx, s = P * DPR, G = '#808080', Wh = '#ffffff', B = '#000000';
+  var pr = facePressed && faceHover;
+  px(c, s, 0, 0, 26, 26, G);
+  px(c, s, 1, 1, 24, 24, '#c0c0c0');
+  if (pr) {
+    px(c, s, 1, 1, 24, 1, G); px(c, s, 1, 1, 1, 24, G);
+  } else {
+    px(c, s, 1, 23, 24, 2, G); px(c, s, 23, 1, 2, 24, G);
+    px(c, s, 1, 1, 23, 1, Wh); px(c, s, 1, 2, 22, 1, Wh);
+    px(c, s, 1, 1, 1, 23, Wh); px(c, s, 2, 1, 1, 22, Wh);
+  }
+  var o = pr ? 5 : 4;
+  blit(c, s, FACE, o, o);
+  var mood = pr ? 'smile' : won ? 'cool' : (over ? 'dead' : (boardPressing() ? 'ooh' : 'smile'));
+  function d(x, y, w, h) { px(c, s, o + x, o + y, w || 1, h || 1, B); }
+  function smile() { d(4, 10); d(5, 11); d(6, 12, 5, 1); d(11, 11); d(12, 10); }
+  if (mood === 'smile') { d(5, 5, 2, 2); d(10, 5, 2, 2); smile(); }
+  else if (mood === 'ooh') { d(5, 4, 2, 3); d(10, 4, 2, 3); d(7, 10, 3, 1); d(6, 11, 1, 2); d(10, 11, 1, 2); d(7, 13, 3, 1); }
+  else if (mood === 'cool') {
+    d(3, 5, 5, 3); d(9, 5, 5, 3); d(8, 5, 1, 1); d(2, 5); d(14, 5); d(1, 4); d(15, 4);
+    px(c, s, o + 4, o + 5, 1, 1, '#808080'); px(c, s, o + 10, o + 5, 1, 1, '#808080');
+    smile();
+  } else {
+    [[5, 5], [7, 5], [6, 6], [5, 7], [7, 7], [9, 5], [11, 5], [10, 6], [9, 7], [11, 7]].forEach(function (p) { d(p[0], p[1]); });
+    d(6, 11, 5, 1); d(5, 12); d(11, 12); d(4, 13); d(12, 13);
+  }
+}
+function render() {
+  drawBoard(); drawFace();
+  drawLED(ledM, M - flags);
+  drawLED(ledT, elapsed);
+}
+
+/* ================= layout ================= */
+var CANDS = [32, 30, 28, 26, 24, 22, 20, 18, 16, 15, 14];
+function applySize(t) {
+  T = t; P = t / 16;
+  var u = Math.min(P, 1.5), rs = document.documentElement.style;
+  rs.setProperty('--b3', (P >= 1.5 ? 4 : 3) + 'px');
+  rs.setProperty('--b2', (P >= 1.5 ? 3 : 2) + 'px');
+  rs.setProperty('--pad', Math.round(6 * u) + 'px');
+  rs.setProperty('--hpad', Math.round(4 * u) + 'px');
+  sizeCanvas(boardCv, W * 16, H * 16, P);
+  sizeCanvas(faceCv, 26, 26, P);
+  sizeCanvas(ledM, 39, 23, P);
+  sizeCanvas(ledT, 39, 23, P);
+}
+function measure() {
+  if (standalone) return [appEl.offsetWidth, appEl.offsetHeight];
+  return [gameEl.offsetWidth, menubar.offsetHeight + gameEl.offsetHeight];
+}
+function layout() {
+  DPR = window.devicePixelRatio || 1;
+  var avW = window.innerWidth - (standalone ? 24 : 0);
+  var avH = window.innerHeight - (standalone ? 24 : 0);
+  var chosen = CANDS[CANDS.length - 1];
+  for (var k = 0; k < CANDS.length; k++) {
+    applySize(CANDS[k]);
+    var m = measure();
+    if (m[0] <= avW && m[1] <= avH) { chosen = CANDS[k]; break; }
+  }
+  if (T !== chosen) applySize(chosen);
+  render();
+  var flagIcon = $('flagicon');
+  sizeCanvas(flagIcon, 11, 10, 1.4);
+  var fc = flagIcon.getContext('2d'); fc.clearRect(0, 0, flagIcon.width, flagIcon.height);
+  blit(fc, 1.4 * DPR, FLAG, 0, 0);
+  mineIcon($('ticon'), 16);
+  if (embedded) {
+    var sz = measure();
+    try { window.parent.postMessage({ type: 'win95:app-size', app: 'minesweeper', width: sz[0], height: sz[1] }, '*'); } catch (e) {}
+  }
+}
+var rafPending = false;
+window.addEventListener('resize', function () {
+  if (rafPending) return;
+  rafPending = true;
+  requestAnimationFrame(function () { rafPending = false; layout(); });
+});
+
+/* ================= mouse on board ================= */
+function cellFromPoint(cx, cy) {
+  var r = boardCv.getBoundingClientRect();
+  var x = Math.floor((cx - r.left) / (r.width / W)), y = Math.floor((cy - r.top) / (r.height / H));
+  if (x < 0 || y < 0 || x >= W || y >= H) return -1;
+  return y * W + x;
+}
+var lastTouch = 0;
+boardCv.addEventListener('mousedown', function (e) {
+  e.preventDefault();
+  if (Date.now() - lastTouch < 800 || over || dlgStack.length) return;
+  hover = cellFromPoint(e.clientX, e.clientY);
+  if (e.button === 0) { L = true; if (R || (e.buttons & 2)) { R = true; chord = true; } }
+  else if (e.button === 2) {
+    R = true;
+    if (L || (e.buttons & 1)) { L = true; chord = true; }
+    else if (!chord) cycleMark(hover);
+  } else if (e.button === 1) { Mid = true; chord = true; }
+  drawBoard(); drawFace();
+});
+window.addEventListener('mousemove', function (e) {
+  if (L || R || Mid) {
+    var h = cellFromPoint(e.clientX, e.clientY);
+    if (h !== hover) { hover = h; drawBoard(); }
+  }
+  if (facePressed) {
+    var fr = faceCv.getBoundingClientRect();
+    var inside = e.clientX >= fr.left && e.clientX < fr.right && e.clientY >= fr.top && e.clientY < fr.bottom;
+    if (inside !== faceHover) { faceHover = inside; drawFace(); }
+  }
+});
+window.addEventListener('mouseup', function (e) {
+  if (facePressed && e.button === 0) {
+    var go = faceHover;
+    facePressed = false; faceHover = false;
+    if (go) { newGame(); layout(); } else drawFace();
+  }
+  if (!(L || R || Mid)) return;
+  var wasL = L;
+  if (e.button === 0) L = false; else if (e.button === 2) R = false; else if (e.button === 1) Mid = false;
+  if (chord) {
+    if (!ignore) doChord(hover);
+    chord = false; ignore = L || R || Mid;
+  } else if (e.button === 0 && wasL && !ignore) {
+    reveal(hover);
+  }
+  if (!L && !R && !Mid) { ignore = false; hover = -1; }
+  render();
+});
+window.addEventListener('blur', function () {
+  L = R = Mid = chord = ignore = false; hover = -1; facePressed = false;
+  if (W) { drawBoard(); drawFace(); }
+});
+document.addEventListener('contextmenu', function (e) { if (!(e.target instanceof HTMLInputElement)) e.preventDefault(); });
+boardCv.addEventListener('auxclick', function (e) { e.preventDefault(); });
+
+/* ================= touch on board ================= */
+var lpTimer = 0, tStart = null, tCell = -1, tLong = false, tMoved = false;
+function cancelLP() { clearTimeout(lpTimer); lpTimer = 0; }
+boardCv.addEventListener('touchstart', function (e) {
+  lastTouch = Date.now();
+  if (openMenu) { closeMenu(); tCell = -1; return; }
+  if (e.touches.length > 1 || over || dlgStack.length) { cancelLP(); tCell = -1; touchPress = -1; render(); return; }
+  var t = e.touches[0];
+  tStart = { x: t.clientX, y: t.clientY };
+  tCell = cellFromPoint(t.clientX, t.clientY);
+  tLong = false; tMoved = false;
+  touchPress = (tCell >= 0 && st[tCell] !== FLG && !flagMode) ? tCell : -1;
+  cancelLP();
+  if (tCell >= 0) lpTimer = setTimeout(function () {
+    lpTimer = 0; tLong = true; touchPress = -1;
+    if (st[tCell] !== REV) {
+      cycleMark(tCell);
+      try { if (navigator.vibrate) navigator.vibrate(25); } catch (er) {}
+    }
+    render();
+  }, 400);
+  drawBoard(); drawFace();
+}, { passive: true });
+boardCv.addEventListener('touchmove', function (e) {
+  if (!tStart || tMoved) return;
+  var t = e.touches[0];
+  if (Math.abs(t.clientX - tStart.x) > 10 || Math.abs(t.clientY - tStart.y) > 10) {
+    tMoved = true; cancelLP(); touchPress = -1; drawBoard(); drawFace();
+  }
+}, { passive: true });
+boardCv.addEventListener('touchend', function (e) {
+  lastTouch = Date.now();
+  cancelLP();
+  var cell = tCell; tCell = -1; touchPress = -1;
+  if (e.cancelable) e.preventDefault();
+  if (cell >= 0 && !tLong && !tMoved && !over) {
+    if (st[cell] === REV) doChord(cell);
+    else if (flagMode) cycleMark(cell);
+    else reveal(cell);
+  }
+  tStart = null;
+  render();
+});
+boardCv.addEventListener('touchcancel', function () { cancelLP(); tCell = -1; touchPress = -1; tStart = null; render(); });
+
+$('flagbtn').addEventListener('click', function () {
+  flagMode = !flagMode;
+  this.classList.toggle('on', flagMode);
+  this.setAttribute('aria-pressed', String(flagMode));
+});
+
+/* ================= face button ================= */
+faceCv.addEventListener('mousedown', function (e) {
+  if (e.button !== 0 || dlgStack.length) return;
+  e.preventDefault();
+  facePressed = true; faceHover = true; drawFace();
+});
+
+/* ================= menus ================= */
+var openMenu = null;
+var tops = Array.prototype.slice.call(document.querySelectorAll('.mtop'));
+function openM(t) { if (openMenu) openMenu.classList.remove('open'); openMenu = t; t.classList.add('open'); }
+function closeMenu() { if (openMenu) openMenu.classList.remove('open'); openMenu = null; }
+tops.forEach(function (t) {
+  t.addEventListener('mousedown', function (e) {
+    if (e.button !== 0 || e.target.closest('.drop') || dlgStack.length) return;
+    e.preventDefault();
+    if (openMenu === t) closeMenu(); else openM(t);
+  });
+  t.addEventListener('mouseenter', function () { if (openMenu && openMenu !== t) openM(t); });
+});
+Array.prototype.forEach.call(document.querySelectorAll('.mi'), function (mi) {
+  mi.addEventListener('mouseup', function (e) {
+    if (e.button !== 0 || mi.classList.contains('disabled') || !openMenu) return;
+    e.stopPropagation();
+    closeMenu();
+    action(mi.getAttribute('data-act'));
+  });
+});
+document.addEventListener('mousedown', function (e) {
+  if (openMenu && !menubar.contains(e.target)) { closeMenu(); e.preventDefault(); e.stopPropagation(); }
+}, true);
+if (standalone) { $('exititem').style.display = 'none'; $('exitsep').style.display = 'none'; }
+function updateChecks() {
+  Array.prototype.forEach.call(document.querySelectorAll('.mi[data-check]'), function (mi) {
+    var k = mi.getAttribute('data-check');
+    var on = k === 'marks' ? settings.marks : settings.level === k;
+    var box = mi.querySelector('.chk');
+    box.innerHTML = '';
+    if (on) box.appendChild(svgBitmap(CHECK));
+  });
+}
+function setLevel(l) {
+  settings.level = l; save(); updateChecks(); newGame(); layout();
+}
+function action(a) {
+  switch (a) {
+    case 'new': newGame(); layout(); break;
+    case 'beginner': case 'intermediate': case 'expert': setLevel(a); break;
+    case 'custom': customDialog(); break;
+    case 'marks': settings.marks = !settings.marks; save(); updateChecks(); break;
+    case 'best': bestTimes(); break;
+    case 'about': aboutBox(); break;
+    case 'exit':
+      try { window.parent.postMessage({ type: 'win95:close', app: 'minesweeper' }, '*'); } catch (e) {}
+      break;
+  }
+}
+
+/* ================= dialogs ================= */
+var dlgStack = [];
+function el(tag, cls, text) {
+  var n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text != null) n.textContent = text;
+  return n;
+}
+function btn(label, fn, def) {
+  var b = el('button', 'w95' + (def ? ' def' : ''), label);
+  b.type = 'button';
+  b.addEventListener('click', fn);
+  return b;
+}
+function openDialog(title, build) {
+  closeMenu();
+  var ov = el('div', 'overlay'), d = el('div', 'dlg'), tb = el('div', 'dtitle'), body = el('div', 'dbody');
+  d.setAttribute('role', 'dialog'); d.setAttribute('aria-label', title);
+  tb.appendChild(el('span', null, title));
+  var x = el('button', 'tbtn'); x.type = 'button'; x.setAttribute('aria-label', 'Close');
+  x.appendChild(svgBitmap(XMARK, '#000'));
+  tb.appendChild(x);
+  d.appendChild(tb); d.appendChild(body); ov.appendChild(d);
+  ov.addEventListener('mousedown', function (e) { if (e.target === ov) e.preventDefault(); });
+  var api = {
+    ok: null, cancel: null,
+    close: function () { ov.remove(); var i = dlgStack.indexOf(api); if (i >= 0) dlgStack.splice(i, 1); }
+  };
+  x.addEventListener('click', function () { (api.cancel || api.close)(); });
+  // drag by title bar
+  var drag = null, dx = 0, dy = 0;
+  tb.addEventListener('pointerdown', function (e) {
+    if (e.target.closest('.tbtn')) return;
+    drag = { x: e.clientX - dx, y: e.clientY - dy }; tb.setPointerCapture(e.pointerId);
+  });
+  tb.addEventListener('pointermove', function (e) {
+    if (!drag) return;
+    dx = e.clientX - drag.x; dy = e.clientY - drag.y;
+    d.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+  });
+  tb.addEventListener('pointerup', function () { drag = null; });
+  build(body, api);
+  document.body.appendChild(ov);
+  dlgStack.push(api);
+  var f = body.querySelector('input') || body.querySelector('button.def') || body.querySelector('button');
+  if (f) { f.focus(); if (f.select) f.select(); }
+  return api;
+}
+function msgIcon() {
+  var cv = el('canvas');
+  mineIcon(cv, 32);
+  return cv;
+}
+function aboutBox() {
+  openDialog('About Minesweeper', function (body, api) {
+    var m = el('div', 'msg');
+    m.appendChild(msgIcon());
+    var p = el('p');
+    p.innerHTML = 'Minesweeper \u2014 a tribute recreation.<br>Original by Robert Donner and Curt Johnson.';
+    m.appendChild(p);
+    body.appendChild(m);
+    var row = el('div', 'btnrow');
+    api.ok = api.close;
+    row.appendChild(btn('OK', api.close, true));
+    body.appendChild(row);
+  });
+}
+function customDialog() {
+  openDialog('Custom Field', function (body, api) {
+    var wrap = el('div', 'custom'), grid = el('div', 'fields'), col = el('div', 'btncol');
+    function field(label, val) {
+      var lb = el('label'); lb.innerHTML = label;
+      var inp = el('input', 'w95in'); inp.type = 'text'; inp.inputMode = 'numeric'; inp.maxLength = 3; inp.value = val;
+      grid.appendChild(lb); grid.appendChild(inp);
+      return inp;
+    }
+    var hI = field('<u>H</u>eight:', H), wI = field('<u>W</u>idth:', W), mI = field('<u>M</u>ines:', M);
+    api.ok = function () {
+      settings.custom = clampCustom(hI.value, wI.value, mI.value);
+      api.close();
+      setLevel('custom');
+    };
+    api.cancel = api.close;
+    col.appendChild(btn('OK', api.ok, true));
+    col.appendChild(btn('Cancel', api.cancel));
+    wrap.appendChild(grid); wrap.appendChild(col);
+    body.appendChild(wrap);
+  });
+}
+function bestTimes() {
+  openDialog('Fastest Mine Sweepers', function (body, api) {
+    var tbl = el('div', 'besttbl');
+    function fill() {
+      tbl.innerHTML = '';
+      [['Beginner', 'beginner'], ['Intermediate', 'intermediate'], ['Expert', 'expert']].forEach(function (r) {
+        var b = settings.best[r[1]];
+        tbl.appendChild(el('span', null, r[0] + ':'));
+        tbl.appendChild(el('span', 't', b.t + ' seconds'));
+        tbl.appendChild(el('span', null, b.n));
+      });
+    }
+    fill();
+    body.appendChild(tbl);
+    var row = el('div', 'btnrow');
+    row.appendChild(btn('Reset Scores', function () { settings.best = defaultBest(); save(); fill(); }));
+    api.ok = api.close;
+    row.appendChild(btn('OK', api.close, true));
+    body.appendChild(row);
+  });
+}
+function askName(lvl, time) {
+  openDialog('Minesweeper', function (body, api) {
+    var box = el('div', 'namebox');
+    var p = el('p');
+    p.innerHTML = 'You have the fastest time<br>for ' + lvl + ' level.<br>Please type your name:';
+    var inp = el('input', 'w95in'); inp.type = 'text'; inp.maxLength = 32;
+    inp.value = settings.best[lvl].n || 'Anonymous';
+    box.appendChild(p); box.appendChild(inp);
+    body.appendChild(box);
+    api.ok = function () {
+      settings.best[lvl] = { t: time, n: (inp.value.trim() || 'Anonymous').slice(0, 32) };
+      save(); api.close(); bestTimes();
+    };
+    api.cancel = api.ok;
+    var row = el('div', 'btnrow');
+    row.appendChild(btn('OK', api.ok, true));
+    body.appendChild(row);
+  });
+}
+
+/* ================= keyboard ================= */
+document.addEventListener('keydown', function (e) {
+  var top = dlgStack[dlgStack.length - 1];
+  if (top) {
+    if (e.key === 'Enter' && !(e.target instanceof HTMLButtonElement)) { e.preventDefault(); (top.ok || top.close)(); }
+    else if (e.key === 'Escape') { e.preventDefault(); (top.cancel || top.close)(); }
+    return;
+  }
+  if (e.key === 'Escape' && openMenu) { closeMenu(); return; }
+  if (e.key === 'F2') { e.preventDefault(); closeMenu(); newGame(); layout(); return; }
+  if (e.altKey && !e.ctrlKey && (e.key === 'g' || e.key === 'G')) { e.preventDefault(); openM(tops[0]); return; }
+  if (e.altKey && !e.ctrlKey && (e.key === 'h' || e.key === 'H')) { e.preventDefault(); openM(tops[1]); return; }
+  if (openMenu && !e.altKey && e.key.length === 1) {
+    var k = e.key.toLowerCase();
+    var items = openMenu.querySelectorAll('.mi:not(.disabled)');
+    for (var i = 0; i < items.length; i++) {
+      var u = items[i].querySelector('u');
+      if (u && u.textContent.toLowerCase() === k && items[i].style.display !== 'none') {
+        e.preventDefault(); closeMenu(); action(items[i].getAttribute('data-act')); return;
+      }
+    }
+  }
+});
+
+/* ================= boot ================= */
+updateChecks();
+newGame();
+layout();
+})();
+</script>
+</body>
+</html>

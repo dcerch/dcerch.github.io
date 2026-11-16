@@ -1,0 +1,12 @@
+3D assets used by Navigator
+===========================
+
+assets/models/*   and   assets/textures/*
+
+All models and textures come from Poly Haven (https://polyhaven.com) and are
+licensed CC0 1.0 (public domain): https://polyhaven.com/license
+No attribution is required, but thank you, Poly Haven!
+
+They were downloaded and their textures resized to 512px (models) / 1024px
+(floors) for the web by tools/fetch_assets.py. Re-run that script to fetch them
+again or to add more (edit the MODELS / TEXTURES lists).

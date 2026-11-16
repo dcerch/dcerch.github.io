@@ -2,7 +2,15 @@
 //  main.js — the Navigator engine.
 // =====================================================================
 import * as THREE from "three";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
+import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 import { buildWorld } from "./world.js";
+import { furnish } from "./furnish.js";
+import { buildKidSpace } from "./kidspace.js";
+import { setAnisotropy } from "./assets.js";
 import { makeScreens } from "./screens.js";
 import { createARG } from "./arg.js";
 import { sfx, isMuted, setMuted } from "./audio.js";
@@ -11,6 +19,7 @@ import { ROOMS, APPS, TRINKETS } from "./data.js";
 
 const $ = s => document.querySelector(s);
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const EMBEDDED = window.parent !== window;
 
 // ---------------------------------------------------------------- renderer
 const canvas = $("#scene");
@@ -26,32 +35,39 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.05;
+renderer.toneMappingExposure = 1.0;
+setAnisotropy(Math.min(8, renderer.capabilities.getMaxAnisotropy()));
 
 const scene = new THREE.Scene();
 window.__navReady = true;
 scene.fog = new THREE.Fog(0xcfe0ee, 45, 110);
 const camera = new THREE.PerspectiveCamera(60, 1, 0.03, 300);
 
-scene.add(new THREE.HemisphereLight(0xfff1dc, 0x5a3a24, 0.9));
-const sun = new THREE.DirectionalLight(0xfff0d6, 2.2);
+// image-based lighting: soft, glossy "pre-rendered" reflections on every surface
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+scene.environmentIntensity = 0.45;
+scene.add(new THREE.HemisphereLight(0xfff1dc, 0x5a3a24, 0.45));
+const sun = new THREE.DirectionalLight(0xfff0d6, 1.7);
 sun.position.set(14, 22, 12); sun.castShadow = true;
 sun.shadow.mapSize.set(2048, 2048);
 Object.assign(sun.shadow.camera, { left: -18, right: 18, top: 18, bottom: -18, near: 1, far: 60 });
 sun.shadow.bias = -0.0005; sun.shadow.normalBias = 0.02;
 sun.target.position.set(0, 0, -4); scene.add(sun, sun.target);
-scene.add(new THREE.AmbientLight(0xffe8d0, 0.35));
+scene.add(new THREE.AmbientLight(0xffe8d0, 0.12));
 
 const world = buildWorld(scene);
 const { hotspots, refs } = world;
+const kid = buildKidSpace(scene, { hot: world.hot, updaters: world.updaters, refs });
+const furnished = furnish(refs);
 const screens = makeScreens(refs);
 window.__nav = { scene, refs, camera, THREE, hotspots }; // handy for poking around in devtools
 
 // assign each hotspot to a room by its position
-function roomAt(x, z) { return x > 6 ? "kitchen" : x < -6 ? "den" : z < -6 ? "rec" : "living"; }
+function roomAt(x, z) { return z < -30 ? "kidspace" : x > 6 ? "kitchen" : x < -6 ? "den" : z < -6 ? "rec" : "living"; }
 scene.updateMatrixWorld(true);
 const tmpV = new THREE.Vector3(), tmpBox = new THREE.Box3();
-hotspots.forEach(o => { tmpBox.setFromObject(o).getCenter(tmpV); o.userData.hot.room = roomAt(tmpV.x, tmpV.z); });
+hotspots.forEach(o => { o.getWorldPosition(tmpV); o.userData.hot.room = roomAt(tmpV.x, tmpV.z); });
 
 // ---------------------------------------------------------------- camera rig
 const cam = { pos: new THREE.Vector3(0, 2.2, 17), yaw: 0, pitch: -0.05, fov: 60 };
@@ -89,8 +105,21 @@ function dismissWindow() {
   if (mode === "focus") mode = "room";
 }
 
+async function warpTo(target) {
+  const prev = mode; mode = "travel"; UI.tooltip(null); clearHover();
+  if (prev === "drawer") closeDrawerQuiet();
+  sfx.boing(); const w = $("#warp"); w.hidden = false; w.classList.remove("on"); void w.offsetWidth; w.classList.add("on");
+  await new Promise(r => setTimeout(r, reduceMotion ? 10 : 450));
+  const v = roomView(target); cam.pos.copy(v.pos); cam.yaw = v.yaw; cam.pitch = v.pitch; cam.fov = v.fov;
+  room = target; onRoomChanged();
+  await new Promise(r => setTimeout(r, reduceMotion ? 10 : 450));
+  w.classList.remove("on"); setTimeout(() => (w.hidden = true), 400);
+  mode = "room";
+  if (target === "kidspace" && !kid.greeted) { kid.greeted = true; kid.welcome(); }
+}
 async function travelTo(target) {
   if (!isRoom(target) || mode === "travel" || mode === "boot") return;
+  if ((target === "kidspace") !== (room === "kidspace")) return warpTo(target);
   if (target === room && mode === "room") { flyTo(roomView(room), 0.6); return; }
   const prev = mode; mode = "travel"; UI.tooltip(null); clearHover();
   if (prev === "drawer") closeDrawerQuiet();
@@ -113,12 +142,14 @@ function onRoomChanged() {
   UI.setRoomTitle(ROOMS[room].name);
   UI.setDefaultStatus(ROOMS[room].blurb);
   document.querySelectorAll("[data-room]").forEach(b => b.classList.toggle("active", b.dataset.room === room));
+  document.body.classList.toggle("in-kidspace", room === "kidspace");
   history.replaceState(null, "", "#" + room);
 }
 
 function focusPose(def) {
   const o = def.obj;
-  tmpBox.setFromObject(o).getCenter(tmpV);
+  tmpBox.setFromObject(o);
+  if (tmpBox.isEmpty()) o.getWorldPosition(tmpV); else tmpBox.getCenter(tmpV);
   const center = tmpV.clone();
   const q = new THREE.Quaternion(); o.getWorldQuaternion(q);
   const off = new THREE.Vector3(...def.focus);
@@ -180,6 +211,7 @@ const mapLabels = {};
 function buildMapLabels() {
   const host = $("#mapLabels");
   Object.entries(ROOMS).forEach(([k, r]) => {
+    if (k === "kidspace") return;
     const b = document.createElement("button"); b.className = "maplabel"; b.textContent = r.name;
     b.addEventListener("click", () => exitMap(k)); host.appendChild(b); mapLabels[k] = b;
   });
@@ -336,8 +368,8 @@ window.addEventListener("keydown", e => {
     return;
   }
   if (UI.isWindowOpen()) return;
-  if (["1", "2", "3", "4"].includes(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey) {
-    const r = ["living", "kitchen", "den", "rec"][+e.key - 1];
+  if (["1", "2", "3", "4", "5"].includes(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey) {
+    const r = ["living", "kitchen", "den", "rec", "kidspace"][+e.key - 1];
     if (mode === "map") exitMap(r); else { if (mode === "focus") mode = "room"; travelTo(r); } return;
   }
   const step = 0.12;
@@ -388,6 +420,7 @@ async function activate(def) {
       body.querySelector("#kjWares").addEventListener("click", () => { sfx.coin(); UI.openWindow({ title: "Wares: Elder Scrolls Blades guide", url: "toolbox.html?embed=1#elderscrolls", icon: "💰", onClose: backToView }); });
       return;
     }
+    case "custom": return a.fn();
     case "panel":
       if (def.id === "tv" && screens.state.tvMode === "clue") {
         await focusOn(def); sfx.static();
@@ -443,6 +476,8 @@ function wirePhone(body) {
   });
 }
 
+kid.activate = (action, obj) => activate({ action, label: "", obj, focus: null });
+
 // ---------------------------------------------------------------- ARG hooks
 const arg = createARG({
   onSpoken() {
@@ -480,6 +515,9 @@ function openJournal() {
 }
 
 // ---------------------------------------------------------------- chrome wiring
+document.querySelectorAll("[data-exit]").forEach(a => a.addEventListener("click", e => {
+  if (EMBEDDED) { e.preventDefault(); window.parent.postMessage({ type: "win95:close" }, location.origin); }
+}));
 UI.initChrome();
 buildMapLabels();
 document.querySelectorAll("[data-room]").forEach(b => b.addEventListener("click", () => { sfx.click(); dismissWindow(); if (mode === "map") exitMap(b.dataset.room); else travelTo(b.dataset.room); }));
@@ -501,9 +539,15 @@ $("#drawerClose").addEventListener("click", () => closeDrawer());
 updateJournalBadge();
 
 // ---------------------------------------------------------------- resize + loop
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.3, 0.5, 1.1);
+composer.addPass(bloom);
+composer.addPass(new OutputPass());
 function resize() {
   const w = window.innerWidth, h = window.innerHeight;
-  renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+  renderer.setSize(w, h, false); composer.setPixelRatio(renderer.getPixelRatio()); composer.setSize(w, h);
+  camera.aspect = w / h; camera.updateProjectionMatrix();
 }
 window.addEventListener("resize", resize); resize();
 
@@ -532,7 +576,9 @@ function frame() {
     });
   }
   applyCam();
-  renderer.render(scene, camera);
+  bloom.strength = room === "kidspace" ? 0.8 : 0.28; bloom.threshold = room === "kidspace" ? 0.97 : 1.15;
+  kid.updateBubble(camera, room === "kidspace" && mode !== "travel" && mode !== "map" && !UI.isWindowOpen());
+  composer.render();
   requestAnimationFrame(frame);
 }
 applyCam();
@@ -544,9 +590,13 @@ const startRoom = (location.hash || "").replace("#", "");
 function setBoot(stage) { boot.dataset.stage = stage; }
 async function bootSequence() {
   const quick = sessionStorage.getItem("nav.booted") === "1" || reduceMotion;
-  setBoot("win"); await wait(quick ? 50 : 1100);
   setBoot("splash"); const bar = $("#bootBar");
-  for (let i = 0; i <= 20; i++) { bar.style.width = i * 5 + "%"; await wait(quick ? 5 : 55 + Math.random() * 40); }
+  let done = false; Promise.race([furnished.living, wait(8000)]).then(() => (done = true));
+  for (let i = 0; i <= 20; i++) {
+    bar.style.width = i * 5 + "%";
+    await wait(quick ? 5 : 45);
+    while (i === 17 && !done) { $("#bootStatus").textContent = "Arranging the furniture…"; await wait(100); }
+  }
   $("#bootStatus").textContent = "Ready.";
   setBoot("ready"); $("#enterBtn").focus();
 }
@@ -568,6 +618,7 @@ async function enterHouse() {
   if (fd) fd.rotation.y = Math.PI;
   room = "living"; mode = "room"; onRoomChanged();
   if (isRoom(startRoom) && startRoom !== "living") travelTo(startRoom);
+  window.addEventListener("hashchange", () => { const r = location.hash.slice(1); if (isRoom(r) && r !== room && mode !== "boot") { dismissWindow(); if (mode === "map") exitMap(r); else travelTo(r); } });
   if (!localStorage.getItem("nav.hinted")) { localStorage.setItem("nav.hinted", "1"); setTimeout(() => UI.toast("Drag to look around · hover to explore · click anything", 5000), 600); }
 }
 bootSequence();
