@@ -24,14 +24,14 @@
   <img alt="vanilla JS" src="https://img.shields.io/badge/vanilla-JS-f7df1e?logo=javascript&logoColor=000">
   <img alt="GitHub Pages" src="https://img.shields.io/badge/hosted%20on-GitHub%20Pages-222?logo=github">
   <img alt="3D assets CC0" src="https://img.shields.io/badge/3D%20assets-CC0-2a6ad8">
-  <img alt="cats" src="https://img.shields.io/badge/cats-3%20(+1%20merchant)-e08a3c">
+  <img alt="cats" src="https://img.shields.io/badge/cats-Simba%20·%20Mugsy%20·%20Tiger%20(+1%20merchant)-e08a3c">
 </p>
 
 ---
 
 ## 💾 It's 1996 again
 
-My personal site boots straight to a **Windows 95-style desktop**: rolling green hills, a blue sky, a Start button and a taskbar. There's no loading screen, and the desktop is up in under half a second.
+My personal site boots straight to a **Windows 95-style desktop**: a big green hill under a cobalt sky (painted in code, in the spirit of the famous XP wallpaper), a Start button and a taskbar. There's no loading screen, and the desktop is up in under half a second.
 
 Double-click around. There's a LinkedIn icon, a `README.TXT`, a Recycle Bin (my old green-screen homepage is in it), and a stack of classic programs, each rebuilt from scratch:
 
@@ -43,6 +43,7 @@ Double-click around. There's a LinkedIn icon, a `README.TXT`, a Recycle Bin (my 
 | 🚀 | **Space Pinball** | An original table in the spirit of *3D Pinball – Space Cadet*: bumpers, a ramp, a black hole, missions, and ranks from Cadet to Fleet Admiral. |
 | 🎨 | **Paint** | 16 tools, the 28-color palette, magnifier, select/move, undo, and save as PNG. |
 | 👹 | **DOOM** | The real shareware episode, running in WebAssembly. |
+| 🧃 | **Squeeze Play** | Cold-press juice recipes for the Nama J2: tick what's in your fridge, see what you can make. |
 | 📁 | **My Apps / Toolbox** | My full apps and 21 tiny tools, in Explorer-style folders. |
 
 ![The desktop](docs/img/desktop.jpg)
@@ -62,14 +63,15 @@ Every app I've built is a physical object somewhere in the house:
 | Room | Object | Opens |
 |---|---|---|
 | Living Room | 📺 **CRT television** | About me, on Channel 3 |
-| | 🖼️ **Family portrait** above the mantle | A '96 laser-background picture day: Dad, Mom, big sister, two big brothers, me, three cats |
+| | 🖼️ **Family portrait** above the mantle | A '96 laser-background picture day: Mom and Dad seated, four kids behind, and Simba, Mugsy and Tiger |
 | | 🕯️ **Memorial candle** | Remembrance |
 | | 🗳️ **Ballot box** | [Ranked Choice Voting](apps/rankedchoicevoting.html) |
-| | 👔 **Interview suit + LinkedIn pin** | Career and [LinkedIn](https://www.linkedin.com/in/dcerch/) |
+| | 💼 **Leather briefcase with an "in" badge** | Career and [LinkedIn](https://www.linkedin.com/in/dcerch/) |
 | | 🖥️ **Beige family PC** | The [classic terminal](terminal.html) site |
 | | ☎️ **Rotary phone** | A working keypad. Some numbers are… special |
 | Kitchen | 🧰 **The junk drawer** | 21 trinkets, one per [Toolbox](toolbox.html) snippet |
 | | 🧲 **Fridge magnets** | A new slogan every click |
+| | 🧃 **Cold-press juicer** | [Squeeze Play](apps/juicer.html) |
 | Den | 📜 **Certificates wall** · 🦺 **"Giving Back" shelf** | Certifications, education and volunteering |
 | | 🏛️ **Museum case** | [The Archive](apps/archived.html) |
 | | 📚 **Bookshelf** | Mostly books. *Mostly.* |
@@ -90,7 +92,7 @@ Every app I've built is a physical object somewhere in the house:
 
 Navigator shipped with **Ark KidSpace**, a kids' room full of clickable gags. Its look was a space station with glowing blue plasma tubes, the Moon and Earth out the window, and a striped metal floor. Inside were a lavender program shelf with a robot head and an alien in a jar, a marble filing cabinet (*Friends, Paintings, Homework, Personal, Misc.*), a console desk with a red surprise box, and a guide who popped up with tips. You could switch the view to Mars, a jungle tree house or the beach.
 
-So I rebuilt it. The shelf launches the desktop games, and the drawers open real things: *Homework* is my PMP study sheet. The jack-in-the-box guide is an original character, and the lever on the desk changes the view.
+So I rebuilt it. The shelf launches the desktop games, and every drawer pops open with a little toy of its own: *Friends* is a corkboard of pen-pal postcards you can write back to, *Paintings* is a fridge gallery with a crayon doodle pad, *Homework* is a Space Math worksheet (the dog may eat it), *Personal* is Rivet the robot's padlocked diary, and *Misc.* is a junk drawer of pogs, a slap bracelet and a virtual pet. The jack-in-the-box guide is an original character, and the lever on the desk changes the view.
 
 ![Ark KidSpace](docs/img/kidspace.jpg)
 
@@ -109,7 +111,7 @@ So I rebuilt it. The shelf launches the desktop games, and the drawers open real
   +--------------+-----------+--------+-------+--+-----------------+
   |      DEN     |        LIVING ROOM            |     KITCHEN     |
   | [certs]      | [portrait]  [TV]              |   [fridge]      |
-  | [bookshelf] door [suit]  [ballot box]      door  [JUNK DRAWER] |
+  | [bookshelf] door [case]  [ballot box]      door  [JUNK DRAWER] |
   | [giving back]| [PC]   [phone]   [cat]        |   [table]       |
   | [archive]    |                               |                 |
   +--------------+-------------+-door-+----------+-----------------+
@@ -152,9 +154,11 @@ The site has always hidden a small alternate-reality game. Inside Navigator it b
 It's static files on GitHub Pages: no framework and no bundler. The desktop is plain HTML/CSS/JS and loads no 3D engine at all. Navigator loads [three.js](https://threejs.org) r170 from a CDN through an import map, and the games are single self-contained HTML files.
 
 **Making the 3D look good:**
-- **Lighting:** image-based lighting (PMREM `RoomEnvironment`), soft shadows, ACES tone mapping and a gentle bloom pass.
+- **Lighting:** each room is photographed into its own reflection probe once it's furnished, so glossy wood and chrome reflect the actual room. Ground-truth ambient occlusion (GTAO), a soft shadow-casting ceiling lamp in the room you're in, MSAA, ACES tone mapping and a gentle bloom. An adaptive governor sheds the expensive extras on slower machines.
+- **Outdoors:** a real CC0 photo panorama (Poly Haven *Noon Grass*) projected onto a grounded skybox, so every window looks out on a lawn and tree line.
 - **Materials:** varnished clear-coat cherry wood, plus PBR floors, walls and brick from **Poly Haven (CC0)**.
-- **Furniture:** about 35 real CC0 models (sofa, armchairs, a vintage CRT, frames, a rocking chair, a cardboard box…). Each room streams in on its own, with a procedural stand-in shown until its model arrives.
+- **Furniture:** about 60 real CC0 models (sofa, armchairs, a vintage CRT, a grandfather clock, an electric stove, a leather reading chair, a stock pot and carpentry tools…). Each room streams in on its own, with a procedural stand-in shown until its model arrives.
+- **Hand-built where no model exists:** shaker kitchen cabinets with marble counters and subway tile, a rounded retro fridge, a contoured arcade cabinet, a needle-textured Christmas tree, a lathe-turned hard hat and bean bag, and soft-furred cats with tabby stripes.
 - **Trim:** cherry wainscoting, baseboards and crown molding.
 
 **Procedural where it counts:** the wallpaper, family portrait, certificates, TV and PC screens, KidSpace views, plasma tubes and every sound effect are generated in code.
@@ -176,8 +180,9 @@ It's static files on GitHub Pages: no framework and no bundler. The desktop is p
 |-- apps/
 |   |-- win95/                <- solitaire, minesweeper, pinball, paint (one file each)
 |   |-- doom/                 <- DOOM wrapper + doom.wasm (see NOTICE.txt)
-|   `-- *.html                <- my full apps
-|-- assets/models · textures  <- CC0 Poly Haven assets (see assets/CREDITS.txt)
+|   |-- kidspace-drawers.html <- the five KidSpace drawer toys
+|   `-- *.html                <- my full apps (incl. juicer.html = Squeeze Play)
+|-- assets/models · textures · hdri  <- CC0 Poly Haven assets (see assets/CREDITS.txt)
 |-- tools/fetch_assets.py     <- re-download / shrink the 3D assets
 |-- terminal.html             <- the previous green-screen site, preserved
 `-- toolbox.html · apps.html · 404.html
@@ -199,7 +204,7 @@ python -m http.server 8000      # then open http://localhost:8000
 ## 🙏 Credits & licenses
 
 * **Inspiration:** *Packard Bell Navigator* and *Ark KidSpace* (Ark Interface / Packard Bell, 1994–96). Fan-made homage, not affiliated. No original assets are used.
-* **Windows** is a trademark of Microsoft; this desktop is a lookalike with original artwork, no Microsoft files, and a painted (not photographed) wallpaper.
+* **Windows** is a trademark of Microsoft; this desktop is a lookalike with original artwork, no Microsoft files, and a wallpaper painted in code (it is not the *Bliss* photograph).
 * **DOOM:** engine [jacobenget/doom.wasm](https://github.com/jacobenget/doom.wasm) (**GPL-2.0**). Game data is the freely distributable DOOM shareware WAD, © id Software. See [`apps/doom/NOTICE.txt`](apps/doom/NOTICE.txt).
 * **3D models & textures:** [Poly Haven](https://polyhaven.com), **CC0**. See [`assets/CREDITS.txt`](assets/CREDITS.txt).
 * **Solitaire, Minesweeper, Space Pinball and Paint** are original recreations written for this site, with credit to the original creators in each About box.

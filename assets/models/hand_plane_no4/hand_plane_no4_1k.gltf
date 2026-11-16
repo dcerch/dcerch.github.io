@@ -1,0 +1,164 @@
+{
+  "asset": {
+    "generator": "Khronos glTF Blender I/O v3.3.32",
+    "version": "2.0"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "blend_export",
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0,
+      "name": "hand_plane_no4",
+      "translation": [
+        0.018503330647945404,
+        0.005329778417944908,
+        -0.008124117739498615
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "doubleSided": true,
+      "name": "hand_plane_no4",
+      "normalTexture": {
+        "index": 0
+      },
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 1
+        },
+        "metallicRoughnessTexture": {
+          "index": 2
+        }
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "name": "Plane.007",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "indices": 3,
+          "material": 0
+        }
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "sampler": 0,
+      "source": 0
+    },
+    {
+      "sampler": 0,
+      "source": 1
+    },
+    {
+      "sampler": 0,
+      "source": 2
+    }
+  ],
+  "images": [
+    {
+      "mimeType": "image/jpeg",
+      "name": "hand_plane_no4_nor_gl",
+      "uri": "textures/hand_plane_no4_nor_gl_1k.jpg"
+    },
+    {
+      "mimeType": "image/jpeg",
+      "name": "hand_plane_no4_diff",
+      "uri": "textures/hand_plane_no4_diff_1k.jpg"
+    },
+    {
+      "mimeType": "image/jpeg",
+      "name": "hand_plane_no4_metal-hand_plane_no4_rough",
+      "uri": "textures/hand_plane_no4_arm_1k.jpg"
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 5623,
+      "max": [
+        0.16716815531253815,
+        0.19370946288108826,
+        0.04215884581208229
+      ],
+      "min": [
+        -0.16362977027893066,
+        -0.0040939622558653355,
+        -0.04215884581208229
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 5623,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 5623,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5123,
+      "count": 24660,
+      "type": "SCALAR"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 67476,
+      "byteOffset": 0,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 67476,
+      "byteOffset": 67476,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 44984,
+      "byteOffset": 134952,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 49320,
+      "byteOffset": 179936,
+      "target": 34963
+    }
+  ],
+  "samplers": [
+    {
+      "magFilter": 9729,
+      "minFilter": 9987
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 229256,
+      "uri": "hand_plane_no4.bin"
+    }
+  ]
+}

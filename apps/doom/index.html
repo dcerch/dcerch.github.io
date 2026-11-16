@@ -20,6 +20,7 @@
     #overlay { position: absolute; inset: 0 0 22px 0; display: grid; place-items: center; background: rgba(0,0,0,.65); cursor: pointer; text-align: center; }
     #overlay b { display: block; font: bold 28px Impact, "Arial Black", sans-serif; color: #c00; letter-spacing: 2px; text-shadow: 2px 2px 0 #300; }
     #overlay span { color: #ddd; }
+    #overlay[hidden] { display: none; }
     #bar { position: absolute; left: 0; right: 0; bottom: 0; height: 22px; display: flex; align-items: center; gap: 12px; padding: 0 8px; background: #c0c0c0; color: #000; white-space: nowrap; overflow: hidden; }
     #bar a { color: #000080; }
     #touch { position: absolute; inset: 0 0 22px 0; pointer-events: none; display: none; }
@@ -91,7 +92,7 @@
       };
       canvas.addEventListener("keydown", e => handle(e, true));
       canvas.addEventListener("keyup", e => handle(e, false));
-      canvas.addEventListener("mousedown", e => { if (e.button === 0) ex.reportKeyDown(ex.KEY_FIRE); });
+      canvas.addEventListener("mousedown", e => { canvas.focus(); if (e.button === 0) ex.reportKeyDown(ex.KEY_FIRE); });
       addEventListener("mouseup", e => { if (e.button === 0) ex.reportKeyUp(ex.KEY_FIRE); });
       // touch pad
       document.querySelectorAll(".pad").forEach(b => {
@@ -104,7 +105,7 @@
       setInterval(() => { if (!document.hidden) ex.tickGame(); }, 1000 / 35);
     }).catch(err => { overlay.innerHTML = "<div><b>DOOM</b><span>Couldn't start: " + String(err.message || err) + "</span></div>"; });
 
-    const start = () => { overlay.hidden = true; canvas.focus(); };
+    const start = () => { overlay.hidden = true; window.focus(); canvas.focus(); };
     overlay.addEventListener("click", start);
     canvas.addEventListener("blur", () => { if (!document.body.classList.contains("touch")) overlay.hidden = false; });
     addEventListener("focus", () => canvas.focus());

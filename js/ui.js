@@ -85,7 +85,7 @@ export const panels = {
   family(portraitURL) {
     return {
       title: "Family Portrait", icon: "🖼️", wide: true,
-      html: `<figure class="portrait"><img src="${portraitURL}" alt="An illustrated 1990s-style family portrait with six people and three cats in front of a laser background"><figcaption>Picture day, ’96. Left to right: ${FAMILY.map(f => esc(f.who)).join(", ")} — and the real bosses of the house, ${CATS.map(c => esc(c.name)).join(", ")}.</figcaption></figure>
+      html: `<figure class="portrait"><img src="${portraitURL}" alt="An illustrated 1990s studio family portrait: four siblings standing, Mom and Dad seated, and three cats, in front of a laser background"><figcaption>Picture day, ’96. Back row: ${FAMILY.filter(f => f.row !== "front").map(f => esc(f.who)).join(", ")}. Front: ${FAMILY.filter(f => f.row === "front").map(f => esc(f.who)).join(" and ")} — with the real bosses of the house, ${CATS.map(c => `${esc(c.name)} <i>(${esc(c.look)})</i>`).join(", ")}.</figcaption></figure>
         <p class="hint">The cats are somewhere in this house right now. Go say hi.</p>`
     };
   },

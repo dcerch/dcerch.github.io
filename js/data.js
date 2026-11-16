@@ -25,19 +25,18 @@ export const PROFILE = {
 
 // ---- Den: the trophy room -------------------------------------------
 export const CERTIFICATIONS = [
+  { name: "Power Platform Fundamentals", code: "PL-900", issuer: "Microsoft", color: "#742774" },
   { name: "Azure Fundamentals", code: "AZ-900", issuer: "Microsoft", color: "#0078d4" },
   { name: "Microsoft 365 Fundamentals", code: "MS-900", issuer: "Microsoft", color: "#d83b01" },
-  { name: "ITIL v3 Foundation", code: "ITIL", issuer: "AXELOS", color: "#6b2c91" },
-  { name: "Accessibility in Action", code: "A11Y", issuer: "Microsoft", color: "#107c10" },
-  { name: "B.S. Information Technology & Systems", code: "Magna Cum Laude", issuer: "Marist College · 2014", color: "#b5121b" },
-  { name: "PMP Exam Prep (PMBOK v6)", code: "PMP-trained", issuer: "Project Management", color: "#c8a400" }
+  { name: "ITIL — IT Service Management", code: "ITIL", issuer: "AXELOS", color: "#6b2c91" },
+  { name: "CPR / AED", code: "CPR · AED", issuer: "Certified", color: "#c8102e" },
+  { name: "B.S. Information Technology & Systems", code: "Magna Cum Laude", issuer: "Marist College · 2014", color: "#b5121b" }
 ];
 
 export const VOLUNTEERING = [
-  { id: "habitat", name: "Habitat for Humanity", detail: "Organized and swung hammers on local builds with coworkers.", prop: "hardhat" },
-  { id: "soup", name: "Community soup kitchens", detail: "Organized teams to serve meals at local soup kitchens.", prop: "ladle" },
-  { id: "hackathon", name: "Global Hackathon organizer", detail: "Ran a company-wide hackathon three years in a row with 100+ participants across the globe.", prop: "trophy" },
-  { id: "mentor", name: "Mentoring & coaching", detail: "Interviewed, onboarded, and coached new hires; coached technicians on clear, simple customer communication.", prop: "mug" }
+  { id: "cook", name: "Assistant Cook — homeless shelter", detail: "Helps prep and cook hot meals for guests at a local homeless shelter.", prop: "ladle" },
+  { id: "stem", name: "STEM Teacher & Career Advisor", detail: "Teaches hands-on STEM lessons to high-school students and helps them map out careers in tech.", prop: "chalkboard" },
+  { id: "carpenter", name: "Carpenter — low-income housing", detail: "Framing, drywall, and finish carpentry on homes for low-income families.", prop: "hardhat" }
 ];
 
 // ---- Full apps (each is a physical object somewhere in the house) ---
@@ -52,6 +51,8 @@ export const APPS = {
     desc: "Stranded! Rank 15 salvaged items before the clock runs out and see if the Coast Guard would have kept you alive." },
   everybodyisjohn: { title: "Everybody is John", url: "apps/everybodyisjohn.html",
     desc: "A companion app for the simplest tabletop roleplaying game, where every player is a voice in John's head." },
+  juicer: { title: "Squeeze Play", url: "apps/juicer.html",
+    desc: "Cold-press juice recipes for the Nama J2: tick what's in your fridge and see what you can make right now." },
   archived: { title: "The Archive", url: "apps/archived.html",
     desc: "A museum of retired apps: the Overwatch Workshop Repository, the Raspberry Pi Designer, and Garage to Table." }
 };
@@ -83,20 +84,21 @@ export const TRINKETS = [
 ];
 
 // ---- Family portrait -------------------------------------------------
-//  Illustrated, not photographic. Swap names/colors as you like.
-//  Listed left-to-right as they stand in the picture.
+//  Illustrated, not photographic — a '90s studio portrait. Swap names/colors as you like.
+//  row "back" stands left-to-right behind; row "front" sits. hair: long | short | gray |
+//  volume | curtains | bowl. top: sweater | polo | turtleneck | stripes | flannel.
 export const FAMILY = [
-  { who: "Big sister", shirt: "#3d8b5a", hair: "#3b2414", skin: "#f0c4a0", h: 0.9, hairStyle: "long" },
-  { who: "Big brother #1", shirt: "#c4622d", hair: "#2a1a10", skin: "#e8b98f", h: 0.97, hairStyle: "short" },
-  { who: "Dad", shirt: "#2f5d8a", hair: "#8a8a8a", skin: "#e8b98f", h: 1.0, hairStyle: "short" },
-  { who: "Mom", shirt: "#9b2d5e", hair: "#6b3e1f", skin: "#f0c4a0", h: 0.94, hairStyle: "long" },
-  { who: "Big brother #2", shirt: "#5a3f8c", hair: "#2a1a10", skin: "#e8b98f", h: 0.95, hairStyle: "spiky" },
-  { who: "Dominic", shirt: "#127a74", hair: "#2a1a10", skin: "#e8b98f", h: 0.9, hairStyle: "spiky" }
+  { who: "Big sister", row: "back", shirt: "#3d8b5a", top: "turtleneck", hair: "#4a2c17", skin: "#f0c4a0", hairStyle: "long" },
+  { who: "Big brother #1", row: "back", shirt: "#c4622d", top: "flannel", hair: "#2a1a10", skin: "#e8b98f", hairStyle: "short" },
+  { who: "Big brother #2", row: "back", shirt: "#5a3f8c", top: "stripes", hair: "#2a1a10", skin: "#e8b98f", hairStyle: "curtains" },
+  { who: "Dominic", row: "back", shirt: "#127a74", top: "polo", hair: "#2a1a10", skin: "#ecbe96", hairStyle: "bowl", kid: true },
+  { who: "Dad", row: "front", shirt: "#2f5d8a", top: "sweater", hair: "#8d8a86", skin: "#e8b98f", hairStyle: "gray", glasses: true },
+  { who: "Mom", row: "front", shirt: "#9b2d5e", top: "sweater", hair: "#6b3e1f", skin: "#f0c4a0", hairStyle: "volume" }
 ];
 export const CATS = [
-  { name: "Cat #1", color: "#e08a3c", stripe: "#a85a1c" },
-  { name: "Cat #2", color: "#2b2b2e", stripe: "#1a1a1c" },
-  { name: "Cat #3", color: "#9a9aa2", stripe: "#6d6d75" }
+  { name: "Simba", look: "beige & gray", color: "#cbbba3", stripe: "#8f8a84", belly: "#ece2d2" },
+  { name: "Mugsy", look: "light orange", color: "#f0b878", stripe: "#d99a58", belly: "#fbe6c8" },
+  { name: "Tiger", look: "orange tabby", color: "#e0802e", stripe: "#9e4a12", belly: "#f6d2a6" }
 ];
 
 export const REMEMBRANCE = [

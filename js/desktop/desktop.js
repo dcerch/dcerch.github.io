@@ -4,7 +4,7 @@
 // =====================================================================
 import { ICONS } from "./icons.js";
 import { paintWallpaper } from "./wallpaper.js";
-import { PROFILE, APPS, TRINKETS } from "../data.js";
+import { PROFILE, APPS, TRINKETS, CERTIFICATIONS, VOLUNTEERING } from "../data.js";
 import { sfx, isMuted, setMuted } from "../audio.js";
 
 const $ = (s, r = document) => r.querySelector(s);
@@ -22,13 +22,22 @@ ${PROFILE.title}
 
 ${PROFILE.about.join("\n\n")}
 
+CERTIFICATIONS
+--------------
+${CERTIFICATIONS.map(c => "  * " + c.name + (c.code && !c.name.includes(c.code) ? " (" + c.code + ")" : "")).join("\n")}
+
+GIVING BACK
+-----------
+${VOLUNTEERING.map(v => "  * " + v.name).join("\n")}
+
 WHAT'S ON THIS COMPUTER
 -----------------------
   Navigator ........ a 3D house tour of everything I've built
                      (an homage to Packard Bell Navigator, 1995)
   LinkedIn ......... my professional side
   My Apps .......... full apps: Ranked Choice Voting, Secret Santa,
-                     Kojima Name Generator, Lost at Sea, and more
+                     Kojima Name Generator, Lost at Sea, Squeeze Play
+                     (cold-press juice recipes) and more
   Toolbox .......... 21 tiny web tools (the junk drawer)
   Games ............ Solitaire, Minesweeper, Space Pinball, DOOM
   Paint ............ go on, draw something
@@ -46,7 +55,7 @@ TIPS
 const P = {
   mycomputer: { title: "My Computer", icon: "computer", folder: ["navigator", "apps", "games", "toolbox", "floppy", "controlpanel", "recycle"], w: 440, h: 300 },
   navigator: { title: "Navigator", icon: "navigator", url: "navigator.html", w: 1000, h: 680, max: true },
-  linkedin: { title: "Dominic Cerchio — LinkedIn", icon: "linkedin", view: "linkedin", w: 460, h: 430, label: "LinkedIn" },
+  linkedin: { title: "Dominic Cerchio — LinkedIn", icon: "linkedin", view: "linkedin", w: 480, h: 560, label: "LinkedIn" },
   readme: { title: "README.TXT - Notepad", icon: "notepad", view: "notepad", text: README, w: 560, h: 420, label: "README.TXT" },
   notepad: { title: "Untitled - Notepad", icon: "notepad", view: "notepad", text: "", w: 480, h: 340 },
   solitaire: { title: "Solitaire", icon: "solitaire", url: "apps/win95/solitaire.html?embed=1", w: 720, h: 540 },
@@ -68,7 +77,7 @@ const P = {
   welcome: { title: "Welcome", icon: "computer", view: "welcome", w: 520, h: 300, dialog: true }
 };
 Object.entries(APPS).forEach(([id, a]) => {
-  const icon = { rankedchoicevoting: "apps", secretsanta: "apps", kojima: "apps", lostatsea: "apps", everybodyisjohn: "apps", archived: "folder" }[id] || "apps";
+  const icon = { rankedchoicevoting: "apps", secretsanta: "apps", kojima: "apps", lostatsea: "apps", everybodyisjohn: "apps", juicer: "juice", archived: "folder" }[id] || "apps";
   P["app-" + id] = { title: a.title, icon, url: a.url, w: 900, h: 640, desc: a.desc };
   P.apps.folder.push("app-" + id);
 });
@@ -78,7 +87,7 @@ TRINKETS.forEach(t => {
 });
 P.apps.folder.push("toolbox", "navigator");
 
-const DESKTOP = ["mycomputer", "navigator", "linkedin", "readme", "solitaire", "minesweeper", "pinball", "paint", "doom", "apps", "toolbox", "recycle"];
+const DESKTOP = ["mycomputer", "navigator", "linkedin", "readme", "solitaire", "minesweeper", "pinball", "paint", "doom", "app-juicer", "apps", "toolbox", "recycle"];
 
 // ---------------------------------------------------------------- wallpaper
 const wp = $("#wallpaper");
@@ -291,6 +300,8 @@ const VIEWS = {
     win.body.innerHTML = `<div class="profile sunken"><div class="card"><div class="badge">in</div><div><h2>${esc(PROFILE.name)}</h2><div>${esc(PROFILE.title)}</div></div></div>
       <p>Relationship builder with a front-end developer's toolkit and a passion for empowering people through technology.</p>
       <b>Experience</b><ul>${PROFILE.career.map(c => `<li><b>${esc(c.org)}</b> — ${esc(c.role)} <i>(${esc(c.when)})</i></li>`).join("")}</ul>
+      <b>Certifications</b><ul>${CERTIFICATIONS.map(c => `<li>${esc(c.name)} <i>(${esc(c.code)})</i></li>`).join("")}</ul>
+      <b>Volunteering</b><ul>${VOLUNTEERING.map(v => `<li>${esc(v.name)}</li>`).join("")}</ul>
       <div class="btns" style="display:flex;gap:6px;flex-wrap:wrap"><a class="btn default" style="text-decoration:none;color:#000;display:inline-flex;align-items:center" href="${PROFILE.linkedin}" target="_blank" rel="noopener">Open LinkedIn profile ↗</a>
       <a class="btn" style="text-decoration:none;color:#000;display:inline-flex;align-items:center" href="${PROFILE.github}" target="_blank" rel="noopener">GitHub ↗</a>
       <button class="btn" data-open="navigator">Tour my house →</button></div></div>`;
@@ -314,7 +325,7 @@ const VIEWS = {
       <p><b>The Start menu</b> has everything: Programs, Documents, Settings, Run… and Shut Down.</p>
       <p><b>Navigator</b> is a 3D tour of a house that holds all my projects. Inside, you'll find Ark KidSpace too.</p>
       <p><b>Games.</b> Solitaire, Minesweeper and Space Pinball are original recreations written for this site. DOOM is the freely-distributable shareware episode running on <a href="https://github.com/jacobenget/doom.wasm" target="_blank" rel="noopener">doom.wasm</a>.</p>
-      <p><b>Run commands:</b> help, navigator, kidspace, notepad, paint, doom, pinball, solitaire, winmine, linkedin, dos, about.</p>
+      <p><b>Run commands:</b> help, navigator, kidspace, notepad, paint, doom, pinball, solitaire, winmine, linkedin, juice, dos, about.</p>
       <p style="color:#555">A fan-made homage. Windows is a trademark of Microsoft; Packard Bell Navigator was made by Ark Interface/Packard Bell. Not affiliated. All artwork here is original.</p></div>`;
   },
   run(win) {
@@ -371,7 +382,7 @@ function download(name, text) {
 }
 
 // ---------------------------------------------------------------- Run command
-const ALIASES = { winmine: "minesweeper", mines: "minesweeper", sol: "solitaire", mspaint: "paint", pbrush: "paint", paintbrush: "paint", cmd: "terminal", command: "terminal", dos: "terminal", explorer: "mycomputer", control: "controlpanel", kidspace: "navigator#kidspace", nav: "navigator", "doom.exe": "doom", pinball: "pinball", about: "readme", "readme.txt": "readme", linkedin: "linkedin", calc: "tk-pmpcalc" };
+const ALIASES = { winmine: "minesweeper", mines: "minesweeper", sol: "solitaire", mspaint: "paint", pbrush: "paint", paintbrush: "paint", cmd: "terminal", command: "terminal", dos: "terminal", explorer: "mycomputer", control: "controlpanel", kidspace: "navigator#kidspace", nav: "navigator", "doom.exe": "doom", pinball: "pinball", about: "readme", "readme.txt": "readme", linkedin: "linkedin", calc: "tk-pmpcalc", juice: "app-juicer", juicer: "app-juicer", nama: "app-juicer" };
 function runCommand(v) {
   const c = v.toLowerCase().replace(/\.exe$/, "");
   if (!c) return;

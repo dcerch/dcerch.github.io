@@ -1,0 +1,1091 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="none, noarchive">
+<meta name="description" content="Squeeze Play: an unofficial cold-press pantry for the Nama J2. Tick off what's in your kitchen and see which original juice, shot, nut milk and sorbet recipes you can make right now.">
+<title>Squeeze Play · Cold Press Pantry</title>
+<style>
+:root{
+  --cream:#fff8ec; --paper:#fffdf8; --ink:#2b2118; --muted:#6b5a48; --line:#ead9c0;
+  --green:#2f8f3a; --green-d:#1f6b28; --orange:#e8650f; --pink:#d6336c; --yellow:#f5b700;
+  --berry:#7b2d8b; --focus:#1a5fd0;
+  --display: Georgia, "Times New Roman", serif;
+  --body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --r:16px; --shadow:0 2px 0 rgba(43,33,24,.08), 0 6px 18px rgba(43,33,24,.08);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--cream);color:var(--ink);font:15px/1.5 var(--body);
+  background-image:radial-gradient(circle at 10% 0%,#ffe9c7 0,transparent 40%),radial-gradient(circle at 100% 20%,#e3f5d8 0,transparent 35%);
+  background-attachment:fixed;overflow-x:hidden}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+a{color:var(--green-d)}
+.wrap{max-width:1240px;margin:0 auto;padding:12px 14px 40px}
+header.top{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:6px 0 14px}
+.brand{display:flex;align-items:center;gap:12px;min-width:0;flex:1 1 260px}
+.logo{width:52px;height:52px;flex:none}
+.brand h1{font:700 clamp(26px,5vw,38px)/1 var(--display);margin:0;letter-spacing:-.5px}
+.brand h1 span{color:var(--orange)}
+.brand p{margin:3px 0 0;color:var(--muted);font-size:13.5px}
+.backlink{font-size:13px;text-decoration:none;color:var(--muted);border:1px solid var(--line);padding:4px 10px;border-radius:99px;background:var(--paper)}
+.backlink:hover{color:var(--ink)}
+.top-actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:2px solid var(--ink);background:var(--paper);border-radius:99px;padding:7px 14px;font-weight:700;font-size:14px;
+  box-shadow:0 3px 0 var(--ink);transition:transform .12s, box-shadow .12s, background .15s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn:hover{background:#fff1d6}
+.btn:active{transform:translateY(3px);box-shadow:0 0 0 var(--ink)}
+.btn.primary{background:var(--orange);color:#fff;border-color:#8a3a06;box-shadow:0 3px 0 #8a3a06}
+.btn.primary:hover{background:#d95a08}
+.btn.small{padding:4px 10px;font-size:13px;box-shadow:0 2px 0 var(--ink)}
+.btn .count{background:var(--pink);color:#fff;border-radius:99px;padding:0 7px;font-size:12px;min-width:20px;text-align:center}
+.layout{display:grid;grid-template-columns:1fr;gap:16px}
+@media (min-width:900px){.layout{grid-template-columns:minmax(300px,360px) 1fr;align-items:start}
+  .pantry{position:sticky;top:10px;max-height:calc(100vh - 20px);overflow:auto}}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:14px}
+.panel h2{font:700 21px/1.2 var(--display);margin:0 0 8px}
+.pantry-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.pill-note{font-size:12.5px;color:var(--muted)}
+.search{width:100%;border:2px solid var(--line);background:#fff;border-radius:12px;padding:8px 12px;margin:8px 0;min-width:0}
+.search:focus{border-color:var(--focus);outline:none;box-shadow:0 0 0 3px rgba(26,95,208,.2)}
+.qa{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.cat{margin-top:10px}
+.cat h3{font:700 12px/1.2 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 6px;display:flex;justify-content:space-between}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1.5px solid var(--line);background:#fff;border-radius:99px;padding:4px 10px 4px 7px;font-size:13.5px;display:inline-flex;align-items:center;gap:5px;
+  transition:background .15s,border-color .15s,transform .1s;max-width:100%}
+.chip:hover{border-color:#cbb08a}
+.chip:active{transform:scale(.96)}
+.chip[aria-pressed="true"]{background:#e2f4dc;border-color:var(--green);color:#16451b;font-weight:600}
+.chip[aria-pressed="true"]::after{content:"✓";font-weight:800;color:var(--green)}
+.chip .e{font-size:15px}
+.empty-cat{font-size:13px;color:var(--muted);font-style:italic}
+.toolbar{display:flex;flex-direction:column;gap:8px}
+.filters{display:flex;flex-wrap:wrap;gap:6px}
+.fchip{border:2px solid var(--ink);background:#fff;border-radius:99px;padding:3px 11px;font-size:13px;font-weight:600;transition:background .15s}
+.fchip[aria-pressed="true"]{background:var(--ink);color:#fff}
+.fchip:hover{background:#fff1d6}
+.fchip[aria-pressed="true"]:hover{background:#4a3a2b}
+.summary{font-size:13.5px;color:var(--muted);margin:2px 0 0}
+details.tier{margin-top:14px}
+details.tier > summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;font:700 20px/1.2 var(--display);padding:6px 4px;border-radius:10px}
+details.tier > summary::-webkit-details-marker{display:none}
+details.tier > summary::before{content:"▸";font-size:15px;transition:transform .2s;display:inline-block;width:14px}
+details.tier[open] > summary::before{transform:rotate(90deg)}
+details.tier > summary .n{font:700 12px/1 var(--body);background:var(--ink);color:#fff;border-radius:99px;padding:4px 8px}
+details.tier > summary small{font:400 13px var(--body);color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(225px,100%),1fr));gap:12px;margin-top:8px}
+.card{position:relative;background:var(--paper);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;
+  transition:transform .15s, box-shadow .15s}
+.card:hover{transform:translateY(-3px);box-shadow:0 4px 0 rgba(43,33,24,.08),0 12px 26px rgba(43,33,24,.14)}
+.card .open{all:unset;cursor:pointer;display:flex;flex-direction:column;flex:1;border-radius:18px}
+.card .open:focus-visible{outline:3px solid var(--focus);outline-offset:-3px}
+.swatch{height:92px;position:relative;display:flex;align-items:flex-end;padding:10px 12px;overflow:hidden}
+.swatch::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,rgba(255,255,255,.35) 0 14%,transparent 15% 100%);pointer-events:none}
+.bottle{position:absolute;right:10px;top:10px;width:36px;height:72px;border-radius:9px 9px 12px 12px;border:2px solid rgba(255,255,255,.75);background:rgba(255,255,255,.15)}
+.bottle::before{content:"";position:absolute;left:8px;right:8px;top:-9px;height:9px;background:rgba(255,255,255,.85);border-radius:3px 3px 0 0}
+.swatch .emo{font-size:34px;line-height:1;filter:drop-shadow(0 2px 2px rgba(0,0,0,.18))}
+.badge{position:absolute;left:10px;top:10px;font-size:11px;font-weight:700;background:rgba(255,255,255,.92);color:var(--ink);border-radius:99px;padding:2px 8px;letter-spacing:.02em}
+.card .body{padding:10px 12px 12px;display:flex;flex-direction:column;gap:6px;flex:1}
+.card h4{margin:0;font:700 17px/1.2 var(--display)}
+.card p{margin:0;font-size:13px;color:var(--muted)}
+.ings{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}
+.ing{font-size:12px;border-radius:99px;padding:1px 7px;background:#f3ead9;color:#4b3c2c}
+.ing.have{background:#e2f4dc;color:#16451b}
+.ing.miss{background:#ffe1e6;color:#9b1035;font-weight:700;border:1px dashed #d6336c}
+.ing.swap{background:#fff1c9;color:#7a5200;font-weight:700}
+.ing.opt{opacity:.75;font-style:italic}
+.swapnote{font-size:12px;color:#7a5200;background:#fff6dc;border-radius:8px;padding:3px 7px}
+.card .acts{position:absolute;right:52px;top:8px;display:flex;gap:4px;z-index:2}
+.iconbtn{width:34px;height:34px;border-radius:50%;border:none;background:rgba(255,255,255,.92);color:var(--ink);display:grid;place-items:center;font-size:17px;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .15s}
+.iconbtn:hover{transform:scale(1.12)}
+.iconbtn[aria-pressed="true"].fav{color:var(--pink)}
+.iconbtn.fav{color:#9c8c7a}
+.iconbtn.want{color:#9c8c7a}
+.iconbtn[aria-pressed="true"].want{color:#d99a00}
+.hint{background:#fff3d6;border:1px dashed #e0b45c;border-radius:12px;padding:10px 12px;font-size:14px;margin-top:12px}
+.none{color:var(--muted);font-style:italic;padding:10px 4px}
+details.tips{margin-top:16px}
+details.tips > summary{cursor:pointer;font:700 20px/1.2 var(--display);list-style:none;display:flex;align-items:center;gap:8px}
+details.tips > summary::-webkit-details-marker{display:none}
+details.tips > summary::after{content:"＋";margin-left:auto;font-size:18px}
+details.tips[open] > summary::after{content:"－"}
+.tips ul{margin:10px 0 0;padding-left:20px}
+.tips li{margin:5px 0}
+footer{margin-top:22px;font-size:12.5px;color:var(--muted);text-align:center}
+/* modal + drawer */
+.scrim{position:fixed;inset:0;background:rgba(43,33,24,.45);display:none;z-index:50;animation:fade .2s}
+.scrim.on{display:block}
+.modal{position:fixed;z-index:60;left:50%;top:50%;transform:translate(-50%,-50%);width:min(760px,calc(100vw - 20px));max-height:calc(100vh - 20px);
+  overflow:auto;background:var(--paper);border-radius:22px;box-shadow:0 20px 60px rgba(0,0,0,.3);display:none;animation:pop .22s}
+.modal.on{display:block}
+.mhead{position:relative;padding:20px 18px 18px;color:#fff;min-height:130px;display:flex;flex-direction:column;justify-content:flex-end}
+.mhead h2{margin:0;font:700 clamp(24px,5vw,32px)/1.1 var(--display);text-shadow:0 2px 6px rgba(0,0,0,.35);padding-right:44px}
+.mhead p{margin:6px 0 0;text-shadow:0 1px 4px rgba(0,0,0,.45);font-size:14.5px;max-width:560px}
+.mhead .emo{font-size:44px;line-height:1}
+.mclose{position:absolute;right:12px;top:12px}
+.macts{position:absolute;right:56px;top:12px;display:flex;gap:6px}
+.mbody{padding:16px 18px 20px;display:grid;gap:16px}
+.mbody h3{margin:0 0 6px;font:700 17px/1.2 var(--display)}
+.sizes{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.sizes [role=radio]{border:2px solid var(--ink);background:#fff;border-radius:99px;padding:4px 12px;font-weight:700;font-size:13.5px}
+.sizes [role=radio][aria-checked="true"]{background:var(--ink);color:#fff}
+.stats{display:flex;gap:8px;flex-wrap:wrap}
+.stat{background:#f6ecda;border-radius:12px;padding:6px 10px;font-size:13px}
+.stat b{display:block;font-size:16px}
+.ilist{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.ilist li{display:flex;gap:8px;align-items:baseline;padding:5px 8px;border-radius:10px;background:#fbf4e7;flex-wrap:wrap}
+.ilist .q{font-weight:800;min-width:76px}
+.ilist .tag{font-size:11.5px;border-radius:99px;padding:0 7px;margin-left:auto}
+.ilist .tag.have{background:#e2f4dc;color:#16451b}
+.ilist .tag.miss{background:#ffe1e6;color:#9b1035}
+.ilist .tag.swap{background:#fff1c9;color:#7a5200}
+.ilist .tag.opt{background:#eee;color:#555}
+.meter{height:12px;background:#efe3cf;border-radius:99px;overflow:hidden;margin-top:4px}
+.meter i{display:block;height:100%;background:linear-gradient(90deg,var(--green),#9ccc3c);border-radius:99px;transition:width .3s}
+.meter.over i{background:linear-gradient(90deg,#e8650f,#d6336c)}
+.warn{background:#ffe1e6;color:#7d0d2c;border-radius:10px;padding:8px 10px;font-size:13.5px;margin-top:6px}
+.stack{display:flex;flex-direction:column-reverse;gap:4px;border:3px solid #cdbb9d;border-top:none;border-radius:0 0 18px 18px;padding:8px;background:linear-gradient(#fff,#f7efe1)}
+.layer{border-radius:8px;padding:5px 9px;font-size:13px;display:flex;gap:8px;flex-wrap:wrap;align-items:baseline}
+.layer b{font-size:11px;text-transform:uppercase;letter-spacing:.06em;min-width:62px}
+.layer.leafy{background:#d9f0c9}.layer.soft{background:#ffe0e8}.layer.medium{background:#fff0c4}.layer.hard{background:#ffd9b8}
+.layer.frozen{background:#dcefff}.layer.nut{background:#efe2cf}
+.steps{margin:0;padding-left:20px}
+.steps li{margin:4px 0}
+.prep{margin:0;padding-left:18px;font-size:14px}
+.prep li{margin:3px 0}
+.drawer{position:fixed;z-index:60;right:0;top:0;bottom:0;width:min(400px,100vw);background:var(--paper);box-shadow:-10px 0 40px rgba(0,0,0,.25);
+  transform:translateX(105%);transition:transform .25s;display:flex;flex-direction:column;visibility:hidden}
+.drawer.on{transform:none;visibility:visible}
+.drawer header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line)}
+.drawer h2{margin:0;font:700 22px/1.2 var(--display)}
+.drawer .dbody{padding:14px 16px;overflow:auto;flex:1}
+.shop{list-style:none;margin:0;padding:0}
+.shop li{padding:7px 0;border-bottom:1px dashed var(--line);display:flex;gap:8px;align-items:baseline}
+.shop .for{font-size:12px;color:var(--muted);display:block}
+.drawer footer{padding:12px 16px;border-top:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;margin:0}
+.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%) translateY(30px);background:var(--ink);color:#fff;padding:9px 16px;border-radius:99px;font-size:14px;
+  opacity:0;transition:opacity .2s, transform .2s;z-index:80;pointer-events:none;max-width:calc(100vw - 24px);text-align:center}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+@keyframes pop{from{opacity:0;transform:translate(-50%,-46%) scale(.97)}to{opacity:1;transform:translate(-50%,-50%)}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@media (max-width:520px){
+  .wrap{padding:10px 10px 30px}
+  .logo{width:42px;height:42px}
+  .top-actions .btn{padding:6px 11px;font-size:13px}
+  .mhead{min-height:110px}
+  .mbody{padding:14px 12px 18px}
+  .ilist .q{min-width:64px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+  .card:hover{transform:none}
+}
+</style>
+</head>
+<body>
+<a href="#results" class="sr-only">Skip to recipes</a>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 64 64" aria-hidden="true">
+        <rect x="18" y="14" width="28" height="44" rx="8" fill="#ffd27a" stroke="#2b2118" stroke-width="3"/>
+        <rect x="18" y="30" width="28" height="28" rx="8" fill="#e8650f"/>
+        <rect x="18" y="14" width="28" height="44" rx="8" fill="none" stroke="#2b2118" stroke-width="3"/>
+        <rect x="24" y="6" width="16" height="9" rx="2" fill="#2f8f3a" stroke="#2b2118" stroke-width="3"/>
+        <path d="M24 36 q4 -4 8 0 t8 0" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <circle cx="26" cy="46" r="2" fill="#fff"/><circle cx="35" cy="50" r="1.5" fill="#fff"/>
+      </svg>
+      <div>
+        <h1>Squeeze <span>Play</span></h1>
+        <p>A cold-press pantry for the Nama J2 · tick what you have, see what you can press</p>
+      </div>
+    </div>
+    <div class="top-actions">
+      <a class="backlink" id="backlink" href="../index.html">← dominiccerchio.com</a>
+      <button class="btn primary" id="surprise" type="button">🎲 Surprise me</button>
+      <button class="btn" id="openShop" type="button" aria-haspopup="dialog">🛒 Shopping list <span class="count" id="shopCount">0</span></button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <section class="panel pantry" aria-labelledby="pantryH">
+      <div class="pantry-head">
+        <h2 id="pantryH">Your pantry</h2>
+        <span class="pill-note" id="pantryCount" aria-live="polite">0 selected</span>
+      </div>
+      <label class="sr-only" for="ingSearch">Filter ingredients</label>
+      <input id="ingSearch" class="search" type="search" placeholder="Find an ingredient… (e.g. ginger)" autocomplete="off">
+      <div class="qa">
+        <button class="btn small" type="button" id="staples">⭐ Select common staples</button>
+        <button class="btn small" type="button" id="clearPantry">✕ Clear</button>
+      </div>
+      <div id="cats"></div>
+    </section>
+
+    <main id="results" tabindex="-1">
+      <section class="panel toolbar" aria-label="Recipe filters">
+        <label class="sr-only" for="recSearch">Search recipes</label>
+        <input id="recSearch" class="search" type="search" placeholder="Search recipes or ingredients… (e.g. pineapple, beet)" autocomplete="off" style="margin:0">
+        <div class="filters" id="filters" role="group" aria-label="Filter recipes"></div>
+        <p class="summary" id="summary" aria-live="polite"></p>
+      </section>
+      <div id="tiers"></div>
+
+      <details class="panel tips">
+        <summary>🧃 J2 tips &amp; tricks</summary>
+        <ul>
+          <li><b>Layer the hopper</b> bottom → top: leafy greens first, then soft produce, then medium, then hard items on top. The weight of the hard stuff pushes the greens down into the auger.</li>
+          <li><b>Cut leafy greens</b> (kale, chard, collards) into thirds and celery into thirds so long fibres don't wrap around the blade.</li>
+          <li><b>Pair greens with cucumber</b>, celery or apple — watery produce flushes leafy pulp through and boosts yield.</li>
+          <li><b>Skip the juice strainer</b> for banana, avocado and mango — they turn to paste. Save them for smoothies or the sorbet attachment.</li>
+          <li><b>Foam is normal</b> with greens and apples. Stir it back in or skim it off.</li>
+          <li><b>Pomegranate:</b> arils only. Pit stone fruit and dates. Core apples and pears (seeds out).</li>
+          <li><b>Run time:</b> keep sessions to about 20 minutes, then let the motor rest.</li>
+          <li><b>Clean right away</b> before pulp dries. Running REV for ~15 seconds helps loosen parts for disassembly; an overnight baking-soda soak deep-cleans the strainer.</li>
+          <li><b>Save your pulp:</b> freeze it in ice-cube trays for smoothies, muffins, crackers or broth — or compost it.</li>
+          <li><b>Storage:</b> airtight glass jar filled to the very top, fridge, best within 24–48 h (72 h max). A squeeze of lemon slows browning.</li>
+        </ul>
+      </details>
+    </main>
+  </div>
+
+  <footer>
+    Squeeze Play is an unofficial fan-made hobby tool. Not affiliated with, endorsed by, or sponsored by Nama.
+    Recipes and yields are approximate — trust your taste buds. Pantry is saved only in this browser.
+  </footer>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="dTitle">
+  <header>
+    <h2 id="dTitle">🛒 Shopping list</h2>
+    <button class="iconbtn" id="closeShop" type="button" aria-label="Close shopping list">✕</button>
+  </header>
+  <div class="dbody" id="shopBody"></div>
+  <footer>
+    <button class="btn primary small" id="copyShop" type="button">📋 Copy list</button>
+    <button class="btn small" id="clearWant" type="button">Clear “want to make”</button>
+  </footer>
+</aside>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+"use strict";
+(function () {
+/* ---------- ingredient master list ---------- */
+var CATS = [
+  ["greens", "Greens & herbs"], ["veg", "Vegetables"], ["roots", "Roots & rhizomes"], ["citrus", "Citrus"],
+  ["fruit", "Fruits"], ["melon", "Melons"], ["berry", "Berries"], ["frozen", "Frozen (for sorbet)"],
+  ["nuts", "Nuts & seeds (for milks)"], ["extras", "Extras"]
+];
+var ING = {}, ING_ORDER = [];
+function G(id, name, emoji, cat, texture, y, prep, f) {
+  f = f || {};
+  ING[id] = { id: id, name: name, emoji: emoji, cat: cat, texture: texture, y: y, prep: prep,
+    staple: !!f.staple, low: !!f.low, always: !!f.always };
+  ING_ORDER.push(id);
+}
+// greens
+G("kale", "Kale", "🥬", "greens", "leafy", { leaf: 0.4, bunch: 5 }, "Cut leaves into thirds (stems on) so they don't wrap the blade.", { staple: 1 });
+G("spinach", "Spinach", "🍃", "greens", "leafy", { handful: 0.8, cup: 0.8 }, "Rinse well; pack loosely at the bottom.", { staple: 1 });
+G("chard", "Swiss chard", "🌿", "greens", "leafy", { leaf: 0.6 }, "Cut leaves into thirds; stems juice fine.");
+G("romaine", "Romaine", "🥗", "greens", "leafy", { leaf: 0.5, whole: 6 }, "Separate leaves; cut long leaves in half.");
+G("parsley", "Parsley", "🌱", "greens", "leafy", { handful: 0.5, bunch: 1.5 }, "Stems and all; bundle it so it feeds as one clump.");
+G("cilantro", "Cilantro", "🌿", "greens", "leafy", { handful: 0.5 }, "Stems and all; bundle it into a clump.");
+G("mint", "Mint", "🌿", "greens", "leafy", { handful: 0.2, leaf: 0 }, "Leaves and tender stems; tuck between other produce.");
+G("basil", "Basil", "🌿", "greens", "leafy", { handful: 0.2 }, "Leaves and tender stems; tuck between other produce.");
+G("wheatgrass", "Wheatgrass", "🌾", "greens", "leafy", { cup: 1 }, "Cut into 2–3\" lengths so it doesn't wrap the blade.");
+G("lemongrass", "Lemongrass", "🌾", "greens", "hard", { stalk: 0.2 }, "Trim the dry top, bruise and cut into 2\" pieces.");
+G("cabbage", "Cabbage", "🥬", "greens", "medium", { cup: 1.5 }, "Cut into wedges that fit the hopper; core is fine.");
+// vegetables
+G("celery", "Celery", "🥬", "veg", "medium", { stalk: 1.1, bunch: 14 }, "Cut stalks into thirds so the fibres don't wrap the blade.", { staple: 1 });
+G("cucumber", "Cucumber", "🥒", "veg", "medium", { whole: 8 }, "Halve or quarter lengthwise; skin on.", { staple: 1 });
+G("fennel", "Fennel", "🌿", "veg", "medium", { whole: 5 }, "Quarter the bulb; fronds can go in with the leafy layer.");
+G("tomato", "Tomato", "🍅", "veg", "soft", { whole: 3 }, "Core and quarter.");
+G("redpepper", "Red bell pepper", "🫑", "veg", "medium", { whole: 3 }, "Remove stem and seeds; cut into strips.");
+G("jalapeno", "Jalapeño", "🌶️", "veg", "medium", { whole: 0.2 }, "Stem off; keep seeds for heat or remove for mild. Wash hands after!");
+// roots
+G("carrot", "Carrot", "🥕", "roots", "hard", { whole: 2, lb: 9 }, "Scrub, trim the tops; no need to peel. Halve big ones.", { staple: 1 });
+G("beet", "Beet", "🟣", "roots", "hard", { whole: 3 }, "Scrub well or peel; cut into wedges. Greens can join the leafy layer.");
+G("ginger", "Ginger", "🫚", "roots", "hard", { inch: 0.3 }, "Skin on — just scrub. Slice into coins.", { staple: 1 });
+G("turmeric", "Fresh turmeric", "🟠", "roots", "hard", { inch: 0.2 }, "Skin on — scrub. It stains: rinse parts right away.");
+G("sweetpotato", "Sweet potato", "🍠", "roots", "hard", { whole: 4 }, "Scrub or peel; cut into sticks.");
+// citrus
+G("lemon", "Lemon", "🍋", "citrus", "soft", { whole: 1.5 }, "Peel optional (peel = bitter); keep the white pith. Halve.", { staple: 1, low: 1 });
+G("lime", "Lime", "🟢", "citrus", "soft", { whole: 1 }, "Peel optional (peel = bitter); keep the white pith. Halve.", { staple: 1, low: 1 });
+G("orange", "Orange", "🍊", "citrus", "soft", { whole: 3 }, "Peel the zest off but keep the pith; quarter.", { staple: 1 });
+G("grapefruit", "Grapefruit", "🍊", "citrus", "soft", { whole: 6 }, "Peel the zest off but keep the pith; cut into wedges.");
+G("mandarin", "Tangerine / clementine", "🍊", "citrus", "soft", { whole: 1.5 }, "Peel; leave the segments whole.");
+// fruits
+G("apple", "Apple", "🍎", "fruit", "hard", { whole: 3 }, "Core (seeds out), cut into quarters or eighths.", { staple: 1 });
+G("pear", "Pear", "🍐", "fruit", "medium", { whole: 3 }, "Core (seeds out), quarter. Firm-ripe juices best.");
+G("asianpear", "Asian pear", "🍐", "fruit", "hard", { whole: 4 }, "Core and quarter; skin on.");
+G("pineapple", "Pineapple", "🍍", "fruit", "medium", { cup: 4.5 }, "Skin off; the core is fine to juice. Cut into spears.");
+G("kiwi", "Kiwi", "🥝", "fruit", "soft", { whole: 1.2 }, "Peel optional; halve.");
+G("grapes", "Grapes", "🍇", "fruit", "soft", { cup: 4 }, "Destem.");
+G("peach", "Peach / nectarine", "🍑", "fruit", "soft", { whole: 2.5 }, "Pit it! Then quarter.");
+G("pomegranate", "Pomegranate arils", "❤️", "fruit", "soft", { cup: 4 }, "Arils only — no peel or white membrane.");
+G("cranberries", "Cranberries", "🔴", "fruit", "soft", { cup: 2 }, "Fresh or thawed; rinse.");
+// melons
+G("watermelon", "Watermelon", "🍉", "melon", "soft", { cup: 5 }, "Rind off; cut into chunks (seeds are OK).");
+G("cantaloupe", "Cantaloupe", "🍈", "melon", "soft", { cup: 4 }, "Rind and seeds off; chunk it.");
+G("honeydew", "Honeydew", "🍈", "melon", "soft", { cup: 4.5 }, "Rind and seeds off; chunk it.");
+// berries
+G("strawberries", "Strawberries", "🍓", "berry", "soft", { cup: 3 }, "Hull (or leave the tops on — they juice fine).");
+G("raspberries", "Raspberries", "🫐", "berry", "soft", { cup: 2.5 }, "Rinse gently.");
+G("blackberries", "Blackberries", "🫐", "berry", "soft", { cup: 2.5 }, "Rinse gently.");
+// frozen
+G("fbanana", "Frozen banana", "🍌", "frozen", "frozen", { whole: 3 }, "Peel BEFORE freezing; cut into 2\" chunks. Thaw 5 min.");
+G("fberries", "Frozen mixed berries", "🫐", "frozen", "frozen", { cup: 4 }, "Let sit 5 minutes to soften slightly.");
+G("fmango", "Frozen mango", "🥭", "frozen", "frozen", { cup: 4 }, "Chunks; let sit 5 minutes to soften slightly.");
+G("fcherries", "Frozen cherries", "🍒", "frozen", "frozen", { cup: 4 }, "Pitted only!");
+G("fpineapple", "Frozen pineapple", "🍍", "frozen", "frozen", { cup: 4 }, "Chunks; let sit 5 minutes to soften slightly.");
+G("fstrawberries", "Frozen strawberries", "🍓", "frozen", "frozen", { cup: 4 }, "Hulled; let sit 5 minutes.");
+G("fyogurt", "Frozen yogurt cubes", "🧊", "frozen", "frozen", { cup: 4 }, "Freeze yogurt in an ice-cube tray overnight.");
+// nuts
+G("almonds", "Almonds", "🌰", "nuts", "nut", { cup: 1 }, "Soak 8–12 h in the fridge, drain and rinse.");
+G("cashews", "Cashews", "🥜", "nuts", "nut", { cup: 1 }, "Soak 4–12 h, drain and rinse.");
+G("walnuts", "Walnuts", "🌰", "nuts", "nut", { cup: 1 }, "Soak 8–12 h, drain and rinse.");
+G("coconut", "Shredded coconut", "🥥", "nuts", "nut", { cup: 1 }, "Unsweetened; soak in warm water 30 min.");
+// extras
+G("dates", "Dates", "🟤", "extras", "nut", { whole: 0 }, "Pit them! Soak with the nuts to soften.");
+G("coconutwater", "Coconut water", "🥥", "extras", "liquid", { cup: 8 }, "Stir in after juicing.");
+G("water", "Filtered water", "💧", "extras", "liquid", { cup: 8 }, "Cold, filtered.", { always: 1, staple: 1 });
+G("vanilla", "Vanilla extract", "🍦", "extras", "stir-in", { tsp: 0 }, "Stir in after.");
+G("cinnamon", "Cinnamon", "🟫", "extras", "stir-in", { tsp: 0, pinch: 0 }, "Stir in after.", { staple: 1 });
+G("nutmeg", "Nutmeg", "🟤", "extras", "stir-in", { pinch: 0 }, "Stir in after.");
+G("blackpepper", "Black pepper", "⚫", "extras", "stir-in", { pinch: 0 }, "Stir a pinch in after — helps your body absorb turmeric.", { staple: 1 });
+G("salt", "Sea salt", "🧂", "extras", "stir-in", { pinch: 0 }, "Stir in after.", { staple: 1 });
+G("cayenne", "Cayenne", "🌶️", "extras", "stir-in", { pinch: 0 }, "Stir in after — a little goes a long way.");
+G("hotsauce", "Hot sauce", "🔥", "extras", "stir-in", { tsp: 0 }, "Stir in after, to taste.");
+
+/* ---------- substitution groups ---------- */
+var SUBS = [
+  ["lemon", "lime"], ["kale", "spinach", "chard", "romaine"], ["apple", "pear", "asianpear"],
+  ["orange", "mandarin"], ["strawberries", "raspberries", "blackberries"], ["mint", "basil"],
+  ["almonds", "cashews"], ["parsley", "cilantro"], ["cantaloupe", "honeydew"],
+  ["fmango", "fpineapple"], ["fberries", "fstrawberries", "fcherries"]
+];
+
+/* ---------- recipes ---------- */
+var RECIPES = [];
+function R(id, name, emoji, color, tags, type, oz, desc, items, x) {
+  x = x || {};
+  RECIPES.push({ id: id, name: name, emoji: emoji, color: color, tags: tags, type: type, oz: oz, desc: desc,
+    items: items.map(function (a) { return { ing: a[0], qty: a[1], unit: a[2], opt: !!a[3], note: a[4] || "" }; }),
+    strainer: x.strainer || null, experimental: !!x.experimental });
+}
+/* juices: greens & celery */
+R("stalk-market", "Stalk Market", "🥬", ["#b8e07a", "#6fae3c"], ["green"], "juice", 16,
+  "One big bunch of celery, nothing else. Bold, salty-crisp, and weirdly addictive once you're in the club.",
+  [["celery", 1, "bunch"]]);
+R("stalk-zing", "Stalk & Zing", "🍋", ["#d7ef8f", "#86c043"], ["green", "citrus"], "juice", 16,
+  "Straight celery with a lemon jolt that knocks the edges off. Your gateway to green.",
+  [["celery", 1, "bunch"], ["lemon", 0.5, "whole"]]);
+R("green-room", "The Green Room", "🥒", ["#d9f2b4", "#8cc65a"], ["green"], "juice", 16,
+  "Celery and cucumber chilling backstage. Mellow, hydrating and quietly cool.",
+  [["celery", 8, "stalk"], ["cucumber", 1, "whole"]]);
+R("parsley-parade", "Parsley Parade", "🌱", ["#c8eb8a", "#4f9a2f"], ["green", "citrus"], "juice", 16,
+  "Parsley finally gets to lead the marching band, with cucumber and celery keeping the beat.",
+  [["cucumber", 1, "whole"], ["celery", 5, "stalk"], ["parsley", 1, "handful"], ["lemon", 0.5, "whole"]]);
+/* roots */
+R("carrot-top-hat", "Carrot Top Hat", "🥕", ["#ffb347", "#f06d06"], ["root", "kid"], "juice", 16,
+  "A dapper carrot-apple classic wearing a little ginger bow tie. Sweet, smooth, sharp-dressed.",
+  [["carrot", 1, "lb"], ["apple", 1, "whole"], ["ginger", 1, "inch"]]);
+R("spelling-bee-t", "Spelling Bee-t", "🐝", ["#e0436b", "#f28c28"], ["root", "kid"], "juice", 16,
+  "Your ABCs in a glass — apple, beet, carrot — with lemon and ginger as the extra-credit letters.",
+  [["beet", 1, "whole"], ["carrot", 4, "whole"], ["apple", 1, "whole"], ["lemon", 0.5, "whole"], ["ginger", 0.5, "inch"]]);
+R("root-canal", "Root Canal (The Fun Kind)", "🦷", ["#c2185b", "#e86a3a"], ["root", "citrus"], "juice", 16,
+  "An earthy, low-sugar deep clean: beet and carrot grounded by celery and cucumber. Zero dentists involved.",
+  [["beet", 1, "whole"], ["carrot", 3, "whole"], ["celery", 3, "stalk"], ["cucumber", 0.5, "whole"], ["lemon", 0.5, "whole"]]);
+R("beet-drop", "Beet Drop", "🎧", ["#a3123f", "#e0436b"], ["root"], "juice", 16,
+  "Deep magenta bass line, apple melody, ginger hi-hat. Turn it up.",
+  [["beet", 1, "whole"], ["apple", 2, "whole"], ["lemon", 0.5, "whole"], ["ginger", 0.5, "inch"]]);
+R("berry-beet-romance", "Berry Beet Romance", "💘", ["#d81b60", "#ff6f91"], ["root", "kid"], "juice", 16,
+  "Earthy beet meets flirty strawberry. They said it wouldn't last; it's delicious.",
+  [["beet", 1, "whole"], ["strawberries", 1, "cup"], ["apple", 1, "whole"], ["lemon", 0.5, "whole"]]);
+R("pink-flamingo", "Pink Flamingo Lagoon", "🦩", ["#ff7aa2", "#e5376b"], ["root", "citrus"], "juice", 16,
+  "Watermelon wading in a beet-tinted lagoon, standing on one lime leg. Ridiculously pink.",
+  [["beet", 0.5, "whole"], ["watermelon", 3, "cup"], ["lime", 1, "whole"]]);
+R("midnight-bramble", "Midnight Bramble", "🌙", ["#4a0e3b", "#9b2457"], ["root"], "juice", 16,
+  "Inky blackberry and beet with a ginger glow — like a forest walk after dark.",
+  [["beet", 1, "whole"], ["blackberries", 1, "cup"], ["apple", 2, "whole"], ["lemon", 0.5, "whole"], ["ginger", 0.5, "inch"]]);
+/* greens */
+R("daily-leaf", "The Daily Leaf", "📰", ["#b5e48c", "#52a63a"], ["green", "kid"], "juice", 16,
+  "Your everyday green: crisp, bright, a little tart, and gone before the headlines finish.",
+  [["cucumber", 1, "whole"], ["celery", 4, "stalk"], ["kale", 4, "leaf"], ["apple", 1, "whole", false, "green apple if you have one"], ["lemon", 0.5, "whole"]]);
+R("spinach-spa", "Spinach Spa Day", "🧖", ["#cdeb9b", "#6cb24a"], ["green", "kid"], "juice", 16,
+  "Cucumber slices on the eyes, pear in the robe pocket. Soft, gentle, very relaxed.",
+  [["spinach", 2, "handful"], ["cucumber", 1, "whole"], ["celery", 3, "stalk"], ["pear", 1, "whole"], ["lemon", 0.5, "whole"]]);
+R("caesars-revenge", "Caesar's Revenge", "🏛️", ["#d4efa1", "#7cbf4b"], ["green", "citrus"], "juice", 16,
+  "Romaine finally escapes the salad bowl and gets a lime-spiked glass of its own.",
+  [["romaine", 6, "leaf"], ["cucumber", 1, "whole"], ["celery", 3, "stalk"], ["apple", 1, "whole"], ["lime", 0.5, "whole"]]);
+R("kaleifornia", "Kale-ifornia Dreaming", "🏄", ["#9fd36b", "#f2c94c"], ["green", "tropical", "kid"], "juice", 16,
+  "Kale on a surfboard riding a pineapple wave. Sunny, green and a little smug about it.",
+  [["kale", 4, "leaf"], ["pineapple", 2, "cup"], ["cucumber", 1, "whole"], ["lime", 1, "whole"]]);
+R("fire-garden", "Fire in the Garden", "🔥", ["#8cc63f", "#3f8f2a"], ["green", "citrus"], "juice", 16,
+  "A spicy green with a parsley backbone and a serious ginger kick. Wakes up every taste bud.",
+  [["cucumber", 1, "whole"], ["celery", 4, "stalk"], ["spinach", 1, "handful"], ["parsley", 1, "handful"], ["ginger", 1.5, "inch"], ["lemon", 1, "whole"], ["cayenne", 1, "pinch", true]]);
+R("chard-times", "Chard Times Sweet Fix", "🌈", ["#c5e384", "#d1495b"], ["green"], "juice", 16,
+  "Rainbow chard softened by two apples. Proof that hard times can taste sweet.",
+  [["chard", 4, "leaf"], ["cucumber", 1, "whole"], ["apple", 2, "whole"], ["lemon", 0.5, "whole"]]);
+R("coleslaw-rebellion", "Coleslaw Rebellion", "✊", ["#e4f2c4", "#9cc96b"], ["green"], "juice", 16,
+  "Cabbage throws off the mayo and goes crisp, clean and apple-bright. Viva la slaw.",
+  [["cabbage", 2, "cup"], ["celery", 4, "stalk"], ["apple", 2, "whole"], ["lemon", 0.5, "whole"]]);
+R("bangkok-breeze", "Bangkok Breeze", "🛺", ["#e1f5b0", "#8fcf5c"], ["green", "kid"], "juice", 16,
+  "Lemongrass perfume floating over cucumber and apple, with spinach riding shotgun.",
+  [["cucumber", 1, "whole"], ["apple", 2, "whole"], ["lemongrass", 1, "stalk"], ["spinach", 1, "handful"]]);
+R("kiwi-kickflip", "Kiwi Kickflip", "🛹", ["#c6e66f", "#6aa832"], ["green", "kid"], "juice", 16,
+  "Fuzzy little kiwis landing a clean trick on a cucumber ramp. Tangy, bright, rad.",
+  [["kiwi", 3, "whole"], ["cucumber", 1, "whole"], ["apple", 1, "whole"]]);
+R("vineyard-vacation", "Vineyard Vacation", "🍇", ["#d9edb0", "#9bbf4f"], ["green"], "juice", 16,
+  "Green grapes and fennel on a sunny terrace. Lightly anise-y, fully relaxed, zero hangover.",
+  [["grapes", 2, "cup"], ["cucumber", 1, "whole"], ["fennel", 0.5, "whole"], ["lemon", 0.5, "whole"]]);
+R("licorice-whisper", "Licorice Whisper", "🤫", ["#eef5c8", "#b2cf6b"], ["green"], "juice", 16,
+  "Pear says hello, fennel whispers something faintly sweet and licorice-y back.",
+  [["pear", 2, "whole"], ["fennel", 1, "whole"], ["cucumber", 0.5, "whole"], ["lemon", 0.5, "whole"]]);
+/* fresh & fruity */
+R("mint-condition", "Mint Condition", "🪙", ["#d8f5c0", "#71c48a"], ["green", "citrus", "kid"], "juice", 16,
+  "Cucumber, mint and lime — still in the original packaging, never been this fresh.",
+  [["cucumber", 1, "whole"], ["mint", 1, "handful"], ["lime", 1, "whole"], ["apple", 1, "whole"]]);
+R("tropic-hot", "Tropic Like It's Hot", "🌴", ["#fbe38e", "#9bd35a"], ["tropical", "kid"], "juice", 16,
+  "Pineapple and mint doing the limbo under a cucumber bar. Stay cool.",
+  [["pineapple", 2, "cup"], ["mint", 1, "handful"], ["cucumber", 1, "whole"]]);
+R("ginger-snap-island", "Ginger Snap Island", "🏝️", ["#ffe17a", "#f5a524"], ["tropical", "citrus"], "juice", 16,
+  "A pineapple island with a fiery ginger volcano and lime-green lagoon. Snappy!",
+  [["pineapple", 3, "cup"], ["ginger", 1, "inch"], ["lime", 1, "whole"]]);
+R("impostor-oj", "The Impostor OJ", "🕵️", ["#ffc04d", "#ff8c1a"], ["tropical", "root", "kid"], "juice", 16,
+  "Half carrot, half pineapple, entirely convincing. Fools breakfast guests every time.",
+  [["carrot", 4, "whole"], ["pineapple", 2, "cup"]]);
+R("sunset-strip", "Sunset Strip", "🌅", ["#ffb03b", "#ff6b3d"], ["tropical", "root", "kid"], "juice", 16,
+  "Carrot-pineapple cruising the boulevard with the lime top down.",
+  [["carrot", 4, "whole"], ["pineapple", 2, "cup"], ["lime", 1, "whole"]]);
+R("melon-collie", "Melon Collie (Not Sad)", "🐕", ["#ff8fa3", "#ff4d6d"], ["citrus", "kid"], "juice", 16,
+  "Pure watermelon with a squeeze of lime. Impossible to stay gloomy while drinking it.",
+  [["watermelon", 4, "cup"], ["lime", 1, "whole"]]);
+R("porch-swing", "Porch Swing", "🪑", ["#ffb3c1", "#b9e4a5"], ["green", "kid"], "juice", 16,
+  "Watermelon, cucumber and mint on a slow summer afternoon. Creak, sip, repeat.",
+  [["watermelon", 3, "cup"], ["cucumber", 0.5, "whole"], ["mint", 1, "handful"]]);
+R("picnic-blanket", "Picnic Blanket", "🧺", ["#ff6b81", "#ff9a8b"], ["citrus", "kid"], "juice", 16,
+  "Watermelon and strawberries spread out on a checkered cloth, lime keeping the ants away.",
+  [["watermelon", 3, "cup"], ["strawberries", 1, "cup"], ["lime", 0.5, "whole"]]);
+/* citrus & orange things */
+R("golden-hour", "Golden Hour", "🌇", ["#ffcf3f", "#ff8a00"], ["citrus", "root"], "juice", 16,
+  "Orange, carrot and fresh turmeric glowing like the last light of the day.",
+  [["orange", 2, "whole"], ["carrot", 4, "whole"], ["turmeric", 1, "inch"], ["blackpepper", 1, "pinch", true, "stir in after"]]);
+R("sunrise-alarm", "Sunrise Alarm Clock", "⏰", ["#ffd35c", "#ff7b25"], ["citrus", "root", "kid"], "juice", 16,
+  "Orange and carrot with a ginger buzzer. Snooze is not an option.",
+  [["orange", 2, "whole"], ["carrot", 4, "whole"], ["ginger", 1, "inch"]]);
+R("orange-you-glad", "Orange You Glad", "😄", ["#ffb732", "#ff8c00"], ["citrus", "kid"], "juice", 16,
+  "Just oranges, pressed slow and cold. Knock knock — it's the best OJ you've had.",
+  [["orange", 6, "whole", false, "peeled"]]);
+R("grapefruit-pop", "Pink Grapefruit Pop", "🎈", ["#ff9e80", "#ff6e40"], ["citrus", "root"], "juice", 16,
+  "Grapefruit's bittersweet sparkle mellowed by carrot. Pops like a balloon on the tongue.",
+  [["grapefruit", 1, "whole"], ["carrot", 4, "whole"]]);
+R("citrus-circus", "Citrus Circus", "🎪", ["#ffe259", "#ffa751"], ["citrus"], "juice", 16,
+  "Three rings of citrus: orange on the trapeze, grapefruit juggling, lemon as ringmaster.",
+  [["orange", 2, "whole"], ["grapefruit", 1, "whole"], ["lemon", 1, "whole"]]);
+R("zinger-ginger", "Zinger Ginger", "⚡", ["#f6f0a0", "#d9c24a"], ["citrus", "kid"], "juice", 16,
+  "Apple, lemon and ginger — the crisp, zappy lemonade you'll want on repeat.",
+  [["apple", 4, "whole"], ["lemon", 1, "whole"], ["ginger", 1, "inch"]]);
+R("orchard-gossip", "Orchard Gossip", "🗣️", ["#f4ecb0", "#c9d86a"], ["kid"], "juice", 16,
+  "Apple and pear swapping secrets, ginger listening in. Sweet, juicy and a bit spicy.",
+  [["apple", 2, "whole"], ["pear", 2, "whole"], ["ginger", 1, "inch"]]);
+R("strawberry-field-trip", "Strawberry Field Trip", "🚌", ["#ff5e78", "#ff8fa0"], ["kid"], "juice", 16,
+  "Strawberries and apple loaded on the bus, lemon as chaperone. Permission slip signed.",
+  [["strawberries", 2, "cup"], ["apple", 2, "whole"], ["lemon", 0.5, "whole"]]);
+R("cantaloupe-elope", "Cantaloupe Elope", "💍", ["#ffc078", "#ff922b"], ["root", "kid"], "juice", 16,
+  "Cantaloupe and carrot ran off together; ginger was the witness. A silky, sunset-orange romance.",
+  [["cantaloupe", 2, "cup"], ["carrot", 3, "whole"], ["ginger", 0.5, "inch"]], { strainer: "coarse" });
+R("honeydew-list", "Honeydew List", "📝", ["#e2f7c2", "#a6dd85"], ["green", "citrus", "kid"], "juice", 16,
+  "Item one: honeydew. Item two: cucumber, mint and lime. Item three: drink it immediately.",
+  [["honeydew", 2, "cup"], ["cucumber", 1, "whole"], ["mint", 1, "handful"], ["lime", 1, "whole"]]);
+R("crisp-lantern", "Crisp Lantern", "🏮", ["#f7f0c6", "#dccb7a"], ["green"], "juice", 16,
+  "Asian pear's floral crunch lit up by ginger and cooled with cucumber.",
+  [["asianpear", 2, "whole"], ["ginger", 1, "inch"], ["cucumber", 1, "whole"]]);
+R("bog-party", "Bog Party", "🎉", ["#e63946", "#ff8c61"], ["citrus"], "juice", 16,
+  "Tart cranberries leave the bog for a party with pear and orange. Very festive, very pink.",
+  [["cranberries", 1, "cup"], ["pear", 2, "whole"], ["orange", 2, "whole"]]);
+R("jewel-box", "Jewel Box", "💎", ["#c9184a", "#ff8fab"], ["citrus", "kid"], "juice", 16,
+  "Ruby pomegranate arils and orange — a glass full of tiny treasure.",
+  [["pomegranate", 2, "cup"], ["orange", 2, "whole"]]);
+R("garnet-gold", "Garnet & Gold", "🏅", ["#b5179e", "#ff9100"], ["root", "citrus"], "juice", 16,
+  "Pomegranate, carrot and apple trading medals, with lime on the podium.",
+  [["pomegranate", 1, "cup"], ["carrot", 4, "whole"], ["apple", 1, "whole"], ["lime", 0.5, "whole"]]);
+R("bloody-brilliant", "Bloody Brilliant (Virgin)", "🍅", ["#e63946", "#b5241c"], ["root"], "juice", 16,
+  "A savoury garden-tomato juice with celery, cucumber and red pepper. Brunch, but make it honest.",
+  [["tomato", 4, "whole"], ["celery", 2, "stalk"], ["cucumber", 0.5, "whole"], ["redpepper", 0.5, "whole"], ["lemon", 0.5, "whole"], ["hotsauce", 1, "tsp", true], ["salt", 1, "pinch", true]], { strainer: "coarse" });
+R("traffic-light", "Traffic Light", "🚦", ["#ff4d4d", "#ffa600"], ["root", "citrus", "kid"], "juice", 16,
+  "Red pepper, orange carrot and orange — all signals say go.",
+  [["redpepper", 1, "whole"], ["carrot", 4, "whole"], ["orange", 2, "whole"]]);
+R("sweater-weather", "Sweater Weather", "🧣", ["#f9a03f", "#d1603d"], ["root", "kid"], "juice", 16,
+  "Sweet potato, carrot, apple and orange — cozy, earthy and best with a fuzzy blanket.",
+  [["sweetpotato", 1, "whole"], ["carrot", 3, "whole"], ["apple", 1, "whole"], ["orange", 1, "whole"]]);
+/* my own extras */
+R("apple-pie", "Apple Pie à la Juice", "🥧", ["#f6e3a1", "#d4a24c"], ["kid"], "juice", 16,
+  "Pure pressed apple with lemon and a dusting of cinnamon. Dessert pretending to be breakfast.",
+  [["apple", 4, "whole"], ["lemon", 0.5, "whole"], ["cinnamon", 0.25, "tsp", false, "stir in after"]]);
+R("turmeric-tiki", "Turmeric Tiki", "🗿", ["#ffd000", "#ff9e00"], ["tropical", "citrus", "root"], "juice", 16,
+  "Pineapple and orange in a golden tiki mug, turmeric glowing like torchlight.",
+  [["pineapple", 2, "cup"], ["turmeric", 1, "inch"], ["orange", 1, "whole"], ["blackpepper", 1, "pinch", true, "stir in after"]]);
+R("jalapeno-business", "Jalapeño Business", "🌶️", ["#c7e67a", "#f2d04b"], ["tropical", "green", "citrus"], "juice", 16,
+  "Sweet pineapple minding its own business until a sliver of jalapeño shows up. Spicy-sweet negotiation.",
+  [["pineapple", 2, "cup"], ["cucumber", 1, "whole"], ["jalapeno", 0.25, "whole"], ["lime", 1, "whole"]]);
+R("carrot-cake", "Carrot Cake Confession", "🍰", ["#ffad5a", "#e07a2e"], ["root", "kid"], "juice", 16,
+  "I drank the cake. Carrot and apple with cinnamon and nutmeg stirred in — frosting optional (and imaginary).",
+  [["carrot", 5, "whole"], ["apple", 1, "whole"], ["ginger", 0.5, "inch", true], ["cinnamon", 0.25, "tsp", false, "stir in after"], ["nutmeg", 1, "pinch", true, "stir in after"]]);
+R("peachy-keen", "Peachy Keen Machine", "🍑", ["#ffcba4", "#ff8c5a"], ["root", "kid"], "juice", 16,
+  "Ripe peaches and carrot whirring like a well-oiled summer machine.",
+  [["peach", 2, "whole", false, "pitted"], ["carrot", 3, "whole"], ["lemon", 0.5, "whole", true]]);
+R("razzle-lemonade", "Razzle Lemonade", "✨", ["#ff4f81", "#ffd23f"], ["citrus", "kid"], "juice", 16,
+  "Raspberry-razzled lemonade sweetened only with apples. Pink, tart and sparkly-tasting.",
+  [["raspberries", 1, "cup"], ["lemon", 1.5, "whole"], ["apple", 3, "whole"]]);
+R("poolside-hydrator", "Poolside Hydrator", "🏊", ["#e6fbe0", "#a9e5bb"], ["green", "citrus"], "juice", 16,
+  "Cucumber-lime-mint stretched out with a splash of coconut water. Cannonball optional.",
+  [["cucumber", 1.5, "whole"], ["lime", 1, "whole"], ["mint", 1, "handful"], ["coconutwater", 0.5, "cup", false, "stir in after"]]);
+R("salsa-verde", "Salsa Verde Sipper", "🌮", ["#b9e07a", "#5ea33a"], ["green", "citrus"], "juice", 16,
+  "Cilantro, cucumber and celery doing a little salsa with lime and a whisper of chile.",
+  [["cucumber", 1, "whole"], ["celery", 4, "stalk"], ["cilantro", 1, "handful"], ["apple", 1, "whole", false, "green apple"], ["lime", 1, "whole"], ["jalapeno", 0.25, "whole", true]]);
+R("tangerine-rocket", "Tiny Tangerine Rocket", "🚀", ["#ffb627", "#ff7b00"], ["citrus", "root", "kid"], "juice", 16,
+  "Lunchbox clementines and carrots blasting off. Pint-sized, mighty sweet.",
+  [["mandarin", 4, "whole"], ["carrot", 3, "whole"]]);
+R("strawberry-basil", "Strawberry Basil Smash", "🍓", ["#ff4d6d", "#7cb342"], ["citrus"], "juice", 16,
+  "Strawberries and lemon with a fistful of basil — like a fancy bistro dessert you can drink.",
+  [["strawberries", 2, "cup"], ["basil", 1, "handful"], ["lemon", 1, "whole"], ["apple", 1, "whole"]]);
+/* shots */
+R("wake-up-slap", "Wake-Up Slap", "👋", ["#fff3a0", "#f0c419"], ["citrus"], "shot", 2,
+  "Ginger and lemon, no chaser. One gulp and your eyebrows are up for the day.",
+  [["ginger", 3, "inch"], ["lemon", 1, "whole"], ["cayenne", 1, "pinch", true, "stir in after"]]);
+R("sunbeam-shot", "Sunbeam Shot", "☀️", ["#ffc300", "#ff8800"], ["citrus", "root"], "shot", 2,
+  "Turmeric, ginger and orange: a tiny golden ray, with black pepper for good measure.",
+  [["turmeric", 2, "inch"], ["ginger", 1, "inch"], ["orange", 0.5, "whole"], ["blackpepper", 1, "pinch", true, "stir in after — recommended"]]);
+R("lawn-mower", "Lawn Mower", "🚜", ["#7ccf3a", "#2f8f1f"], ["green"], "shot", 2,
+  "Pure wheatgrass. Tastes exactly like a freshly cut lawn, in the best possible way. Probably.",
+  [["wheatgrass", 2, "cup"]]);
+R("hula-lawn", "Hula Lawn", "🌺", ["#c8e85a", "#ffd23f"], ["green", "tropical"], "shot", 2,
+  "Wheatgrass in a grass skirt: pineapple sweetens the deal.",
+  [["wheatgrass", 1, "cup"], ["pineapple", 0.5, "cup"]]);
+/* nut milks */
+R("almond-sunday", "Silky Almond Sunday", "🥛", ["#fbf6ec", "#e8d9bd"], ["kid"], "milk", 32,
+  "Creamy, clean almond milk — dress it up with dates and vanilla or keep it plain and lazy.",
+  [["almonds", 1, "cup", false, "soaked 8–12 h"], ["water", 4, "cup"], ["dates", 2, "whole", true, "pitted"], ["vanilla", 0.5, "tsp", true], ["salt", 1, "pinch", true]]);
+R("cashew-cloud", "Cashew Cloud", "☁️", ["#fffaf0", "#efe3c8"], ["kid"], "milk", 24,
+  "The richest, fluffiest homemade milk. Basically a cloud you can pour on cereal.",
+  [["cashews", 1, "cup", false, "soaked 4–12 h"], ["water", 3, "cup"], ["dates", 1, "whole", true, "pitted"], ["salt", 1, "pinch", true]]);
+R("cozy-cabin", "Cozy Cabin Milk", "🏡", ["#e9d6b8", "#b08968"], ["kid"], "milk", 32,
+  "Walnut milk sweetened with dates and warmed by cinnamon. Smells like a log fire (minus the smoke).",
+  [["walnuts", 1, "cup", false, "soaked 8–12 h"], ["water", 4, "cup"], ["dates", 3, "whole", false, "pitted"], ["cinnamon", 0.5, "tsp"]]);
+R("castaway-coconut", "Castaway Coconut Milk", "🥥", ["#ffffff", "#e6e2d6"], ["tropical"], "milk", 24,
+  "Experimental: shredded coconut and warm water, pressed into a light coconut milk. Results vary — have fun!",
+  [["coconut", 1.5, "cup", false, "unsweetened"], ["water", 3, "cup", false, "warm"]], { experimental: true });
+/* sorbets */
+R("banana-split", "Banana Split Decision", "🍌", ["#fff3b0", "#f6d365"], ["kid"], "sorbet", 2,
+  "Frozen bananas pressed into soft-serve-smooth nice cream. The only decision: toppings.",
+  [["fbanana", 3, "whole"]]);
+R("berry-blizzard", "Berry Blizzard", "🌨️", ["#b5179e", "#7209b7"], ["kid"], "sorbet", 2,
+  "Frozen mixed berries and banana swirled into a purple snowstorm.",
+  [["fberries", 1, "cup"], ["fbanana", 2, "whole"]]);
+R("mango-tango", "Mango Tango Cherry", "💃", ["#ffb703", "#c1121f"], ["tropical", "kid"], "sorbet", 2,
+  "Mango and cherry dancing cheek-to-cheek in a frosty two-tone sorbet.",
+  [["fmango", 1.5, "cup"], ["fcherries", 1, "cup"]]);
+R("pineapple-snowglobe", "Pineapple Snowglobe", "🔮", ["#fff1a8", "#c9e265"], ["tropical", "kid"], "sorbet", 2,
+  "Frozen pineapple flecked with mint. Shake it up; it's always sunny inside.",
+  [["fpineapple", 2, "cup"], ["mint", 6, "leaf", true]]);
+R("strawberry-swirl", "Strawberry Swirl Sundae", "🍨", ["#ffc2d1", "#ff5d8f"], ["kid"], "sorbet", 2,
+  "Frozen strawberries and frozen-yogurt cubes, swirled into a pink sundae base.",
+  [["fstrawberries", 1.5, "cup"], ["fyogurt", 1, "cup"]]);
+/* ---------- helpers ---------- */
+var $ = function (s, el) { return (el || document).querySelector(s); };
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+  });
+}
+function load(key) {
+  try { var v = JSON.parse(localStorage.getItem("juicer." + key) || "[]"); return Array.isArray(v) ? v : []; }
+  catch (e) { return []; }
+}
+function save(key, set) {
+  try { localStorage.setItem("juicer." + key, JSON.stringify(Array.from(set))); } catch (e) { /* private mode */ }
+}
+var RBYID = {};
+RECIPES.forEach(function (r) { RBYID[r.id] = r; });
+var pantry = new Set(load("pantry").filter(function (id) { return ING[id]; }));
+var favs = new Set(load("favs").filter(function (id) { return RBYID[id]; }));
+var want = new Set(load("want").filter(function (id) { return RBYID[id]; }));
+var filters = new Set();
+var recQuery = "", ingQuery = "";
+var tierOpen = {};
+
+var FRAC = { 0.25: "¼", 0.5: "½", 0.75: "¾" };
+function fmtNum(q) {
+  var w = Math.floor(q + 1e-9), f = Math.round((q - w) * 4) / 4;
+  if (f === 1) { w += 1; f = 0; }
+  if (!f) return String(w);
+  return (w ? w : "") + FRAC[f];
+}
+var UNITS = {
+  stalk: ["stalk", "stalks"], cup: ["cup", "cups"], inch: ["inch", "inches"], whole: ["", ""],
+  leaf: ["leaf", "leaves"], handful: ["handful", "handfuls"], oz: ["oz", "oz"], tsp: ["tsp", "tsp"],
+  pinch: ["pinch", "pinches"], lb: ["lb", "lb"], bunch: ["bunch", "bunches"]
+};
+function unitLabel(u, q) { var x = UNITS[u] || [u, u]; return q > 1 ? x[1] : x[0]; }
+function roundQty(q, u) {
+  if (u === "stalk" || u === "leaf" || u === "pinch") return Math.max(1, Math.round(q));
+  if (u === "whole" && q >= 1) return Math.max(0.5, Math.round(q * 2) / 2);
+  return Math.max(0.25, Math.round(q * 4) / 4);
+}
+function qtyText(it, factor) {
+  var q = roundQty(it.qty * factor, it.unit);
+  var u = unitLabel(it.unit, q);
+  return fmtNum(q) + (u ? " " + u : "");
+}
+function isStirIn(it) {
+  var t = ING[it.ing].texture;
+  return t === "stir-in" || (t === "liquid" && !ING[it.ing].always);
+}
+function itemYield(it, factor) {
+  var g = ING[it.ing], per = g.y[it.unit] || 0;
+  return roundQty(it.qty * factor, it.unit) * per;
+}
+function estYield(r, factor) {
+  if (r.type === "milk" || r.type === "sorbet") return r.oz * factor;
+  var t = 0;
+  r.items.forEach(function (it) { if (!it.opt) t += itemYield(it, factor); });
+  return t;
+}
+function isLowSugar(r) {
+  if (r.type !== "juice" && r.type !== "shot") return false;
+  var veg = 0, tot = 0;
+  r.items.forEach(function (it) {
+    if (it.opt || isStirIn(it)) return;
+    var g = ING[it.ing], y = itemYield(it, 1);
+    tot += y;
+    if (g.low || g.cat === "greens" || g.cat === "veg" || g.cat === "roots") veg += y;
+  });
+  return tot > 0 && veg / tot >= 0.8;
+}
+RECIPES.forEach(function (r) { r.low = isLowSugar(r); });
+
+function subsFor(id) {
+  for (var i = 0; i < SUBS.length; i++) if (SUBS[i].indexOf(id) >= 0) return SUBS[i].filter(function (x) { return x !== id; });
+  return [];
+}
+function match(r) {
+  var inRecipe = new Set(r.items.map(function (it) { return it.ing; }));
+  var used = new Set(), have = [], swaps = [], missing = [];
+  r.items.forEach(function (it) {
+    if (it.opt || ING[it.ing].always) return;
+    if (pantry.has(it.ing)) { have.push(it.ing); return; }
+    var sub = subsFor(it.ing).filter(function (s) { return pantry.has(s) && !inRecipe.has(s) && !used.has(s); })[0];
+    if (sub) { used.add(sub); swaps.push({ from: it.ing, to: sub }); } else missing.push(it.ing);
+  });
+  var uses = have.length + swaps.length;
+  r.items.forEach(function (it) { if (it.opt && pantry.has(it.ing)) uses++; });
+  var tier = missing.length === 0 ? (swaps.length ? "swap" : "ready") : missing.length === 1 ? "m1" : missing.length === 2 ? "m2" : "m3";
+  return { have: have, swaps: swaps, missing: missing, uses: uses, tier: tier };
+}
+function swapOf(m, id) { for (var i = 0; i < m.swaps.length; i++) if (m.swaps[i].from === id) return m.swaps[i].to; return null; }
+
+/* ---------- filters ---------- */
+var FILTERS = [
+  ["green", "🥬 Green", function (r) { return r.tags.indexOf("green") >= 0; }],
+  ["citrus", "🍋 Citrus", function (r) { return r.tags.indexOf("citrus") >= 0; }],
+  ["root", "🥕 Root / earthy", function (r) { return r.tags.indexOf("root") >= 0; }],
+  ["tropical", "🍍 Tropical", function (r) { return r.tags.indexOf("tropical") >= 0; }],
+  ["low", "📉 Low-sugar 80/20", function (r) { return r.low; }],
+  ["kid", "🧒 Kid-friendly", function (r) { return r.tags.indexOf("kid") >= 0; }],
+  ["shot", "💥 Shots", function (r) { return r.type === "shot"; }],
+  ["sorbet", "🍨 Sorbets", function (r) { return r.type === "sorbet"; }],
+  ["milk", "🥛 Nut milks", function (r) { return r.type === "milk"; }],
+  ["fav", "♥ Favourites", function (r) { return favs.has(r.id); }],
+  ["want", "★ Want to make", function (r) { return want.has(r.id); }]
+];
+function passes(r) {
+  for (var i = 0; i < FILTERS.length; i++) if (filters.has(FILTERS[i][0]) && !FILTERS[i][2](r)) return false;
+  if (recQuery) {
+    var hay = (r.name + " " + r.desc + " " + r.items.map(function (it) { return ING[it.ing].name; }).join(" ")).toLowerCase();
+    var words = recQuery.toLowerCase().split(/\s+/).filter(Boolean);
+    for (var j = 0; j < words.length; j++) if (hay.indexOf(words[j]) < 0) return false;
+  }
+  return true;
+}
+
+/* ---------- pantry UI ---------- */
+function renderPantry() {
+  var q = ingQuery.toLowerCase(), html = "";
+  CATS.forEach(function (c) {
+    var ids = ING_ORDER.filter(function (id) {
+      var g = ING[id];
+      return g.cat === c[0] && !g.always && (!q || g.name.toLowerCase().indexOf(q) >= 0 || id.indexOf(q) >= 0);
+    });
+    if (!ids.length) return;
+    var n = ids.filter(function (id) { return pantry.has(id); }).length;
+    html += '<div class="cat" role="group" aria-label="' + esc(c[1]) + '"><h3><span>' + esc(c[1]) + '</span><span>' + n + "/" + ids.length + "</span></h3><div class=\"chips\">" +
+      ids.map(function (id) {
+        var g = ING[id];
+        return '<button type="button" class="chip" data-ing="' + esc(id) + '" aria-pressed="' + pantry.has(id) + '"><span class="e" aria-hidden="true">' + g.emoji + "</span>" + esc(g.name) + "</button>";
+      }).join("") + "</div></div>";
+  });
+  $("#cats").innerHTML = html || '<p class="empty-cat">No ingredients match “' + esc(ingQuery) + "”.</p>";
+  updatePantryCount();
+}
+function updatePantryCount() {
+  $("#pantryCount").textContent = pantry.size + " selected";
+  document.querySelectorAll("#cats .cat").forEach(function (cat) {
+    var chips = cat.querySelectorAll(".chip"), n = 0;
+    chips.forEach(function (ch) { if (pantry.has(ch.getAttribute("data-ing"))) n++; });
+    cat.querySelector("h3 span:last-child").textContent = n + "/" + chips.length;
+  });
+}
+
+/* ---------- results UI ---------- */
+var TIERS = [
+  ["ready", "✅ Make it now", "you have everything", true],
+  ["swap", "🔁 Make it with a swap", "use a substitute you already have", true],
+  ["m1", "🛒 Missing 1", "one ingredient away", true],
+  ["m2", "🧺 Missing 2", "two ingredients away", false],
+  ["m3", "🗺️ Missing 3+", "a proper shopping trip", false]
+];
+function typeBadge(r) {
+  return r.type === "shot" ? "Shot · 2 oz" : r.type === "milk" ? "Nut milk · " + r.oz + " oz" : r.type === "sorbet" ? "Sorbet · 2 servings" : "Juice · 16 oz";
+}
+function card(r, m, showStatus) {
+  var ings = r.items.map(function (it) {
+    var g = ING[it.ing], cls = "ing", label = g.name, sw;
+    if (it.opt) { cls += " opt"; label += " (opt.)"; }
+    else if (g.always) cls += "";
+    else if (showStatus) {
+      if (pantry.has(it.ing)) cls += " have";
+      else if ((sw = swapOf(m, it.ing))) { cls += " swap"; }
+      else { cls += " miss"; label = "✕ " + label; }
+    }
+    return '<span class="' + cls + '">' + esc(label) + "</span>";
+  }).join("");
+  var swapTxt = showStatus && m.swaps.length ? '<span class="swapnote">' + m.swaps.map(function (s) {
+    return "swap " + esc(ING[s.from].name) + " for " + esc(ING[s.to].name);
+  }).join(" · ") + "</span>" : "";
+  var missTxt = showStatus && m.missing.length ? "missing " + m.missing.map(function (id) { return ING[id].name; }).join(", ") : "";
+  return '<article class="card" data-id="' + r.id + '">' +
+    '<div class="acts">' +
+    '<button type="button" class="iconbtn fav" data-fav="' + r.id + '" aria-pressed="' + favs.has(r.id) + '" aria-label="Favourite ' + esc(r.name) + '">' + (favs.has(r.id) ? "♥" : "♡") + "</button>" +
+    '<button type="button" class="iconbtn want" data-want="' + r.id + '" aria-pressed="' + want.has(r.id) + '" aria-label="Want to make ' + esc(r.name) + ' (adds missing items to shopping list)">' + (want.has(r.id) ? "★" : "☆") + "</button>" +
+    "</div>" +
+    '<button type="button" class="open" data-open="' + r.id + '" aria-label="' + esc(r.name + ". " + typeBadge(r) + (missTxt ? ", " + missTxt : "") + ". Open recipe") + '">' +
+    '<div class="swatch" style="background:linear-gradient(160deg,' + r.color[0] + "," + r.color[1] + ')"><span class="badge">' + esc(typeBadge(r)) + (r.low ? " · 80/20" : "") + '</span><span class="bottle" aria-hidden="true"></span><span class="emo" aria-hidden="true">' + r.emoji + "</span></div>" +
+    '<div class="body"><h4>' + esc(r.name) + "</h4><p>" + esc(r.desc) + '</p><div class="ings">' + ings + "</div>" + swapTxt + "</div></button></article>";
+}
+function renderResults(focusSel) {
+  var list = RECIPES.filter(passes);
+  var html = "";
+  if (!pantry.size) {
+    html += '<div class="hint">👋 Tap the ingredients you have in the pantry panel and I\'ll sort these into “make it now”, “with a swap”, and “missing 1–2”. Try <b>Select common staples</b> to start.</div>';
+    html += tierHtml("all", "📖 All recipes", list.length + " to browse", true, list.slice().sort(byName).map(function (r) { return card(r, null, false); }));
+    $("#summary").textContent = list.length + " of " + RECIPES.length + " recipes shown.";
+  } else {
+    var groups = { ready: [], swap: [], m1: [], m2: [], m3: [] };
+    list.forEach(function (r) { var m = match(r); groups[m.tier].push({ r: r, m: m }); });
+    TIERS.forEach(function (t) {
+      var g = groups[t[0]].sort(function (a, b) { return b.m.uses - a.m.uses || a.m.missing.length - b.m.missing.length || byName(a.r, b.r); });
+      html += tierHtml(t[0], t[1], t[2], t[3], g.map(function (x) { return card(x.r, x.m, true); }));
+    });
+    $("#summary").textContent = list.length + " recipes shown · " + groups.ready.length + " ready now · " + groups.swap.length + " with a swap · " + groups.m1.length + " missing one.";
+  }
+  if (!list.length) html = '<p class="none">No recipes match those filters. Try removing one.</p>';
+  $("#tiers").innerHTML = html;
+  if (focusSel) { var el = $(focusSel); if (el) el.focus(); }
+}
+function byName(a, b) { return a.name.localeCompare(b.name); }
+function tierHtml(key, title, sub, defOpen, cards) {
+  var open = key in tierOpen ? tierOpen[key] : defOpen;
+  return '<details class="tier" data-tier="' + key + '"' + (open ? " open" : "") + "><summary>" + esc(title) + ' <span class="n">' + cards.length + "</span> <small>" + esc(sub) + "</small></summary>" +
+    (cards.length ? '<div class="grid">' + cards.join("") + "</div>" : '<p class="none">Nothing here yet.</p>') + "</details>";
+}
+function renderFilters() {
+  $("#filters").innerHTML = FILTERS.map(function (f) {
+    return '<button type="button" class="fchip" data-filter="' + f[0] + '" aria-pressed="' + filters.has(f[0]) + '">' + esc(f[1]) + "</button>";
+  }).join("");
+}
+
+/* ---------- detail modal ---------- */
+var SIZES = { juice: [8, 16, 32], shot: [2, 8, 16], milk: [16, 32], sorbet: [1, 2, 4] };
+var TEX = [["leafy", "Leafy"], ["soft", "Soft"], ["medium", "Medium"], ["hard", "Hard"]];
+var current = null, lastFocus = null;
+function factorFor(r, size) { return size / (r.type === "juice" ? 16 : r.oz); }
+function openRecipe(id, opener) {
+  var r = RBYID[id]; if (!r) return;
+  lastFocus = opener || document.activeElement;
+  current = { r: r, size: r.type === "juice" ? 16 : r.oz };
+  renderModal();
+  $("#scrim").classList.add("on");
+  $("#modal").classList.add("on");
+  $("#modal").scrollTop = 0;
+  $("#mClose").focus();
+}
+function renderModal(keepFocus) {
+  var r = current.r, size = current.size, f = factorFor(r, size), m = match(r), hasP = pantry.size > 0;
+  var yieldOz = estYield(r, f);
+  var unitWord = r.type === "sorbet" ? "serving" : "oz";
+  var sizeBtns = SIZES[r.type].map(function (s) {
+    return '<button type="button" role="radio" data-size="' + s + '" aria-checked="' + (s === size) + '" tabindex="' + (s === size ? 0 : -1) + '">' + s + " " + (r.type === "sorbet" ? (s > 1 ? "servings" : "serving") : "oz") + "</button>";
+  }).join("");
+  var juiceItems = r.items.filter(function (it) { return !isStirIn(it); });
+  var stir = r.items.filter(isStirIn);
+  var ilist = r.items.map(function (it) {
+    var g = ING[it.ing], tag = "", sw;
+    if (it.opt) tag = '<span class="tag opt">optional</span>';
+    else if (g.always) tag = "";
+    else if (hasP && pantry.has(it.ing)) tag = '<span class="tag have">have it</span>';
+    else if (hasP && (sw = swapOf(m, it.ing))) tag = '<span class="tag swap">swap → ' + esc(ING[sw].name) + "</span>";
+    else if (hasP) tag = '<span class="tag miss">need it</span>';
+    return '<li><span class="q">' + esc(qtyText(it, f)) + "</span><span>" + g.emoji + " " + esc(g.name) + (it.note ? ' <small style="color:var(--muted)">(' + esc(it.note) + ")</small>" : "") + "</span>" + tag + "</li>";
+  }).join("");
+
+  var load = "", order = "", strainer, storage;
+  if (r.type === "juice" || r.type === "shot") {
+    var hop = Math.round(yieldOz * 2.2);
+    var pct = Math.min(100, Math.round(hop / 70 * 100));
+    load = '<div><h3>Hopper load</h3><div class="stat" style="display:block">~' + hop + " oz of chopped produce in a 70 oz hopper" +
+      '<div class="meter' + (hop > 70 ? " over" : "") + '" role="meter" aria-valuemin="0" aria-valuemax="70" aria-valuenow="' + Math.min(hop, 999) + '" aria-label="Hopper fill"><i style="width:' + pct + '%"></i></div></div>' +
+      (hop > 70 ? '<div class="warn">⚠️ That\'s more than the J2\'s 70 oz hopper holds. Load it in two batches: run the first, then refill with the same layering.</div>' : "") + "</div>";
+    var layers = TEX.map(function (t) {
+      var its = juiceItems.filter(function (it) { return ING[it.ing].texture === t[0]; });
+      if (!its.length) return "";
+      return '<div class="layer ' + t[0] + '"><b>' + t[1] + "</b>" + its.map(function (it) { return esc(ING[it.ing].name) + (it.opt ? " (opt.)" : ""); }).join(", ") + "</div>";
+    }).join("");
+    order = '<div><h3>J2 loading order <small style="font:400 12px var(--body);color:var(--muted)">(top of list = top of hopper)</small></h3><div class="stack" aria-label="Hopper layers from bottom to top">' + layers + "</div>" +
+      '<ol class="steps"><li>Prep everything (see notes below), then layer the hopper bottom → top: leafy, soft, medium, hard.</li><li>Close the lid, press ON and let gravity do the work — no pushing needed.</li>' +
+      (stir.length ? "<li><b>Stir in after:</b> " + stir.map(function (it) { return esc(qtyText(it, f) + " " + ING[it.ing].name); }).join(", ") + ".</li>" : "") +
+      "<li>Stir, taste, adjust with lemon or lime.</li></ol></div>";
+    strainer = r.strainer === "coarse" ? "Coarse strainer — keeps more body for thick, pulpy produce." : "Juice strainer (fine mesh) for a smooth, pulp-free juice.";
+    storage = "Pour into an airtight glass jar filled right to the top (less air = less oxidation). Fridge it and drink within 24–48 h, 72 h max. A squeeze of lemon helps it keep its colour.";
+  } else if (r.type === "milk") {
+    var nuts = r.items.filter(function (it) { return ING[it.ing].texture === "nut"; });
+    order = '<div><h3>How to press it</h3><ol class="steps"><li>Soak the nuts (8–12 h; cashews can be shorter), then drain and rinse. Pit any dates.</li>' +
+      "<li>Fit the <b>juice strainer</b>, close the lid and turn the J2 ON.</li>" +
+      "<li>With the motor running, feed " + nuts.map(function (it) { return esc(ING[it.ing].name.toLowerCase()); }).join(" + ") + " <b>and the water together</b>, a little at a time, through the small top hole.</li>" +
+      "<li>Run the pulp through once more with a splash of the milk for extra yield.</li>" +
+      (stir.length ? "<li><b>Stir in after:</b> " + stir.map(function (it) { return esc(qtyText(it, f) + " " + ING[it.ing].name); }).join(", ") + ".</li>" : "") +
+      "</ol>" + (r.experimental ? '<div class="warn">🧪 Experimental: coconut milk results vary with the brand of coconut. Warm water helps release the fat.</div>' : "") + "</div>";
+    strainer = "Juice strainer (fine mesh).";
+    storage = "Glass bottle in the fridge, up to ~3 days. It separates naturally — shake before pouring.";
+  } else {
+    order = '<div><h3>How to press it</h3><ol class="steps"><li>Swap the strainer for the <b>sorbet attachment</b> (sold separately).</li>' +
+      "<li>Let frozen fruit sit out ~5 minutes so it's just barely soft.</li>" +
+      "<li>Turn ON and feed frozen pieces <b>one at a time through the top hole</b>, waiting for each to go through. Don't load the hopper.</li>" +
+      "<li>Catch the sorbet in a chilled bowl; alternate flavours for a swirl.</li></ol></div>";
+    strainer = "Sorbet attachment (sold separately) — not the juice strainer.";
+    storage = "Serve immediately! Or freeze in a lidded tub for ~30 min for a firmer scoop.";
+  }
+  var seen = {}, prep = r.items.filter(function (it) { if (seen[it.ing] || ING[it.ing].always) return false; seen[it.ing] = 1; return true; })
+    .map(function (it) { return "<li><b>" + esc(ING[it.ing].name) + ":</b> " + esc(ING[it.ing].prep) + "</li>"; }).join("");
+  var swapLine = hasP && m.swaps.length ? '<div class="swapnote" style="font-size:13.5px">🔁 ' + m.swaps.map(function (s) { return "Swap " + esc(ING[s.from].name) + " for " + esc(ING[s.to].name); }).join(" · ") + "</div>" : "";
+
+  $("#modal").innerHTML =
+    '<div class="mhead" style="background:linear-gradient(135deg,' + r.color[0] + "," + r.color[1] + ')">' +
+    '<div class="macts"><button type="button" class="iconbtn fav" data-fav="' + r.id + '" aria-pressed="' + favs.has(r.id) + '" aria-label="Favourite">' + (favs.has(r.id) ? "♥" : "♡") + "</button>" +
+    '<button type="button" class="iconbtn want" data-want="' + r.id + '" aria-pressed="' + want.has(r.id) + '" aria-label="Want to make">' + (want.has(r.id) ? "★" : "☆") + "</button></div>" +
+    '<button type="button" class="iconbtn mclose" id="mClose" aria-label="Close recipe">✕</button>' +
+    '<span class="emo" aria-hidden="true">' + r.emoji + '</span><h2 id="mTitle">' + esc(r.name) + "</h2><p>" + esc(r.desc) + "</p></div>" +
+    '<div class="mbody">' +
+    '<div><h3 id="sizeH">Make how much?</h3><div class="sizes" role="radiogroup" aria-labelledby="sizeH">' + sizeBtns + "</div></div>" +
+    '<div class="stats"><div class="stat"><b>~' + (r.type === "sorbet" ? size + " " + (size > 1 ? "servings" : "serving") : Math.round(yieldOz) + " oz") + "</b>estimated yield</div>" +
+    '<div class="stat"><b>' + esc(typeBadge(r).split(" · ")[0]) + "</b>type</div>" +
+    (r.low ? '<div class="stat"><b>80/20</b>low-sugar</div>' : "") + "</div>" +
+    swapLine +
+    '<div><h3>Ingredients</h3><ul class="ilist">' + ilist + "</ul></div>" +
+    load + order +
+    "<div><h3>Prep notes</h3><ul class=\"prep\">" + prep + "</ul></div>" +
+    "<div><h3>Strainer</h3><p style=\"margin:0\">" + esc(strainer) + "</p></div>" +
+    "<div><h3>Storage</h3><p style=\"margin:0\">" + esc(storage) + "</p></div>" +
+    "</div>";
+  if (keepFocus) { var el = $(keepFocus, $("#modal")); if (el) el.focus(); }
+}
+function closeModal() {
+  if (!current) return;
+  current = null;
+  $("#modal").classList.remove("on");
+  if (!$("#drawer").classList.contains("on")) $("#scrim").classList.remove("on");
+  if (lastFocus && document.contains(lastFocus)) lastFocus.focus();
+}
+
+/* ---------- shopping drawer ---------- */
+var drawerOpener = null;
+function shoppingItems() {
+  var agg = {};
+  want.forEach(function (id) {
+    var r = RBYID[id], m = match(r);
+    r.items.forEach(function (it) {
+      if (m.missing.indexOf(it.ing) < 0) return;
+      var k = it.ing + "|" + it.unit;
+      if (!agg[k]) agg[k] = { ing: it.ing, unit: it.unit, qty: 0, for: [] };
+      agg[k].qty += it.qty;
+      if (agg[k].for.indexOf(r.name) < 0) agg[k].for.push(r.name);
+    });
+  });
+  return Object.keys(agg).map(function (k) { return agg[k]; }).sort(function (a, b) { return ING[a.ing].name.localeCompare(ING[b.ing].name); });
+}
+function shopLine(x) { return qtyText({ qty: x.qty, unit: x.unit }, 1) + " " + ING[x.ing].name; }
+function renderShop() {
+  var items = shoppingItems();
+  $("#shopCount").textContent = items.length;
+  if (!$("#drawer").classList.contains("on")) return;
+  var html;
+  if (!want.size) html = '<p class="none">Tap ☆ “want to make” on any recipe and its missing ingredients will land here.</p>';
+  else if (!items.length) html = '<p class="none">🎉 You already have everything for your ' + want.size + " starred recipe" + (want.size > 1 ? "s" : "") + ".</p>";
+  else html = '<ul class="shop">' + items.map(function (x) {
+    return "<li><span aria-hidden=\"true\">" + ING[x.ing].emoji + "</span><span><b>" + esc(shopLine(x)) + '</b><span class="for">for ' + esc(x.for.join(", ")) + "</span></span></li>";
+  }).join("") + "</ul>";
+  if (want.size) html += '<p class="pill-note" style="margin-top:12px">Starred: ' + esc(Array.from(want).map(function (id) { return RBYID[id].name; }).join(", ")) + "</p>";
+  $("#shopBody").innerHTML = html;
+}
+function openShop() {
+  drawerOpener = document.activeElement;
+  $("#drawer").classList.add("on");
+  $("#scrim").classList.add("on");
+  renderShop();
+  $("#closeShop").focus();
+}
+function closeShop() {
+  $("#drawer").classList.remove("on");
+  if (!current) $("#scrim").classList.remove("on");
+  if (drawerOpener && document.contains(drawerOpener)) drawerOpener.focus();
+}
+function copyText(text) {
+  if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+  return new Promise(function (res, rej) {
+    var ta = document.createElement("textarea");
+    ta.value = text; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy") ? res() : rej(); } catch (e) { rej(e); }
+    document.body.removeChild(ta);
+  });
+}
+
+/* ---------- toast ---------- */
+var toastT;
+function toast(msg) {
+  var t = $("#toast"); t.textContent = msg; t.classList.add("on");
+  clearTimeout(toastT); toastT = setTimeout(function () { t.classList.remove("on"); }, 2200);
+}
+
+/* ---------- toggles ---------- */
+function toggleSet(set, key, id) {
+  if (set.has(id)) set.delete(id); else set.add(id);
+  save(key, set);
+}
+function refreshIcons(id) {
+  document.querySelectorAll('[data-fav="' + id + '"]').forEach(function (b) { b.setAttribute("aria-pressed", favs.has(id)); b.textContent = favs.has(id) ? "♥" : "♡"; });
+  document.querySelectorAll('[data-want="' + id + '"]').forEach(function (b) { b.setAttribute("aria-pressed", want.has(id)); b.textContent = want.has(id) ? "★" : "☆"; });
+}
+function onFavWant(btn) {
+  var fid = btn.getAttribute("data-fav"), wid = btn.getAttribute("data-want"), id = fid || wid;
+  if (fid) { toggleSet(favs, "favs", id); toast(favs.has(id) ? "♥ Added to favourites" : "Removed from favourites"); }
+  else { toggleSet(want, "want", id); toast(want.has(id) ? "★ Added to “want to make” — missing items go to your list" : "Removed from “want to make”"); }
+  refreshIcons(id);
+  renderShop();
+  if ((fid && filters.has("fav")) || (wid && filters.has("want"))) {
+    var inModal = btn.closest("#modal");
+    renderResults(inModal ? null : null);
+    if (!inModal) $("#results").focus();
+  }
+}
+
+/* ---------- events ---------- */
+$("#cats").addEventListener("click", function (e) {
+  var b = e.target.closest(".chip"); if (!b) return;
+  var id = b.getAttribute("data-ing");
+  toggleSet(pantry, "pantry", id);
+  b.setAttribute("aria-pressed", pantry.has(id));
+  updatePantryCount(); renderResults(); renderShop();
+});
+$("#ingSearch").addEventListener("input", function () { ingQuery = this.value.trim(); renderPantry(); });
+$("#recSearch").addEventListener("input", function () { recQuery = this.value.trim(); renderResults(); });
+$("#staples").addEventListener("click", function () {
+  ING_ORDER.forEach(function (id) { if (ING[id].staple && !ING[id].always) pantry.add(id); });
+  save("pantry", pantry); renderPantry(); renderResults(); renderShop(); toast("⭐ Common staples added");
+});
+$("#clearPantry").addEventListener("click", function () {
+  pantry.clear(); save("pantry", pantry); renderPantry(); renderResults(); renderShop(); toast("Pantry cleared");
+});
+$("#filters").addEventListener("click", function (e) {
+  var b = e.target.closest(".fchip"); if (!b) return;
+  var k = b.getAttribute("data-filter");
+  if (filters.has(k)) filters.delete(k); else filters.add(k);
+  b.setAttribute("aria-pressed", filters.has(k));
+  renderResults();
+});
+$("#tiers").addEventListener("click", function (e) {
+  var fw = e.target.closest("[data-fav],[data-want]");
+  if (fw) { onFavWant(fw); return; }
+  var o = e.target.closest("[data-open]");
+  if (o) openRecipe(o.getAttribute("data-open"), o);
+});
+$("#tiers").addEventListener("toggle", function (e) {
+  var d = e.target; if (d.matches && d.matches("details.tier")) tierOpen[d.getAttribute("data-tier")] = d.open;
+}, true);
+$("#modal").addEventListener("click", function (e) {
+  if (e.target.closest("#mClose")) { closeModal(); return; }
+  var fw = e.target.closest("[data-fav],[data-want]");
+  if (fw) { onFavWant(fw); return; }
+  var s = e.target.closest("[data-size]");
+  if (s && current) { current.size = +s.getAttribute("data-size"); renderModal('[data-size="' + current.size + '"]'); }
+});
+$("#modal").addEventListener("keydown", function (e) {
+  var s = e.target.closest && e.target.closest("[data-size]");
+  if (!s || !current || (e.key !== "ArrowRight" && e.key !== "ArrowLeft" && e.key !== "ArrowDown" && e.key !== "ArrowUp")) return;
+  e.preventDefault();
+  var opts = SIZES[current.r.type], i = opts.indexOf(current.size);
+  i = (i + (e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : -1) + opts.length) % opts.length;
+  current.size = opts[i]; renderModal('[data-size="' + current.size + '"]');
+});
+$("#scrim").addEventListener("click", function () { if (current) closeModal(); else closeShop(); });
+$("#openShop").addEventListener("click", openShop);
+$("#closeShop").addEventListener("click", closeShop);
+$("#copyShop").addEventListener("click", function () {
+  var items = shoppingItems();
+  if (!items.length) { toast("Nothing to copy yet"); return; }
+  var text = "Squeeze Play shopping list\n" + items.map(function (x) { return "- " + shopLine(x); }).join("\n");
+  copyText(text).then(function () { toast("📋 Copied to clipboard"); }, function () { toast("Couldn't copy — select the list manually"); });
+});
+$("#clearWant").addEventListener("click", function () {
+  var ids = Array.from(want); want.clear(); save("want", want);
+  ids.forEach(refreshIcons); renderShop();
+  if (filters.has("want")) renderResults();
+  toast("Cleared “want to make”");
+});
+$("#surprise").addEventListener("click", function () {
+  var ok = function (r) { var t = match(r).tier; return t === "ready" || t === "swap"; };
+  var pool = pantry.size ? RECIPES.filter(passes).filter(ok) : [];
+  if (!pool.length && pantry.size) pool = RECIPES.filter(ok);
+  if (!pool.length) { toast(pantry.size ? "Nothing makeable yet — add a few more ingredients" : "Pick some pantry items first (or try “Select common staples”)"); return; }
+  openRecipe(pool[Math.floor(Math.random() * pool.length)].id, this);
+});
+function trap(container, e) {
+  var f = Array.prototype.filter.call(container.querySelectorAll('button,[href],input,[tabindex]:not([tabindex="-1"])'), function (el) { return el.offsetParent !== null && !el.disabled; });
+  if (!f.length) return;
+  var first = f[0], last = f[f.length - 1];
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  else if (!container.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
+}
+document.addEventListener("keydown", function (e) {
+  if (e.key === "Escape") { if (current) closeModal(); else if ($("#drawer").classList.contains("on")) closeShop(); return; }
+  if (e.key === "Tab") {
+    if (current) trap($("#modal"), e);
+    else if ($("#drawer").classList.contains("on")) trap($("#drawer"), e);
+  }
+});
+
+/* ---------- init ---------- */
+try { if (new URLSearchParams(location.search).get("embed") === "1") $("#backlink").hidden = true; } catch (e) { /* old browser */ }
+renderFilters(); renderPantry(); renderResults(); renderShop();
+})();
+</script>
+</body>
+</html>

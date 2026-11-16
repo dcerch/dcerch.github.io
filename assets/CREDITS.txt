@@ -1,12 +1,19 @@
 3D assets used by Navigator
 ===========================
 
-assets/models/*   and   assets/textures/*
+assets/models/*   assets/textures/*   assets/hdri/*
 
-All models and textures come from Poly Haven (https://polyhaven.com) and are
-licensed CC0 1.0 (public domain): https://polyhaven.com/license
+All models, textures and the outdoor panorama come from Poly Haven
+(https://polyhaven.com) and are licensed CC0 1.0 (public domain):
+https://polyhaven.com/license
 No attribution is required, but thank you, Poly Haven!
 
-They were downloaded and their textures resized to 512px (models) / 1024px
-(floors) for the web by tools/fetch_assets.py. Re-run that script to fetch them
-again or to add more (edit the MODELS / TEXTURES lists).
+- Models: furniture and props (Sofa_01, ArmChair_01, Television_01, electric_stove,
+  GreenChair_01, vintage_grandfather_clock_01, treasure_chest, ...). The full list
+  is in tools/fetch_assets.py.
+- Textures: parquet, plaster, brick, velour, brown leather, kitchen wood, marble.
+- Panorama: "Noon Grass" (noon_grass), the tonemapped JPG downscaled to 4k/2k and
+  shown through every window via three.js GroundedSkybox.
+
+Model colour maps are resized to 1024px (other maps 512px) by tools/fetch_assets.py.
+Re-run that script to fetch them again or to add more (edit the MODELS / TEXTURES lists).

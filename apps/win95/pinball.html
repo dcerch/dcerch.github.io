@@ -1256,7 +1256,7 @@ document.addEventListener('visibilitychange',()=>{
 function tablePoint(e){const r=tableC.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*600,y:(e.clientY-r.top)/r.height*1000};}
 function zoneOf(p){if(p.x>505&&p.y>560)return 'tP';return p.x<277?'tL':'tR';}
 tableC.addEventListener('pointerdown',e=>{
-  e.preventDefault(); Snd.init(); closeMenus(); if(dlgOpen) return;
+  e.preventDefault(); window.focus(); Snd.init(); closeMenus(); if(dlgOpen) return;
   if(S.state!=='play'){newGame(false);return;}
   if(S.paused){togglePause(false);return;}
   if(S.demo){newGame(false);return;}
@@ -1268,7 +1268,7 @@ tableC.addEventListener('pointerup',endPointer);
 tableC.addEventListener('pointercancel',endPointer);
 tableC.addEventListener('lostpointercapture',endPointer);
 tableC.addEventListener('contextmenu',e=>e.preventDefault());
-panelC.addEventListener('pointerdown',e=>{e.preventDefault();Snd.init();closeMenus();if(dlgOpen)return;
+panelC.addEventListener('pointerdown',e=>{e.preventDefault();window.focus();Snd.init();closeMenus();if(dlgOpen)return;
   if(S.state!=='play'||S.demo)newGame(false);else if(S.paused)togglePause(false);});
 
 /* ---------------- menus ---------------- */

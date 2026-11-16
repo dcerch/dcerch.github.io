@@ -18,11 +18,19 @@ export const ICONS = {
     <circle cx="25" cy="7" r="5" fill="#fff" stroke="#c9a54a" stroke-width="1.5" shape-rendering="geometricPrecision"/>
     <path d="M25 3 L26.2 7 L25 11 L23.8 7 Z" fill="#b5121b" shape-rendering="geometricPrecision"/>`),
   linkedin: svg(`
-    <path d="M6 30 L8 9 L13 6 L16 12 L19 6 L24 9 L26 30 Z" fill="#1d2738" stroke="#000"/>
-    <path d="M13 6 L16 12 L19 6 Z" fill="#fff" stroke="#000"/>
-    <path d="M15 11 L17 11 L18 22 L16 25 L14 22 Z" fill="#b01c30" stroke="#000"/>
-    <rect x="19" y="14" width="7" height="7" rx="1" fill="#0a66c2" stroke="#000"/>
-    <text x="22.5" y="20" font-family="Arial" font-weight="bold" font-size="6" fill="#fff" text-anchor="middle">in</text>`),
+    <path d="M12 9 V6 H20 V9" fill="none" stroke="#000" stroke-width="2" shape-rendering="geometricPrecision"/>
+    <rect x="3" y="9" width="26" height="18" rx="2" fill="#8a5a36" stroke="#000"/>
+    <rect x="3" y="14" width="26" height="1" fill="#4a2c18"/>
+    <rect x="8" y="13" width="3" height="3" fill="#d8b030" stroke="#000"/><rect x="21" y="13" width="3" height="3" fill="#d8b030" stroke="#000"/>
+    <rect x="12" y="17" width="8" height="8" rx="1" fill="#0a66c2" stroke="#000"/>
+    <text x="16" y="23.5" font-family="Arial" font-weight="bold" font-size="6.5" fill="#fff" text-anchor="middle">in</text>`),
+  juice: svg(`
+    <path d="M9 8 H23 L21 29 H11 Z" fill="#e8f6ff" stroke="#000"/>
+    <path d="M10 14 H22 L21 28 H11 Z" fill="#ff9a1a"/>
+    <path d="M10 14 H22 L21.6 18 H10.4 Z" fill="#ffc04a"/>
+    <path d="M17 3 L15 20" stroke="#e23b5a" stroke-width="2" shape-rendering="geometricPrecision"/>
+    <circle cx="23" cy="9" r="4.5" fill="#7ac943" stroke="#000" shape-rendering="geometricPrecision"/>
+    <path d="M23 5 V13 M19 9 H27" stroke="#d8f0a0" stroke-width="1"/>`),
   solitaire: svg(`
     <rect x="4" y="5" width="15" height="21" fill="#fff" stroke="#000" transform="rotate(-10 11 15)"/>
     <rect x="12" y="6" width="15" height="21" fill="#fff" stroke="#000"/>

@@ -109,6 +109,42 @@ function buildGuide(parent) {
   return root;
 }
 
+// ---------------------------------------------------------------- what pops out of each drawer
+function buildPeek(dg, i) {
+  const p = group(dg, 0.25, 0.17, -0.05); p.visible = false;
+  const shiny = c => new THREE.MeshPhysicalMaterial({ color: c, roughness: 0.35, clearcoat: 0.6 });
+  if (i === 0) {          // postcards
+    ["#ffd94a", "#5ad1ff", "#ff7ab8"].forEach((col, k) => {
+      const t = canvasTex(128, 88, g => { g.fillStyle = "#fdf8ec"; g.fillRect(0, 0, 128, 88); g.fillStyle = col; g.fillRect(6, 6, 70, 76); g.fillStyle = "#e23b3b"; g.fillRect(96, 8, 24, 28); g.strokeStyle = "#555"; for (let y = 50; y < 84; y += 10) { g.beginPath(); g.moveTo(84, y); g.lineTo(122, y); g.stroke(); } });
+      const c = add(p, B(0.2, 0.14, 0.004), new THREE.MeshStandardMaterial({ map: t, roughness: 0.7 }), (k - 1) * 0.06, 0.08 + k * 0.01, 0, false); c.rotation.set(-0.5, 0, (k - 1) * 0.25);
+    });
+  } else if (i === 1) {   // crayons
+    [0xe23b3b, 0xffa020, 0xffd400, 0x3ac04a, 0x2a6ad8, 0x8a3ad8].forEach((c, k) => {
+      const cr = group(p, (k - 2.5) * 0.035, 0.05, 0); cr.rotation.z = (k - 2.5) * 0.12;
+      add(cr, C(0.012, 0.012, 0.12, 10), shiny(c), 0, 0, 0, false); add(cr, new THREE.ConeGeometry(0.012, 0.03, 10), shiny(c), 0, 0.075, 0, false);
+      add(cr, C(0.0125, 0.0125, 0.06, 10), M(0xf4f0e0), 0, -0.01, 0, false);
+    });
+  } else if (i === 2) {   // homework with a gold star
+    const t = canvasTex(128, 160, g => { g.fillStyle = "#fffef6"; g.fillRect(0, 0, 128, 160); g.strokeStyle = "#9ac0f0"; for (let y = 20; y < 160; y += 14) { g.beginPath(); g.moveTo(0, y); g.lineTo(128, y); g.stroke(); } g.strokeStyle = "#f08a8a"; g.beginPath(); g.moveTo(18, 0); g.lineTo(18, 160); g.stroke(); g.fillStyle = "#333"; g.font = "16px 'Comic Sans MS', cursive"; g.fillText("3 + 4 = 7", 26, 46); g.fillText("6 x 2 = 12", 26, 74); g.fillStyle = "#e23b3b"; g.font = "bold 30px Arial"; g.fillText("A+", 70, 140); });
+    const sheet = add(p, B(0.16, 0.2, 0.003), new THREE.MeshStandardMaterial({ map: t, roughness: 0.8 }), 0, 0.1, 0, false); sheet.rotation.x = -0.4;
+    const star = new THREE.Shape(); for (let k = 0; k < 10; k++) { const a = k / 10 * Math.PI * 2 - Math.PI / 2, r = k % 2 ? 0.018 : 0.04; k ? star.lineTo(Math.cos(a) * r, Math.sin(a) * r) : star.moveTo(Math.cos(a) * r, Math.sin(a) * r); }
+    add(p, new THREE.ExtrudeGeometry(star, { depth: 0.006, bevelEnabled: false }), M(0xffd400, { r: 0.25, m: 0.7, e: 0x553300, ei: 0.4 }), 0.05, 0.17, 0.04, false);
+  } else if (i === 3) {   // diary with a padlock
+    add(p, B(0.16, 0.2, 0.04), shiny(0x7a2ad0), 0, 0.1, 0, false).rotation.x = -0.25;
+    add(p, B(0.03, 0.06, 0.05), M(0xd8b030, { r: 0.25, m: 0.9 }), 0.08, 0.1, 0.0, false);
+    add(p, new THREE.TorusGeometry(0.014, 0.004, 8, 14, Math.PI), M(0xd8b030, { r: 0.25, m: 0.9 }), 0.08, 0.135, 0.0, false);
+    add(p, new THREE.PlaneGeometry(0.1, 0.03), new THREE.MeshBasicMaterial({ map: canvasTex(128, 40, g => { g.fillStyle = "#ffd94a"; g.font = "bold 26px 'Comic Sans MS', cursive"; g.fillText("KEEP OUT", 4, 30); }), transparent: true }), -0.01, 0.15, 0.03, false).rotation.x = -0.25;
+  } else {                // a stack of pogs and a slammer
+    for (let k = 0; k < 7; k++) {
+      const t = canvasTex(64, 64, g => { const gr = g.createRadialGradient(32, 32, 2, 32, 32, 32); gr.addColorStop(0, ["#ffd94a", "#5ad1ff", "#ff7ab8", "#7aff8a"][k % 4]); gr.addColorStop(1, ["#e23b3b", "#2a6ad8", "#8a3ad8", "#ffa020"][k % 4]); g.fillStyle = gr; g.fillRect(0, 0, 64, 64); g.fillStyle = "#fff"; g.font = "bold 22px Arial"; g.textAlign = "center"; g.fillText(["☺", "★", "☯", "♛"][k % 4], 32, 40); });
+      add(p, C(0.035, 0.035, 0.004, 20), M(0xf4f0e0), 0, 0.004 + k * 0.0045, 0, false).rotation.y = k;
+      add(p, new THREE.CircleGeometry(0.034, 20), new THREE.MeshStandardMaterial({ map: t }), 0, 0.0061 + k * 0.0045, 0, false).rotation.set(-Math.PI / 2, 0, k);
+    }
+    add(p, C(0.036, 0.036, 0.008, 24), M(0x222222, { r: 0.3, m: 0.6 }), 0.09, 0.03, 0.02, false).rotation.x = 0.6;
+  }
+  return p;
+}
+
 // ---------------------------------------------------------------- build
 export function buildKidSpace(scene, { hot, updaters, refs }) {
   const room = group(scene, 0, 0, KID_Z);
@@ -248,12 +284,13 @@ export function buildKidSpace(scene, { hot, updaters, refs }) {
   const cab = group(room, 3.45, 0, -2.5, -0.35);
   add(cab, B(1.5, 2.9, 0.6), marbleMat, 0, 1.45, 0);
   add(cab, B(1.3, 0.5, 0.04), new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.6 }), 0, 0.55, 0.29);
+  const kd = (hash, title) => ({ type: "url", url: "apps/kidspace-drawers.html?embed=1#" + hash, title });
   const drawers = [
-    { label: "Friends", desc: "Secret Santa — draw names with your friends.", action: { type: "app", app: "secretsanta" } },
-    { label: "Paintings", desc: "Open Paint and make a masterpiece.", action: { type: "url", url: "apps/win95/paint.html?embed=1", title: "Paint" } },
-    { label: "Homework", desc: "Dominic's PMP study sheet. (Yes, grown-ups have homework too.)", action: { type: "toolbox", id: "pmpref", title: "PMP study sheet" } },
-    { label: "Personal", desc: "The family portrait.", action: { type: "panel", panel: "family" } },
-    { label: "Misc.", desc: "The randomizer — dice, symbols and surprises.", action: { type: "toolbox", id: "randomizer", title: "Randomizer" } }
+    { label: "Friends", desc: "Postcards from pen pals all over the galaxy. Write back!", action: kd("friends", "Friends — Pen Pals") },
+    { label: "Paintings", desc: "The fridge gallery, plus a crayon doodle pad.", action: kd("paintings", "Paintings — Fridge Gallery") },
+    { label: "Homework", desc: "Space Math worksheet. (The dog may eat it.)", action: kd("homework", "Homework — Space Math") },
+    { label: "Personal", desc: "Rivet's secret diary. It has a lock…", action: kd("personal", "Personal — Rivet's Diary") },
+    { label: "Misc.", desc: "A junk drawer of wonders: pogs, a slap bracelet, a virtual pet…", action: kd("misc", "Misc. — Junk Drawer of Wonders") }
   ];
   drawers.forEach((d, i) => {
     const dg = group(cab, 0, 2.6 - i * 0.42, 0.3);
@@ -262,11 +299,13 @@ export function buildKidSpace(scene, { hot, updaters, refs }) {
       g.fillStyle = "#fff"; g.font = "bold 28px Arial"; g.textBaseline = "middle"; g.fillText(d.label, 20, 34);
     });
     add(dg, B(1.25, 0.34, 0.06), new THREE.MeshPhysicalMaterial({ map: lbl, roughness: 0.3, clearcoat: 0.6 }), 0, 0, 0);
-    hot(dg, { id: "k-drawer-" + i, label: d.label + " drawer", desc: d.desc, action: { type: "custom", fn: () => { sfx.drawer(); dg.position.z = 0.42; setTimeout(() => (dg.position.z = 0.3), 900); kid.activate(d.action, dg); } }, focus: [0, 0, 1.4] });
+    const peek = buildPeek(dg, i);
+    hot(dg, { id: "k-drawer-" + i, label: d.label + " drawer", desc: d.desc, action: { type: "custom", fn: () => { sfx.drawer(); dg.position.z = 0.5; peek.visible = true; setTimeout(() => { dg.position.z = 0.3; peek.visible = false; }, 1400); kid.activate(d.action, dg); } }, focus: [0, 0, 1.4] });
   });
 
   // ---- console desk with the hazard-striped screen
   const desk = group(room, 0, 0, -1.7);
+  kid.room = room; kid.desk = desk;
   const metal = new THREE.MeshStandardMaterial({ color: 0x3a3a44, roughness: 0.3, metalness: 0.85 });
   add(desk, B(2.8, 0.12, 1.5), metal, 0, 0.86, 0);
   [[-1.3, -0.6], [1.3, -0.6], [-1.3, 0.6], [1.3, 0.6]].forEach(([x, z]) => add(desk, C(0.05, 0.05, 0.84, 10), metal, x, 0.42, z));
@@ -315,7 +354,7 @@ export function buildKidSpace(scene, { hot, updaters, refs }) {
   const TIPS = [
     "Hi there! Welcome to KidSpace — the fun place to play, paint and explore!",
     "Click the programs on the purple shelf to play them.",
-    "The drawers on the right have surprises in them. Try Paintings!",
+    "The drawers on the right are full of surprises: pen pals, a fridge gallery, even Rivet's secret diary!",
     "Pull the red lever on the desk to change the view outside.",
     "Want to go back? Click the little door sign on the pillar.",
     "Rivet the robot and the jar alien love visitors. Say hi!",

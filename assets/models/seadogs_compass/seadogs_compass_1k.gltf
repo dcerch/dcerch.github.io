@@ -1,0 +1,335 @@
+{
+  "asset": {
+    "generator": "Khronos glTF Blender I/O v5.1.19",
+    "version": "2.0"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "Scene",
+      "nodes": [
+        0,
+        1,
+        2
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0,
+      "name": "seadogs_compass",
+      "translation": [
+        0,
+        0.00008968263864517212,
+        0
+      ]
+    },
+    {
+      "mesh": 1,
+      "name": "seadogs_compass_lid",
+      "rotation": [
+        -0.8660253882408142,
+        0,
+        0,
+        0.4999999701976776
+      ],
+      "translation": [
+        0,
+        0.013133298605680466,
+        -0.038380496203899384
+      ]
+    },
+    {
+      "mesh": 2,
+      "name": "seadogs_compass_needle",
+      "rotation": [
+        0,
+        0.3826834559440613,
+        0,
+        0.9238795638084412
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "doubleSided": true,
+      "name": "seadogs_compass",
+      "normalTexture": {
+        "index": 0
+      },
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 1
+        },
+        "metallicRoughnessTexture": {
+          "index": 2
+        }
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "name": "Cylinder.005",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "indices": 3,
+          "material": 0
+        }
+      ]
+    },
+    {
+      "name": "Cylinder.001",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 4,
+            "NORMAL": 5,
+            "TEXCOORD_0": 6
+          },
+          "indices": 7,
+          "material": 0
+        }
+      ]
+    },
+    {
+      "name": "Cylinder.002",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 8,
+            "NORMAL": 9,
+            "TEXCOORD_0": 10
+          },
+          "indices": 11,
+          "material": 0
+        }
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "sampler": 0,
+      "source": 0
+    },
+    {
+      "sampler": 0,
+      "source": 1
+    },
+    {
+      "sampler": 0,
+      "source": 2
+    }
+  ],
+  "images": [
+    {
+      "mimeType": "image/jpeg",
+      "name": "seadogs_compass_nor_gl",
+      "uri": "textures/seadogs_compass_nor_gl_1k.jpg"
+    },
+    {
+      "mimeType": "image/jpeg",
+      "name": "seadogs_compass_diff",
+      "uri": "textures/seadogs_compass_diff_1k.jpg"
+    },
+    {
+      "mimeType": "image/jpeg",
+      "name": "seadogs_compass_metal-seadogs_compass_rough",
+      "uri": "textures/seadogs_compass_arm_1k.jpg"
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 5890,
+      "max": [
+        0.04368401691317558,
+        0.020549556240439415,
+        0.0629928708076477
+      ],
+      "min": [
+        -0.037608567625284195,
+        -0.000109831802546978,
+        -0.04065302386879921
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 5890,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 5890,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5123,
+      "count": 20784,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 4,
+      "componentType": 5126,
+      "count": 3305,
+      "max": [
+        0.0375528521835804,
+        0.00747152604162693,
+        0.08441440016031265
+      ],
+      "min": [
+        -0.0375528521835804,
+        -0.0019227199954912066,
+        -0.002607514848932624
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 5,
+      "componentType": 5126,
+      "count": 3305,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 6,
+      "componentType": 5126,
+      "count": 3305,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 7,
+      "componentType": 5123,
+      "count": 12207,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 8,
+      "componentType": 5126,
+      "count": 669,
+      "max": [
+        0.007018595468252897,
+        0.007974331267178059,
+        0.021512845531105995
+      ],
+      "min": [
+        -0.007018596399575472,
+        0.006685914471745491,
+        -0.02235601656138897
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 9,
+      "componentType": 5126,
+      "count": 669,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 10,
+      "componentType": 5126,
+      "count": 669,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 11,
+      "componentType": 5123,
+      "count": 1944,
+      "type": "SCALAR"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 70680,
+      "byteOffset": 0,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 70680,
+      "byteOffset": 70680,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 47120,
+      "byteOffset": 141360,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 41568,
+      "byteOffset": 188480,
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteLength": 39660,
+      "byteOffset": 230048,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 39660,
+      "byteOffset": 269708,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 26440,
+      "byteOffset": 309368,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 24414,
+      "byteOffset": 335808,
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteLength": 8028,
+      "byteOffset": 360224,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 8028,
+      "byteOffset": 368252,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 5352,
+      "byteOffset": 376280,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 3888,
+      "byteOffset": 381632,
+      "target": 34963
+    }
+  ],
+  "samplers": [
+    {
+      "magFilter": 9729,
+      "minFilter": 9987
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 385520,
+      "uri": "seadogs_compass.bin"
+    }
+  ]
+}

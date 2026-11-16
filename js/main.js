@@ -5,6 +5,7 @@ import * as THREE from "three";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+import { GTAOPass } from "three/addons/postprocessing/GTAOPass.js";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 import { buildWorld } from "./world.js";
@@ -31,6 +32,7 @@ try {
   $("#bootStatus").textContent = "Your browser can't draw 3D right now — opening the house directory instead.";
   throw e;
 }
+const lowPower = matchMedia("(pointer: coarse)").matches || (navigator.hardwareConcurrency || 8) <= 4;
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -45,7 +47,8 @@ const camera = new THREE.PerspectiveCamera(60, 1, 0.03, 300);
 
 // image-based lighting: soft, glossy "pre-rendered" reflections on every surface
 const pmrem = new THREE.PMREMGenerator(renderer);
-scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+const defaultEnv = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+scene.environment = defaultEnv;
 scene.environmentIntensity = 0.45;
 scene.add(new THREE.HemisphereLight(0xfff1dc, 0x5a3a24, 0.45));
 const sun = new THREE.DirectionalLight(0xfff0d6, 1.7);
@@ -61,6 +64,9 @@ const { hotspots, refs } = world;
 const kid = buildKidSpace(scene, { hot: world.hot, updaters: world.updaters, refs });
 const furnished = furnish(refs);
 const screens = makeScreens(refs);
+const later = ms => new Promise(r => setTimeout(r, ms));
+furnished.living.then(() => later(250)).then(() => bakeProbe("living"));
+furnished.all.then(() => later(400)).then(() => { ["kitchen", "den", "rec", "kidspace"].forEach(bakeProbe); quality.grace = performance.now() + 5000; });
 window.__nav = { scene, refs, camera, THREE, hotspots }; // handy for poking around in devtools
 
 // assign each hotspot to a room by its position
@@ -144,7 +150,69 @@ function onRoomChanged() {
   document.querySelectorAll("[data-room]").forEach(b => b.classList.toggle("active", b.dataset.room === room));
   document.body.classList.toggle("in-kidspace", room === "kidspace");
   history.replaceState(null, "", "#" + room);
+  useRoomProbe(room);
 }
+
+// ---------------------------------------------------------------- room culling
+// Only draw the rooms you can actually see: the one you're in plus the living room (every door
+// opens onto it). From the living room every room is visible through a doorway.
+const HOUSE = ["living", "kitchen", "den", "rec"];
+function roomGroup(r) { return r === "kidspace" ? refs.kid?.room : refs.g?.[r]; }
+function setRoomVis(show) {
+  if (!setRoomVis.lifted) {
+    // keep every light in the scene root so hiding a room never changes the light count (that would recompile shaders)
+    setRoomVis.lifted = true;
+    [...HOUSE, "kidspace"].forEach(r => { const g = roomGroup(r); if (!g) return; const ls = []; g.traverse(o => o.isLight && ls.push(o)); ls.forEach(l => { const t = l.target; scene.attach(l); if (t && t.parent !== scene) scene.attach(t); }); });
+  }
+  [...HOUSE, "kidspace"].forEach(r => { const g = roomGroup(r); if (g) g.visible = show.includes(r); });
+}
+const frustum = new THREE.Frustum(), projM = new THREE.Matrix4();
+const DOORS = { rec: new THREE.Box3(new THREE.Vector3(3.6, 0, -6.2), new THREE.Vector3(5.4, 2.35, -5.8)), den: new THREE.Box3(new THREE.Vector3(-6.2, 0, -1), new THREE.Vector3(-5.8, 2.35, 1)), kitchen: new THREE.Box3(new THREE.Vector3(5.8, 0, -1), new THREE.Vector3(6.2, 2.35, 1)) };
+function cullRooms() {
+  if (mode === "map" || mode === "boot") return setRoomVis(HOUSE);
+  const here = roomAt(cam.pos.x, cam.pos.z);
+  if (here === "kidspace") return setRoomVis(["kidspace"]);
+  if (here !== "living") return setRoomVis([here, "living"]);
+  // from the living room, only draw a neighbour if its doorway is actually on screen
+  camera.updateMatrixWorld(); projM.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse); frustum.setFromProjectionMatrix(projM);
+  setRoomVis(["living", ...Object.keys(DOORS).filter(r => mode === "travel" || frustum.intersectsBox(DOORS[r]))]);
+}
+
+// ---------------------------------------------------------------- reflection probes
+// Once a room is furnished, photograph it from the middle into a cube map. Using the room's
+// own picture as its environment gives every glossy surface believable reflections and
+// soft fill light that matches the walls around it.
+const probes = {};
+const probeSpots = { living: [0, 1.6, 0.5], kitchen: [10, 1.6, 0], den: [-10, 1.6, 0], rec: [0, 1.6, -10], kidspace: [0, 1.7, -60] };
+function bakeProbe(r) {
+  const p = probeSpots[r]; if (!p) return;
+  const rt = new THREE.WebGLCubeRenderTarget(256, { type: THREE.HalfFloatType });
+  const cc = new THREE.CubeCamera(0.05, 60, rt); cc.position.set(...p); scene.add(cc);
+  const prevEnv = scene.environment; scene.environment = defaultEnv;
+  setRoomVis(r === "kidspace" ? ["kidspace"] : HOUSE);
+  cc.update(renderer, scene);
+  cullRooms();
+  scene.environment = prevEnv; scene.remove(cc);
+  if (probes[r]) probes[r].dispose();
+  probes[r] = pmrem.fromCubemap(rt.texture).texture; rt.dispose();
+  if (room === r) useRoomProbe(r);
+}
+function useRoomProbe(r) {
+  scene.environment = probes[r] || defaultEnv;
+  scene.environmentIntensity = probes[r] ? ({ kidspace: 0.7, rec: 0.55 }[r] ?? 0.8) : 0.45;
+  // the room you're in gets its ceiling lamp swapped for one shadow-casting twin (a fixed light count
+  // means no shader recompiles when you walk between rooms)
+  Object.entries(refs.lamps || {}).forEach(([k, l]) => {
+    if (l.userData.i0 === undefined) l.userData.i0 = l.intensity;
+    l.intensity = k === r ? 0 : l.userData.i0;
+    if (k === r) { shadowLamp.color.copy(l.color); shadowLamp.distance = l.distance; shadowLamp.decay = l.decay; shadowLamp.position.copy(l.position); }
+  });
+  shadowLamp.intensity = refs.lamps?.[r] ? refs.lamps[r].userData.i0 : 0;
+}
+const shadowLamp = new THREE.PointLight(0xffffff, 0, 10, 1.4);
+shadowLamp.castShadow = !lowPower;
+shadowLamp.shadow.mapSize.set(1024, 1024); shadowLamp.shadow.bias = -0.002; shadowLamp.shadow.normalBias = 0.03; shadowLamp.shadow.radius = 5; shadowLamp.shadow.camera.near = 0.2;
+scene.add(shadowLamp);
 
 function focusPose(def) {
   const o = def.obj;
@@ -300,7 +368,7 @@ function setHover(obj, x, y) {
 }
 
 // ---------------------------------------------------------------- input (drag to look, click to act)
-let down = null, lastMove = null, pinch = null;
+let down = null, lastMove = null, pinch = null, pickDirty = true;
 const pointers = new Map();
 canvas.addEventListener("pointerdown", e => {
   sfx.unlock();
@@ -315,7 +383,7 @@ canvas.addEventListener("pointermove", e => {
     const [a, b] = [...pointers.values()], d = Math.hypot(a.x - b.x, a.y - b.y);
     cam.fov = THREE.MathUtils.clamp(pinch.fov * pinch.d / d, 30, 85); return;
   }
-  lastMove = { x: e.clientX, y: e.clientY };
+  lastMove = { x: e.clientX, y: e.clientY }; pickDirty = true;
   if (down) {
     const dx = e.clientX - down.x, dy = e.clientY - down.y;
     if (Math.abs(dx) + Math.abs(dy) > 6) down.moved = true;
@@ -539,19 +607,44 @@ $("#drawerClose").addEventListener("click", () => closeDrawer());
 updateJournalBadge();
 
 // ---------------------------------------------------------------- resize + loop
-const composer = new EffectComposer(renderer);
+// MSAA on the composer's target keeps edges smooth (the canvas's own antialias doesn't apply to post-processing)
+const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(1, 1, { samples: lowPower ? 0 : 4, type: THREE.HalfFloatType }));
 composer.addPass(new RenderPass(scene, camera));
+// ground-truth ambient occlusion: soft contact shading in corners, under furniture and between props
+const gtao = lowPower ? null : new GTAOPass(scene, camera, 1, 1);
+if (gtao) {
+  gtao.updateGtaoMaterial({ radius: 0.45, distanceExponent: 1.6, thickness: 1.2, scale: 1.15, samples: 8, distanceFallOff: 1, screenSpaceRadius: false });
+  gtao.updatePdMaterial({ lumaPhi: 10, depthPhi: 2, normalPhi: 3, radius: 6, rings: 2, samples: 8 });
+  gtao.blendIntensity = 0.9;
+  composer.addPass(gtao);
+}
 const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.3, 0.5, 1.1);
 composer.addPass(bloom);
 composer.addPass(new OutputPass());
 function resize() {
   const w = window.innerWidth, h = window.innerHeight;
   renderer.setSize(w, h, false); composer.setPixelRatio(renderer.getPixelRatio()); composer.setSize(w, h);
+  if (gtao) gtao.setSize(Math.round(w * renderer.getPixelRatio() * 0.5), Math.round(h * renderer.getPixelRatio() * 0.5));
   camera.aspect = w / h; camera.updateProjectionMatrix();
 }
 window.addEventListener("resize", resize); resize();
+Object.assign(window.__nav, { renderer, composer, gtao, bloom, shadowLamp });
 
 const clock = new THREE.Clock();
+// adaptive quality: if the frame rate sags, shed the most expensive extras one at a time (never adds back)
+const quality = { level: 0, frames: 0, since: performance.now(), grace: Infinity }; // armed once everything has loaded
+window.__nav.quality = quality;
+function governQuality() {
+  quality.frames++;
+  const now = performance.now(), span = now - quality.since;
+  if (span < 2000) return;
+  const fps = quality.frames * 1000 / span; quality.frames = 0; quality.since = now;
+  if (document.hidden || now < quality.grace || mode === "boot" || mode === "travel" || fps >= 32) return;
+  quality.level++; quality.grace = now + 2500;
+  if (quality.level === 1 && gtao) gtao.enabled = false;
+  else if (quality.level === 2 && shadowLamp.castShadow) { shadowLamp.castShadow = false; scene.traverse(o => o.material && [].concat(o.material).forEach(m => (m.needsUpdate = true))); }
+  else if (quality.level === 3) { renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75) * 0.75); resize(); }
+}
 const baseExposure = renderer.toneMappingExposure;
 function frame() {
   const dt = Math.min(0.05, clock.getDelta()), t = clock.elapsedTime;
@@ -567,7 +660,7 @@ function frame() {
   screens.tick(t);
   if (performance.now() < flickerUntil) renderer.toneMappingExposure = baseExposure * (Math.random() < 0.35 ? 0.35 : 1);
   else renderer.toneMappingExposure = baseExposure;
-  if (lastMove && !down && (mode === "room" || mode === "focus" || mode === "drawer") && !UI.isWindowOpen()) setHover(pick(lastMove.x, lastMove.y), lastMove.x, lastMove.y);
+  if (lastMove && !down && (pickDirty || tweening || mode === "drawer") && (mode === "room" || mode === "focus" || mode === "drawer") && !UI.isWindowOpen()) { pickDirty = false; setHover(pick(lastMove.x, lastMove.y), lastMove.x, lastMove.y); }
   if (mode === "map") {
     if (lastMove) setMapHover(mapRoomAt(lastMove.x, lastMove.y));
     Object.entries(roomCenters).forEach(([k, c]) => {
@@ -576,9 +669,11 @@ function frame() {
     });
   }
   applyCam();
+  cullRooms();
   bloom.strength = room === "kidspace" ? 0.8 : 0.28; bloom.threshold = room === "kidspace" ? 0.97 : 1.15;
   kid.updateBubble(camera, room === "kidspace" && mode !== "travel" && mode !== "map" && !UI.isWindowOpen());
   composer.render();
+  governQuality();
   requestAnimationFrame(frame);
 }
 applyCam();

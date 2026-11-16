@@ -22,12 +22,20 @@ MODELS = [
     # rec room / kidspace
     "cardboard_box_01", "lifebuoy", "gamepad", "dartboard", "rubber_duck_toy", "boombox", "Ukulele_01",
     "football", "baseball_01",
+    # round 2: more real furniture and props
+    "vintage_grandfather_clock_01", "ceramic_vase_01",
+    "electric_stove", "wall_clock", "jug_01", "wooden_cutting_board", "lemon", "bananas", "pot_enamel_01",
+    "wicker_basket_01", "GreenChair_01", "desk_lamp_arm_01", "book_encyclopedia_set_01", "marble_bust_01",
+    "magnifying_glass_01", "chess_set", "gaming_console", "cassette_player", "standing_chalkboard_01",
+    "brass_pot_01", "wooden_spoon", "hand_plane_no4", "cross_pein_hammer", "chemistry_set", "binoculars",
+    "treasure_chest", "postcard_set_01", "moon_rock_01", "vintage_spacecraft_instrument", "seadogs_compass",
 ]
 TEXTURES = {  # id: max size of the diffuse map
     "rectangular_parquet": 1024, "herringbone_parquet": 1024, "beige_wall_001": 512, "red_brick_03": 512,
     "velour_velvet": 512, "white_plaster_02": 512,
+    "brown_leather": 512, "kitchen_wood": 1024, "marble_01": 1024, "leafy_grass": 512,
 }
-MODEL_TEX_MAX = 512
+MODEL_TEX_MAX = 1024      # colour maps; normal/roughness maps stay at 512
 
 
 def get(url):
@@ -62,7 +70,7 @@ def fetch_model(mid):
         if os.path.exists(p):
             continue
         os.makedirs(os.path.dirname(p), exist_ok=True)
-        open(p, "wb").write(shrink(get(info["url"]), MODEL_TEX_MAX, rel))
+        open(p, "wb").write(shrink(get(info["url"]), MODEL_TEX_MAX if "diff" in rel.lower() else 512, rel))
     return sum(os.path.getsize(os.path.join(dp, f)) for dp, _, fs in os.walk(dest) for f in fs)
 
 
