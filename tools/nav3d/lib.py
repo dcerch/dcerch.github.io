@@ -172,7 +172,7 @@ def wallquad(name, x0, x1, z0, z1, y, material=None, **k):
 def sidequad(name, y0, y1, z0, z1, x, material=None, facing=1, **k):
     """Upright quad on a side wall at x. facing=+1: faces +X (on the left wall); -1: faces -X (right wall).
     UV u runs from the near edge (small y) to the far edge on the left wall, and far->near... always 'reads' correctly."""
-    pts = [(x, y1, z0), (x, y0, z0), (x, y0, z1), (x, y1, z1)] if facing > 0 else [(x, y0, z0), (x, y1, z0), (x, y1, z1), (x, y0, z1)]
+    pts = [(x, y0, z0), (x, y1, z0), (x, y1, z1), (x, y0, z1)] if facing > 0 else [(x, y1, z0), (x, y0, z0), (x, y0, z1), (x, y1, z1)]
     return quad(name, pts, material, **k)
 
 def floorquad(name, x0, x1, y0, y1, z, material=None, **k):

@@ -12,6 +12,7 @@ import { PROFILE, CATS, CERTIFICATIONS, APPS, TRINKETS } from "../data.js";
 import { kidspace, drawerWin } from "./kidspace.js";
 import { manualsRoomContent, manualViewer } from "./manuals.js";
 import { symbolsClick, faq, retired } from "./v35.js";
+import * as R from "./rendered.js";
 
 const W = 800, H = 600;
 const svg = (body, extraDefs = "") => `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">${A.defs(extraDefs)}${body}</svg>`;
@@ -22,6 +23,16 @@ const at = (c, x, y, z, fn) => { const [px, py] = c(x, y, z); return fn(px, py);
 
 // ---------------------------------------------------------------- Living Room (the hub)
 function living(api) {
+  if (R.has("v39_living")) {
+    const tq = R.anchor("v39_living", "tvScreen"), tb = tq && R.quadBox(tq);
+    const clue = api.arg.step === 2 && tb ? `<rect x="${tb.x}" y="${tb.y}" width="${tb.w}" height="${tb.h}" fill="#0a1a10"/><text x="${tb.cx}" y="${tb.cy}" font-size="${Math.max(6, tb.w / 14)}" font-family="monospace" fill="#5f5" text-anchor="middle">click the symbols</text>` : "";
+    const ov = R.imageOnQuad(R.anchor("v39_living", "portrait"), api.portrait()) + clue;
+    const extra = api.arg.step >= 3 ? [{ k: "khajiit", svg: `<g transform="translate(262 470) scale(1.2)">${merchant()}</g>` }] : [];
+    return svg(R.scene("v39_living", { overlays: ov, extraHots: extra }));
+  }
+  return livingSVG(api);
+}
+function livingSVG(api) {
   const c = cam(), Wd = 3.2, D = 4.2, Hh = 3.8;
   const back = A.lingrad([[0, "#f4f2ee"], [0.6, "#e2ddd4"], [1, "#c9c0b0"]]), right = A.lingrad([[0, "#b8b0a2"], [1, "#e6e0d6"]], 1, 0);
   const ceil = A.lingrad([[0, "#d8d4cc"], [1, "#f4f2ee"]]), floor = A.lingrad([[0, "#d8a868"], [1, "#9a6630"]]), sky = A.lingrad([[0, "#1a3a8a"], [0.6, "#6a9ae0"], [1, "#cfe0f8"]]);
@@ -94,6 +105,10 @@ function merchant() {
 
 // ---------------------------------------------------------------- Info Room
 function info(api) {
+  if (R.has("v39_info")) return svg(R.scene("v39_info", { overlays: R.clockHands(R.anchor("v39_info", "clock")) }));
+  return infoSVG(api);
+}
+function infoSVG(api) {
   const c = A.camera({ cx: 400, hy: 260, K: 600, f: 2.5, eye: 1.6 }), Wd = 3.3, D = 3.6, Hh = 3.0;
   const back = A.lingrad([[0, "#5a5450"], [1, "#a89c90"]]), left = A.lingrad([[0, "#4a4440"], [1, "#8a8078"]], 1, 0), right = A.lingrad([[0, "#9a9088"], [1, "#d8d0c4"]], 1, 0);
   const ceil = A.lingrad([[0, "#3a3634"], [1, "#6a6460"]]), floor = A.lingrad([[0, "#c87a3a"], [1, "#8a4a1a"]]);
@@ -128,6 +143,28 @@ function info(api) {
 
 // ---------------------------------------------------------------- Software Library (straight on, like a cabinet)
 function software(api) {
+  if (!R.has("v39_software")) return softwareSVG(api);
+  const st = api.state.sl || (api.state.sl = { cat: CATS39[0], page: 0 });
+  const items = SOFTWARE.filter(x => x.c39 === st.cat), per = 9, pages = Math.max(1, Math.ceil(items.length / per));
+  st.page = Math.min(st.page, pages - 1);
+  const room = "v39_software", an = k => R.anchor(room, k);
+  let ov = "";
+  CATS39.forEach((cat, i) => {
+    const q = an("cat" + i); if (!q) return;
+    const b = R.quadBox(q), on = cat === st.cat;
+    ov += `${on ? `<rect x="${b.x - 3}" y="${b.y - 2}" width="${b.w * 1.2}" height="${b.h + 4}" fill="#f8e8a0" opacity=".2"/>` : ""}<text x="${b.x + 4}" y="${b.cy + 4}" font-size="${Math.min(12, b.h * 0.45, b.w / (cat.length * 0.56))}" font-family="Arial" font-weight="bold" fill="${on ? "#fff4c0" : "#f2dcc0"}" stroke="#2a0802" stroke-width=".6" paint-order="stroke">${A.esc(cat)}</text>
+      <circle cx="${b.x + b.w * 1.109}" cy="${b.cy}" r="3.6" fill="${on ? "#ff3030" : "#4a0a0a"}"/>${on ? `<circle cx="${b.x + b.w * 1.109}" cy="${b.cy}" r="8" fill="#ff4040" opacity=".35" filter="url(#blur2)"/>` : ""}`;
+  });
+  const shown = items.slice(st.page * per, st.page * per + per);
+  const extra = shown.map((it, i) => ({ k: "sw-" + SOFTWARE.indexOf(it), svg: R.softbox(an("slot" + i), it, "l" + i) }));
+  const pl = an("pageLbl"), pb = pl && R.quadBox(pl);
+  if (pb) ov += `<text x="${pb.cx}" y="${pb.cy + 4}" font-size="11" fill="#f0d8a0" text-anchor="middle" font-family="Arial">${st.page + 1} / ${pages}</text>`;
+  const hidden = [];
+  if (st.page === 0) hidden.push("prev");
+  if (st.page >= pages - 1) hidden.push("next");
+  return svg(R.scene(room, { overlays: ov, extraHots: extra, hidden }));
+}
+function softwareSVG(api) {
   const st = api.state.sl || (api.state.sl = { cat: CATS39[0], page: 0 });
   const items = SOFTWARE.filter(x => x.c39 === st.cat), per = 9, pages = Math.max(1, Math.ceil(items.length / per));
   st.page = Math.min(st.page, pages - 1);
@@ -165,6 +202,20 @@ function software(api) {
 
 // ---------------------------------------------------------------- WorkSpace
 function workspace(api) {
+  if (!R.has("v39_workspace")) return workspaceSVG(api);
+  const room = "v39_workspace", an = k => R.anchor(room, k);
+  let ov = "";
+  CERTIFICATIONS.slice(0, 6).forEach((cert, i) => {
+    const q = an("cert" + i); if (!q) return;
+    const b = R.quadBox(q);
+    ov += `<rect x="${b.x}" y="${b.y + b.h * 0.78}" width="${b.w}" height="${b.h * 0.22}" fill="${cert.color}"/><text x="${b.cx}" y="${b.y + b.h * 0.34}" font-size="${b.h * 0.2}" font-family="Georgia,serif" font-weight="bold" fill="#3a2a10" text-anchor="middle">${A.esc(cert.code.length > 10 ? cert.code.slice(0, 10) : cert.code)}</text><text x="${b.cx}" y="${b.y + b.h * 0.62}" font-size="${b.h * 0.11}" font-family="Arial" fill="#5a4a30" text-anchor="middle">${A.esc(cert.issuer.slice(0, 22))}</text>`;
+  });
+  const cq = an("calendar"), cb = cq && R.quadBox(cq);
+  if (cb) { const d = new Date(); ov += `<text x="${cb.cx}" y="${cb.y + cb.h * 0.17}" font-size="${cb.h * 0.13}" font-family="Arial" font-weight="bold" fill="#fff" text-anchor="middle">${d.toLocaleString([], { month: "short" }).toUpperCase()}</text><text x="${cb.cx}" y="${cb.y + cb.h * 0.72}" font-size="${cb.h * 0.42}" font-family="Arial Black,Arial" fill="#222" text-anchor="middle">${d.getDate()}</text>`; }
+  ["Forms", "Personal Docs", "Business"].forEach((t, i) => { const q = an("fileLbl" + i), b = q && R.quadBox(q); if (b) ov += `<text x="${b.cx}" y="${b.cy + b.h * 0.3}" font-size="${Math.min(b.h * 0.8, b.w / (t.length * 0.55))}" font-family="Arial" font-weight="bold" fill="#222" text-anchor="middle">${t}</text>`; });
+  return svg(R.scene(room, { overlays: ov }));
+}
+function workspaceSVG(api) {
   const c = A.camera({ cx: 400, hy: 250, K: 600, f: 2.5, eye: 1.5 }), Wd = 3.0, D = 3.4, Hh = 2.8;
   const back = A.lingrad([[0, "#d8e0e8"], [1, "#a8b4c4"]]), side = A.lingrad([[0, "#c0c8d4"], [1, "#8a96a8"]], 1, 0), sideR = A.lingrad([[0, "#8a96a8"], [1, "#c0c8d4"]], 1, 0);
   const ceil = A.lingrad([[0, "#a8b0bc"], [1, "#e0e4ea"]]), floor = A.lingrad([[0, "#5a6a7a"], [1, "#2a3440"]]);
@@ -190,6 +241,17 @@ function workspace(api) {
 
 // ---------------------------------------------------------------- MySpace (spooky, for older kids; no toolbar)
 function myspace(api) {
+  if (!R.has("v39_myspace")) return myspaceSVG(api);
+  const room = "v39_myspace", an = k => R.anchor(room, k);
+  let ov = "";
+  ["Friends", "Paintings", "Homework", "Personal", "Misc."].forEach((t, i) => { const q = an("drawer" + i), b = q && R.quadBox(q); if (b) ov += `<text x="${b.x + 2}" y="${b.cy + b.h * 0.3}" font-size="${Math.min(b.h * 0.85, 13)}" font-family="Arial" font-weight="bold" fill="#e8d8ff">${t}</text>`; });
+  const sq = an("symbols"), sb = sq && R.quadBox(sq);
+  if (sb && api.arg.step >= 3) ov += `<rect x="${sb.x}" y="${sb.y}" width="${sb.w}" height="${sb.h}" fill="#0a3a1a"/><text x="${sb.cx}" y="${sb.cy + sb.h * 0.25}" font-size="${sb.h * 0.7}" text-anchor="middle" fill="#5f5" font-family="serif">☉ ☽ ♄ ♃ ☿</text>`;
+  const wq = an("window"), wb = wq && R.quadBox(wq);
+  if (wb && api.state.msLever) ov += `<radialGradient id="msNet2" cx=".5" cy=".5" r=".55"><stop offset="0" stop-color="#7affd0"/><stop offset=".55" stop-color="#2a8ad0"/><stop offset="1" stop-color="#1a0a4a"/></radialGradient><circle cx="${wb.cx}" cy="${wb.cy}" r="${wb.w * 0.47}" fill="url(#msNet2)"/><text x="${wb.cx}" y="${wb.cy + wb.h * 0.12}" font-size="${wb.h * 0.36}" text-anchor="middle">🌐</text>`;
+  return svg(R.scene(room, { overlays: ov }));
+}
+function myspaceSVG(api) {
   let s = `<rect width="800" height="600" fill="url(#msWall)"/>`;
   s += `<rect x="40" y="250" width="220" height="250" fill="url(#msStone)"/><rect x="40" y="236" width="230" height="18" fill="#3a2a1a"/>`;
   s += `<rect x="85" y="330" width="130" height="170" fill="#0a0404"/><ellipse cx="150" cy="490" rx="50" ry="12" fill="#ff7a1a" opacity=".6" filter="url(#glow)"/>${[0, 1, 2].map(i => `<path class="flame" d="M${120 + i * 30} 490 q-12 -30 0 -60 q12 30 0 60z" fill="${["#ffb020", "#ff7a1a", "#ffd060"][i]}"/>`).join("")}`;
@@ -225,7 +287,14 @@ const MS_GAMES = [["doom", "👹"], ["minesweeper", "💣"], ["app-kojima", "�
 // ---------------------------------------------------------------- GameRoom
 const GR_GAMES = [["solitaire", "🂡"], ["minesweeper", "💣"], ["pinball", "🚀"], ["doom", "👹"], ["app-kojima", "📦"], ["app-lostatsea", "🛟"], ["app-everybodyisjohn", "🎲"], ["tk-pointkeeper", "📝"], ["tk-oneshot", "🐉"]];
 function gameroom(api) {
-  const c = A.camera({ cx: 400, hy: 250, K: 600, f: 2.5, eye: 1.5 }), Wd = 3.0, D = 3.4, Hh = 2.8;
+  if (!R.has("v39_gameroom")) return gameroomSVG(api);
+  const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const sail = still ? "" : `<animateTransform attributeName="transform" type="translate" from="-0.35 0" to="1.35 0" dur="16s" repeatCount="indefinite"/>`;
+  const boat = `<clipPath id="portClip" clipPathUnits="userSpaceOnUse"><circle cx=".5" cy=".5" r=".47"/></clipPath><g clip-path="url(#portClip)" pointer-events="none"><g>${sail}<path d="M-.12 .56 h.2 l-.04 .05 h-.12z" fill="#fff"/><path d="M-.03 .55 v-.17 l.1 .16z" fill="#f4f4fa"/><path d="M-.04 .55 v-.12 l-.06 .11z" fill="#e8e0d0"/></g></g>`;
+  return svg(R.scene("v39_gameroom", { overlays: R.onQuad(R.anchor("v39_gameroom", "port"), boat) }));
+}
+function gameroomSVG(api) {
+  const c =  A.camera({ cx: 400, hy: 250, K: 600, f: 2.5, eye: 1.5 }), Wd = 3.0, D = 3.4, Hh = 2.8;
   const back = A.lingrad([[0, "#2a4a3a"], [1, "#1a2a22"]]), side = A.lingrad([[0, "#1a3a2a"], [1, "#2a4a3a"]], 1, 0), sideR = A.lingrad([[0, "#2a4a3a"], [1, "#1a3a2a"]], 1, 0);
   const ceil = A.lingrad([[0, "#0a1a12"], [1, "#2a3a32"]]), floor = A.lingrad([[0, "#7a2a2a"], [1, "#3a0a0a"]]);
   let s = back.def + side.def + sideR.def + ceil.def + floor.def;

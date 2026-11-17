@@ -115,7 +115,16 @@ The site has always hidden a small alternate-reality game, and it works in both 
 
 ## 🧱 How it's built
 
-It's static files on GitHub Pages, with no framework, no bundler and no 3D engine. Navigator's rooms are SVG drawn through a tiny one-point "camera" (`js/nav2d/art.js`), so walls, shelves and furniture share one perspective like a pre-rendered 1995 scene. Each room is a fixed 640×480 or 800×600 stage, scaled to fit.
+It's static files on GitHub Pages, with no framework, no bundler and no 3D engine in the browser. Like the 1995 original, Navigator's main rooms are **pre-rendered**: each one is modelled in Blender (`tools/nav3d/rooms/*.py`), rendered once with Cycles, and dithered down to a 256-colour 640×480 or 800×600 PNG (`img/nav/`). The render script also exports every clickable object as a screen-space polygon, plus anchor quads for live overlays (clock hands, shelf labels, the family portrait, the boat in the porthole) into `js/nav2d/renders.js`. In the page, `js/nav2d/rendered.js` stacks invisible hotspots over the still image. The Map, Manuals and KidSpace are still SVG.
+
+To rebuild a room (Blender 4.x and Pillow):
+
+```bash
+cd tools/nav3d
+python tex.py && python tex_extra.py                  # procedural textures -> tex/
+blender -b --factory-startup -P rooms/v39_gameroom.py  # add -- --fast for a quick preview
+python post.py v39_gameroom                           # -> img/nav/*.png + js/nav2d/renders.js
+```
 
 ```
 .
@@ -127,7 +136,10 @@ It's static files on GitHub Pages, with no framework, no bundler and no 3D engin
 |   |-- desktop/              <- desktop.js, icons.js, wallpapers.js (+ wallpaper.js hills)
 |   |-- nav2d/                <- main.js (engine) · v35.js · v39.js · kidspace.js · manuals.js
 |   |                            catalog.js (boxed software) · art.js · icons.js · music.js · portrait.js
+|   |                            rendered.js + renders.js (pre-rendered rooms)
 |   `-- arg.js · audio.js · ui.js (shared panels)
+|-- img/nav/                  <- pre-rendered Navigator rooms
+|-- tools/nav3d/              <- Blender scenes that render them
 |-- apps/                     <- win95 games, DOOM, and my full apps
 |-- terminal.html             <- the previous green-screen site, preserved
 `-- toolbox.html · apps.html · 404.html
@@ -149,7 +161,7 @@ python -m http.server 8000      # then open http://localhost:8000
 
 ## 🙏 Credits & licenses
 
-* **Inspiration:** *Packard Bell Navigator* and *Ark KidSpace* (Ark Interface / Packard Bell, 1994–97). This is a fan-made homage and isn't affiliated with either. No original assets, sounds or narration are used, and all room art is original SVG.
+* **Inspiration:** *Packard Bell Navigator* and *Ark KidSpace* (Ark Interface / Packard Bell, 1994–97). This is a fan-made homage and isn't affiliated with either. No original assets, sounds or narration are used: every room is an original Blender scene or original SVG.
 * **Windows** is a trademark of Microsoft. This desktop is a lookalike with original artwork and no Microsoft files. The wallpapers are painted in code "in the spirit of" each era.
 * **DOOM:** engine [jacobenget/doom.wasm](https://github.com/jacobenget/doom.wasm) (**GPL-2.0**). The game data is the freely distributable DOOM shareware WAD, © id Software. See [`apps/doom/NOTICE.txt`](apps/doom/NOTICE.txt).
 * **Solitaire, Minesweeper, Space Pinball and Paint** are original recreations written for this site.
