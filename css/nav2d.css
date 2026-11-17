@@ -252,3 +252,9 @@ label { display: flex; align-items: center; gap: 6px; }
 .tail { transform-box: fill-box; transform-origin: 0% 100%; animation: wag 1.4s ease-in-out infinite alternate; }
 @keyframes wag { to { transform: rotate(-18deg); } }
 @media (prefers-reduced-motion: reduce) { .boat, .tail, .flame, .guide .prop, .guide.talk { animation: none !important; } }
+
+/* pre-rendered rooms (tools/nav3d): invisible hotspots; the hovered object lights up */
+.rh .hit { fill: transparent; }
+.rh .lit { display: none; pointer-events: none; }
+.rh.on .lit, .rh:focus-visible .lit { display: inline; }
+.render { image-rendering: auto; }

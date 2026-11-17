@@ -9,6 +9,7 @@ import { SOFTWARE, CATS35, CAT_INFO } from "./catalog.js";
 import { CERTIFICATIONS, VOLUNTEERING, PROFILE, ARCHIVE, CATS } from "../data.js";
 import { kidspace } from "./kidspace.js";
 import { manualsRoomContent, manualViewer } from "./manuals.js";
+import * as R from "./rendered.js";
 
 const W = 640, H = 480;
 const svg = (body, extraDefs = "") => `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">${A.defs(extraDefs)}${body}</svg>`;
@@ -17,6 +18,20 @@ const cam = () => A.camera({ cx: 320, hy: 205, K: 430, f: 2.5, eye: 1.45 });
 
 // ---------------------------------------------------------------- Living Room
 function living(api) {
+  if (R.has("v35_living")) {
+    const ov = R.imageOnQuad(R.anchor("v35_living", "portrait"), api.portrait()) + R.clockHands(R.anchor("v35_living", "clock")) + tvClue(api, R.anchor("v35_living", "tvScreen"));
+    const extra = [{ k: "cat", svg: A.cat(150, 452, 1.05, CATS[2] || {}) }];
+    if (api.arg.step >= 3) extra.push({ k: "khajiit", svg: merchantCat(86, 300) });
+    return svg(R.scene("v35_living", { overlays: ov, extraHots: extra }));
+  }
+  return livingSVG(api);
+}
+function tvClue(api, q) {
+  if (!q || api.arg.step !== 2) return "";
+  const b = R.quadBox(q);
+  return `<rect x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" fill="#0a1a10"/><text x="${b.cx}" y="${b.cy}" font-size="${Math.max(6, b.w / 22)}" font-family="monospace" fill="#5f5" text-anchor="middle">You decide to click the symbols.</text>`;
+}
+function livingSVG(api) {
   const c = cam(), Wd = 3, D = 3.5, Hh = 2.8;
   const back = A.lingrad([[0, "#efe4cc"], [1, "#cdb994"]]), side = A.lingrad([[0, "#d8c8a8"], [1, "#b09a74"]], 1, 0), sideR = A.lingrad([[0, "#b09a74"], [1, "#d8c8a8"]], 1, 0);
   const ceil = A.lingrad([[0, "#c8bca0"], [1, "#efe6d0"]]), floor = A.lingrad([[0, "#8a4a22"], [1, "#5a2a10"]]);
@@ -104,6 +119,14 @@ function merchantCat(x, y) {
 
 // ---------------------------------------------------------------- Info Room
 function info(api) {
+  if (R.has("v35_info")) {
+    const sq = R.anchor("v35_info", "symbols"), sb = sq && R.quadBox(sq);
+    const sym = api.arg.step >= 3 && sb ? `<rect x="${sb.x}" y="${sb.y}" width="${sb.w}" height="${sb.h}" fill="#0a3a1a"/><text x="${sb.cx}" y="${sb.cy + sb.h * 0.25}" font-size="${sb.h * 0.7}" text-anchor="middle" fill="#5f5" font-family="serif">☉ ☽ ♄ ♃ ☿</text>` : "";
+    return svg(R.scene("v35_info", { overlays: R.clockHands(R.anchor("v35_info", "clock")) + sym }));
+  }
+  return infoSVG(api);
+}
+function infoSVG(api) {
   const c = cam(), Wd = 3, D = 3.5, Hh = 2.8;
   const back = A.lingrad([[0, "#e8e2d4"], [1, "#c4baa4"]]), side = A.lingrad([[0, "#d8d0bc"], [1, "#a89e88"]], 1, 0), sideR = A.lingrad([[0, "#a89e88"], [1, "#d8d0bc"]], 1, 0);
   const ceil = A.lingrad([[0, "#bcb4a0"], [1, "#ece6d8"]]), floor = A.lingrad([[0, "#9a5a2a"], [1, "#5a2a10"]]);
@@ -161,7 +184,30 @@ function info(api) {
 }
 
 // ---------------------------------------------------------------- Software Room
+const PER35 = () => (R.has("v35_software") ? 12 : 9);
 function software(api) {
+  if (!R.has("v35_software")) return softwareSVG(api);
+  const st = api.state.sw || (api.state.sw = { cat: CATS35[0], page: 0 });
+  const items = SOFTWARE.filter(x => x.c35 === st.cat), per = 12, pages = Math.max(1, Math.ceil(items.length / per));
+  st.page = Math.min(st.page, pages - 1);
+  const room = "v35_software", an = k => R.anchor(room, k);
+  let ov = "";
+  CATS35.forEach((cat, i) => {
+    const q = an("cat" + i); if (!q) return;
+    const b = R.quadBox(q), on = cat === st.cat;
+    ov += `${on ? `<rect x="${b.x - 3}" y="${b.y - 2}" width="${b.w * 1.2}" height="${b.h + 4}" fill="#f8e8a0" opacity=".22"/>` : ""}<text x="${b.x + 4}" y="${b.cy + 4}" font-size="${Math.min(12, b.h * 0.42, b.w / (cat.length * 0.58))}" font-family="Arial" font-weight="bold" fill="${on ? "#fff4c0" : "#f2dcc0"}" stroke="#2a0802" stroke-width=".6" paint-order="stroke">${A.esc(cat)}</text>
+      <circle cx="${b.x + b.w * 1.109}" cy="${b.cy}" r="3.4" fill="${on ? "#ff3030" : "#4a0a0a"}"/>${on ? `<circle cx="${b.x + b.w * 1.109}" cy="${b.cy}" r="8" fill="#ff4040" opacity=".35" filter="url(#blur2)"/>` : ""}`;
+  });
+  const shown = items.slice(st.page * per, st.page * per + per);
+  const extra = shown.map((it, i) => ({ k: "sw-" + SOFTWARE.indexOf(it), svg: R.softbox(an("slot" + i), it, i) }));
+  const pl = an("pageLbl"), pb = pl && R.quadBox(pl);
+  if (pb) ov += `<text x="${pb.cx}" y="${pb.cy + 4}" font-size="10" fill="#f0d8a0" text-anchor="middle" font-family="Arial">page ${st.page + 1} of ${pages}</text>`;
+  const hidden = [];
+  if (st.page === 0) hidden.push("prev");
+  if (st.page >= pages - 1) hidden.push("next");
+  return svg(R.scene(room, { overlays: ov, extraHots: extra, hidden }));
+}
+function softwareSVG(api) {
   const st = api.state.sw || (api.state.sw = { cat: CATS35[0], page: 0 });
   const items = SOFTWARE.filter(x => x.c35 === st.cat), per = 9, pages = Math.max(1, Math.ceil(items.length / per));
   st.page = Math.min(st.page, pages - 1);
@@ -268,7 +314,7 @@ const hots = {
     "door-info": { cap: "Doorway to the Info Room", info: "This doorway leads to the Info Room.", act: { room: "info" } },
     "door-living": { cap: "Doorway to the Living Room", info: "This doorway leads back to the Living Room.", act: { room: "living" } },
     prev: { cap: "Previous shelves", info: "Returns you to the previous set of software shelves.", act: api => { const s = api.state.sw; if (s.page > 0) { s.page--; api.go("software", { quiet: true }); } } },
-    next: { cap: "More shelves", info: "This button lets you see additional shelves in this category.", act: api => { const s = api.state.sw, n = SOFTWARE.filter(x => x.c35 === s.cat).length; if ((s.page + 1) * 9 < n) { s.page++; api.go("software", { quiet: true }); } } },
+    next: { cap: "More shelves", info: "This button lets you see additional shelves in this category.", act: api => { const s = api.state.sw, n = SOFTWARE.filter(x => x.c35 === s.cat).length; if ((s.page + 1) * PER35() < n) { s.page++; api.go("software", { quiet: true }); } } },
     install: { cap: "Add software", info: "To install new software, click the + button, then follow the simple instructions.", act: api => install(api) },
     trash: { cap: "Trash can: retired software", info: "Holding retired software. Click to read what used to be on these shelves.", act: api => retired(api) }
   },
