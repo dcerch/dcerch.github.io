@@ -31,10 +31,17 @@ box("infoBack", X0, -1.5, Y1 + 2.6, Y1 + 2.7, 0, H, mat("infoWall", "#8a2414", r
 box("infoBooks", -4.0, -2.6, Y1 + 2.55, Y1 + 2.6, 0.2, 2.2, image("redBooks", T("books_red.png")), bevel=0)
 area("infoLight", (-3.3, Y1 + 1.3, 3.1), 0.9, 140, "#ffe0b0", target=(-3.3, Y1 + 1.3, 0))
 # beyond the right door: the Living Room (sofa and a window)
-box("livBack", 1.5, X1, Y1 + 2.6, Y1 + 2.7, 0, H, wall, bevel=0)
-box("livSofa", 2.8, 4.1, Y1 + 1.9, Y1 + 2.55, 0, 0.75, mat("sofa", "#a81c1c", rough=0.7), bevel=0.06)
-wallquad("livWin", 2.9, 3.9, 1.0, 2.2, Y1 + 2.59, image("yardImg", T("ext_garden.png"), emit=1.2, rough=1))
-area("livLight", (3.3, Y1 + 1.3, 3.1), 0.9, 160, "#ffe0b0", target=(3.3, Y1 + 1.3, 0))
+# the Living Room beyond is a sunny glass wall onto the garden (real geometry, so the sun pours back through the door)
+for i, x in enumerate((1.6, 2.5, 3.4, 4.2)):
+    box(f"livMul{i}", x - 0.04, x + 0.04, Y1 + 2.6, Y1 + 2.68, 0, H, mat("mullion", "#f4f0e6", rough=0.35), bevel=0.004)
+box("livTransom", 1.5, X1, Y1 + 2.6, Y1 + 2.68, 2.1, 2.16, mat("mullion", "#f4f0e6", rough=0.35), bevel=0.004)
+box("livHead", 1.5, X1, Y1 + 2.6, Y1 + 2.7, 2.6, H, wall, bevel=0)
+box("livSofa", 2.6, 4.0, Y1 + 1.7, Y1 + 2.35, 0, 0.75, mat("sofa", "#a81c1c", rough=0.7), bevel=0.06)
+box("swLawn", -20, 20, Y1 + 2.7, Y1 + 30, -0.05, -0.02, grass(), bevel=0)
+tree("swTree0", 2.4, Y1 + 6.5, 1.5, seed=31); tree("swTree1", 5.5, Y1 + 9, 1.3, seed=32, kind="tall")
+hedge("swHedge", -4, 9, Y1 + 11, Y1 + 12, 1.3)
+sun("sun", (-0.25, -0.85, -0.55), energy=5.0, color="#fff0d0", angle=0.5)
+area("livLight", (3.3, Y1 + 1.3, 3.1), 0.9, 90, "#ffe0b0", target=(3.3, Y1 + 1.3, 0))
 group("door-info", *door["L"]); group("door-living", *door["R"])
 
 # ---------------------------------------------------------------- the cabinet
@@ -83,10 +90,10 @@ wallquad("pcScr", 2.71, 3.09, 1.05, 1.37, 2.64, image("pcDesk", T("pc_desktop.pn
 
 
 # ---------------------------------------------------------------- lights + camera
-world("#bcd8f0", 0.4)
-area("ceilingMain", (0, 1.8, 3.15), 3.5, 280, "#fff2dc", target=(0, 2.6, 0), size_y=2.0)
+world("#a8ccf0", 0.35)
+area("ceilingMain", (0, 1.8, 3.15), 3.5, 200, "#fff2dc", target=(0, 2.6, 0), size_y=2.0)["soft"] = 1
 spot("cabSpot", (0, 0.4, 3.1), (0.3, C0, 1.3), 320, "#fff0d0", angle=70, blend=0.6)
 area("frontFill", (0.5, -1.2, 2.4), 2.5, 80, "#fff4e4", target=(0, 4, 1))
 ceiling_cans((-1.2, 1.2), 2.2, H)
-camera((0.0, 0.0, 1.5), (0.0, 6.0, 1.5), lens=20, shift_y=0.03)
-render("v35_software", 640, 480, samples=160, look="Punchy", exposure=-0.15)
+camera((0.0, -0.1, 1.5), (0.0, 6.0, 1.5), lens=20, shift_y=0.03)
+render("v35_software", 640, 480, samples=160, exposure=-0.45)

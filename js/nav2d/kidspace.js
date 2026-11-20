@@ -103,15 +103,20 @@ function guideSVG(pose = 0) {
 function render(api) {
   const st = api.state.ks || (api.state.ks = { theme: "space", view: 0, names: false });
   const space = st.theme === "space";
-  let s = outside(st.theme, st.view) + roomShell(st.theme);
+  // The room itself is a pre-rendered still (tools/nav3d/rooms/kidspace.py); the SVG only adds the interactive
+  // sprites on top, as in the original. Set R = false to fall back to the old flat-drawn room.
+  const R = true, bg = `kid_${st.theme}${st.view}`;
+  let s = R ? `<image href="img/nav/${bg}.png" x="0" y="0" width="800" height="600" preserveAspectRatio="none"/>` : outside(st.theme, st.view) + roomShell(st.theme);
   // pillar clock + exit door
   s += hot("k-clock", `<circle cx="665" cy="195" r="15" fill="#f8f4e8" stroke="#8a6a2a" stroke-width="3"/><g class="clock" data-cx="665" data-cy="195" data-r="13"><line class="hh" stroke="#111" stroke-width="2"/><line class="mh" stroke="#111" stroke-width="1.4"/><line class="sh" stroke="#b01010" stroke-width=".6"/></g>`);
   s += hot("k-exit", `<g transform="translate(652 268) rotate(-6)"><rect x="0" y="0" width="34" height="46" rx="2" fill="#6a4a1a" stroke="#2a1a08" stroke-width="2"/><rect x="5" y="5" width="24" height="36" fill="#8a2a1a"/><circle cx="24" cy="24" r="2.4" fill="#e8c020"/><text x="17" y="-4" font-size="9" font-family="Arial" font-weight="bold" fill="#fff" text-anchor="middle">EXIT</text></g>`);
   // the bookcase, with programs on its shelves
   const bc = space ? ["#9a8ad8", "#6a5aa8", "#4a3a88"] : ["#a87a4a", "#7a5428", "#5a3a18"];
-  s += `<path d="M120 238 L270 238 L290 250 L290 600 L120 600Z" fill="${bc[1]}"/><rect x="120" y="238" width="160" height="362" fill="${bc[0]}"/><rect x="132" y="252" width="136" height="230" fill="${bc[2]}"/>`;
-  [322, 400, 478].forEach(y => (s += `<rect x="132" y="${y}" width="136" height="7" fill="${bc[0]}"/>`));
-  s += `<rect x="132" y="490" width="64" height="100" fill="${bc[2]}" stroke="${bc[0]}" stroke-width="3"/><rect x="204" y="490" width="64" height="100" fill="${bc[2]}" stroke="${bc[0]}" stroke-width="3"/><circle cx="188" cy="540" r="3" fill="#e8c020"/><circle cx="212" cy="540" r="3" fill="#e8c020"/>`;
+  if (!R) {
+    s += `<path d="M120 238 L270 238 L290 250 L290 600 L120 600Z" fill="${bc[1]}"/><rect x="120" y="238" width="160" height="362" fill="${bc[0]}"/><rect x="132" y="252" width="136" height="230" fill="${bc[2]}"/>`;
+    [322, 400, 478].forEach(y => (s += `<rect x="132" y="${y}" width="136" height="7" fill="${bc[0]}"/>`));
+    s += `<rect x="132" y="490" width="64" height="100" fill="${bc[2]}" stroke="${bc[0]}" stroke-width="3"/><rect x="204" y="490" width="64" height="100" fill="${bc[2]}" stroke="${bc[0]}" stroke-width="3"/><circle cx="188" cy="540" r="3" fill="#e8c020"/><circle cx="212" cy="540" r="3" fill="#e8c020"/>`;
+  }
   SHELF.forEach(([id, g, name], i) => {
     const r = Math.floor(i / 3), c = i % 3, x = 150 + c * 42, y = 286 + r * 78;
     s += hot("k-app-" + i, `<g class="kapp" data-app="${i}"><rect x="${x - 2}" y="${y - 2}" width="36" height="36" rx="5" fill="#fff" opacity=".18"/><text x="${x + 16}" y="${y + 26}" font-size="26" text-anchor="middle">${g}</text></g>` + tag(x + 16, y - 8, name));
@@ -121,15 +126,20 @@ function render(api) {
   s += hot("k-jar", `<g transform="translate(210 196)"><rect x="-17" y="0" width="34" height="42" rx="6" fill="#bfe0f0" opacity=".55" stroke="#8ab0c0"/><rect x="-19" y="-6" width="38" height="8" rx="2" fill="#c83a2a"/><path class="critter" d="M0 30 q-12 -2 -10 -14 q2 -10 10 -10 q8 0 10 10 q2 12 -10 14z M-6 30 l-6 8 M0 30 v8 M6 30 l6 8" fill="#c83a7a" stroke="#7a1a4a"/><circle cx="-3" cy="16" r="2" fill="#fff"/><circle cx="4" cy="16" r="2" fill="#fff"/></g>`);
   // the dresser with five drawers + the parents' cubby
   const dr = space ? ["#c8c8d0", "#7a7a88", "#3a3a48", "#1a1a24"] : ["#c86a4a", "#8a3a20", "#5a2010", "#3a1408"];
-  s += `<path d="M700 196 L716 186 L800 186 L800 600 L700 600Z" fill="${dr[1]}"/><rect x="706" y="196" width="94" height="404" fill="${dr[0]}" opacity=".9"/>`;
+  if (!R) s += `<path d="M700 196 L716 186 L800 186 L800 600 L700 600Z" fill="${dr[1]}"/><rect x="706" y="196" width="94" height="404" fill="${dr[0]}" opacity=".9"/>`;
   DRAWERS.forEach(([name], i) => {
-    const y = 206 + i * 56, open = st.open === i;
-    s += hot("k-drawer-" + i, `<g class="drawer${open ? " open" : ""}"><rect x="${open ? 690 : 714}" y="${y}" width="${open ? 110 : 86}" height="46" fill="${dr[2]}" stroke="${dr[3]}" stroke-width="2"/><rect x="${(open ? 690 : 714) + 4}" y="${y + 4}" width="${(open ? 110 : 86) - 8}" height="38" fill="none" stroke="${dr[0]}" stroke-width="1" opacity=".6"/><text x="${(open ? 690 : 714) + 12}" y="${y + 28}" font-size="12" font-family="Arial" font-weight="bold" fill="#fff">${A.esc(name)}</text></g>`);
+    const y = 206 + i * 56, open = st.open === i, x = open ? 690 : 714, w = open ? 110 : 86;
+    // closed drawers are part of the render: just an engraved label (and an invisible hit area)
+    const face = open || !R ? `<rect x="${x}" y="${y}" width="${w}" height="46" fill="${dr[2]}" stroke="${dr[3]}" stroke-width="2"/><rect x="${x + 4}" y="${y + 4}" width="${w - 8}" height="38" fill="none" stroke="${dr[0]}" stroke-width="1" opacity=".6"/>`
+      : `<rect x="${x}" y="${y}" width="${w}" height="46" fill="#fff" opacity="0"/>`;
+    s += hot("k-drawer-" + i, `<g class="drawer${open ? " open" : ""}">${face}<text x="${x + 18}" y="${y + 28}" font-size="12" font-family="Arial" font-weight="bold" fill="#fff" stroke="#000" stroke-width="2.4" paint-order="stroke">${A.esc(name)}</text></g>`);
   });
-  s += hot("k-prefs", `<rect x="714" y="490" width="86" height="72" fill="${dr[3]}" stroke="${dr[0]}" stroke-width="2"/><text x="735" y="530" font-size="20">🔧</text><text x="770" y="530" font-size="20">📋</text>` + tag(757, 484, "For Mom & Dad"));
+  s += hot("k-prefs", `<rect x="714" y="490" width="86" height="72" fill="${dr[3]}" opacity="${R ? 0 : 1}" stroke="${dr[0]}" stroke-width="2"/><text x="735" y="530" font-size="20">🔧</text><text x="770" y="530" font-size="20">📋</text>` + tag(757, 484, "For Mom & Dad"));
   // the desk: hazard-striped mat, help box, floppy, glasses, levers, online sign
-  s += `<path d="M230 476 L640 476 L700 560 L170 560Z" fill="${space ? "#3a3a44" : "#7a5430"}"/><rect x="170" y="560" width="530" height="18" fill="${space ? "#22222a" : "#4a3018"}"/><rect x="196" y="578" width="14" height="22" fill="#222"/><rect x="660" y="578" width="14" height="22" fill="#222"/>`;
-  s += `<path d="M300 486 L560 486 L596 548 L262 548Z" fill="url(#hazard)"/><path d="M318 494 L544 494 L572 540 L288 540Z" fill="${space ? "#5a5a66" : "#b88a54"}"/>`;
+  if (!R) {
+    s += `<path d="M230 476 L640 476 L700 560 L170 560Z" fill="${space ? "#3a3a44" : "#7a5430"}"/><rect x="170" y="560" width="530" height="18" fill="${space ? "#22222a" : "#4a3018"}"/><rect x="196" y="578" width="14" height="22" fill="#222"/><rect x="660" y="578" width="14" height="22" fill="#222"/>`;
+    s += `<path d="M300 486 L560 486 L596 548 L262 548Z" fill="url(#hazard)"/><path d="M318 494 L544 494 L572 540 L288 540Z" fill="${space ? "#5a5a66" : "#b88a54"}"/>`;
+  }
   s += hot("k-help", `<g transform="translate(250 520)"><path d="M-16 -16 h32 v28 h-32z" fill="url(#candy)" stroke="#5a0a0a" stroke-width="1.5"/><path d="M-16 -16 l6 -7 h32 l-6 7z" fill="#f04a4a" stroke="#5a0a0a"/><path d="M16 -16 l6 -7 v28 l-6 7z" fill="#a01a1a" stroke="#5a0a0a"/><text x="0" y="5" font-size="16" font-weight="bold" text-anchor="middle" fill="#fff" stroke="#5a0a0a" stroke-width=".6">?</text></g>` + tag(250, 492, "Help"));
   s += hot("k-floppy", `<g transform="translate(220 552) rotate(-8)"><rect x="-11" y="-11" width="22" height="22" fill="#222"/><rect x="-6" y="-11" width="12" height="8" fill="#bbb"/><rect x="-7" y="2" width="14" height="9" fill="#fff"/></g>` + tag(220, 535, "Drive A"));
   s += hot("k-names", `<g transform="translate(618 530)"><circle cx="0" cy="0" r="11" fill="#bfe0ff" opacity=".6" stroke="#5a3a1a" stroke-width="3"/><path d="M8 8 l12 12" stroke="#5a3a1a" stroke-width="5" stroke-linecap="round"/></g>` + tag(618, 510, st.names ? "Hide Names" : "Show Names"));

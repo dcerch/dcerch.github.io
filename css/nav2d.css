@@ -20,51 +20,59 @@ body.infomode #room, body.infomode .hot, body.infomode [data-tool] { cursor: hel
 .flame { animation: flicker 1.6s infinite alternate ease-in-out; transform-box: fill-box; transform-origin: 50% 100%; }
 @keyframes flicker { 0% { transform: scale(1, 1); } 40% { transform: scale(.9, 1.08); } 100% { transform: scale(1.05, .94); } }
 
-/* ---------------- 3.5 chrome ---------------- */
-.tb35 { position: absolute; left: 0; top: 0; right: 0; height: 46px; display: flex; align-items: center; gap: 6px; padding: 0 6px 0 5px; z-index: 20;
-  background: linear-gradient(rgba(70,66,60,.62), rgba(40,36,30,.42)); border-bottom: 1px solid rgba(255,255,255,.18); }
-.tb35 .maptile, .tb35 .tool { width: 36px; height: 36px; padding: 2px; border: 0; cursor: pointer; display: grid; place-items: center;
-  background: linear-gradient(#5a5650, #2a2824); box-shadow: inset 1px 1px rgba(255,255,255,.45), inset -1px -1px rgba(0,0,0,.7), 0 1px 2px rgba(0,0,0,.6); border-radius: 4px; }
-.tb35 .maptile { width: 40px; height: 40px; }
-.tb35 svg { width: 28px; height: 28px; display: block; }
-.tb35 .maptile svg { width: 32px; height: 32px; }
-.tb35 .maptile:hover, .tb35 .tool:hover { background: linear-gradient(#8a8278, #4a463e); }
-.tb35 .maptile:active, .tb35 .tool:active { box-shadow: inset -1px -1px rgba(255,255,255,.35), inset 1px 1px rgba(0,0,0,.7); }
-.tb35 .ttl { display: flex; flex-direction: column; line-height: 1; color: #f2efe6; text-shadow: 1px 1px 0 #000, 0 0 4px rgba(0,0,0,.8); margin-right: auto; }
-.tb35 .ttl b { font: bold 21px/1 Arial, sans-serif; letter-spacing: .3px; }
-.tb35 .ttl span { font-size: 14px; margin-top: 2px; color: #e2ddd0; }
-.tb35 .tools { display: flex; gap: 3px; }
-.bb35 { position: absolute; left: 0; right: 0; bottom: 0; height: 30px; background: #000; display: flex; align-items: center; gap: 6px; padding: 0 4px; z-index: 20; color: #fff; }
-.bb35 #infoBtn { width: 28px; height: 28px; padding: 0; border: 0; background: none; cursor: pointer; border-radius: 50%; }
-.bb35 #infoBtn svg { width: 26px; height: 26px; display: block; margin: auto; }
-#infoBtn.on { box-shadow: 0 0 0 2px #ffe060, 0 0 10px #ffe060; }
-.bb35 #caption { flex: 1; font: bold 12px/1.2 Arial, sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.bb35 #menuBtn { height: 20px; padding: 0 8px; border: 0; background: #c0c0c0; color: #000; font: 11px Arial; cursor: pointer; box-shadow: inset -1px -1px #404040, inset 1px 1px #fff; }
+/* ---------------- 3.5 chrome ----------------
+   A frosted-glass plaque across the top (bevelled house tile, big white title, a row of small
+   pre-rendered tool bitmaps in dark wells), and a black caption bar with the InfoGuide tile. */
+.tbi { display: block; width: 100%; height: 100%; object-fit: contain; image-rendering: auto; pointer-events: none; }
+.tb35 { position: absolute; left: 0; top: 0; right: 0; height: 54px; display: flex; align-items: center; gap: 8px; padding: 0 7px 0 6px; z-index: 20;
+  background: linear-gradient(180deg, rgba(236,238,242,.74), rgba(204,206,214,.58) 55%, rgba(150,152,162,.55));
+  -webkit-backdrop-filter: blur(1.5px); backdrop-filter: blur(1.5px);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.85), inset 0 -1px 0 rgba(0,0,0,.45), 0 2px 3px rgba(0,0,0,.35); }
+.tb35 .maptile, .tb35 .tool { border: 0; cursor: pointer; display: grid; place-items: center; padding: 2px;
+  background: linear-gradient(145deg, #3a4048, #14181c); border-radius: 0;
+  box-shadow: 0 0 0 1px #2a2c30, inset 1px 1px 0 rgba(255,255,255,.55), inset -1px -1px 0 rgba(0,0,0,.8), 1px 1px 0 rgba(255,255,255,.6); }
+.tb35 .maptile { width: 46px; height: 46px; padding: 3px; }
+.tb35 .tool { width: 38px; height: 40px; }
+.tb35 .maptile:hover, .tb35 .tool:hover { background: linear-gradient(145deg, #5a626c, #262a30); }
+.tb35 .maptile:active, .tb35 .tool:active { box-shadow: 0 0 0 1px #2a2c30, inset -1px -1px 0 rgba(255,255,255,.4), inset 2px 2px 0 rgba(0,0,0,.8); }
+.tb35 .maptile:active .tbi, .tb35 .tool:active .tbi { transform: translate(1px, 1px); }
+.tb35 .ttl { display: flex; flex-direction: column; line-height: 1; color: #fff; text-shadow: 2px 2px 0 #000, 0 0 3px rgba(0,0,0,.7); margin-right: auto; }
+.tb35 .ttl b { font: bold 26px/1 Arial, Helvetica, sans-serif; letter-spacing: .2px; }
+.tb35 .ttl span { font: 17px/1 Arial, Helvetica, sans-serif; margin-top: 2px; }
+.tb35 .tools { display: flex; gap: 4px; }
+.bb35 { position: absolute; left: 0; right: 0; bottom: 0; height: 34px; background: #000; display: flex; align-items: center; gap: 6px; padding: 0 4px 0 58px; z-index: 20; color: #fff; }
+.bb35 #infoBtn { position: absolute; left: 3px; bottom: 3px; width: 50px; height: 50px; padding: 4px; border: 0; cursor: pointer;
+  background: linear-gradient(145deg, #8a8c92, #3a3c42);
+  box-shadow: 0 0 0 1px #000, inset 2px 2px 0 rgba(255,255,255,.55), inset -2px -2px 0 rgba(0,0,0,.65); }
+.bb35 #infoBtn:active { box-shadow: 0 0 0 1px #000, inset -2px -2px 0 rgba(255,255,255,.4), inset 2px 2px 0 rgba(0,0,0,.7); }
+#infoBtn.on { outline: 2px solid #ffe060; outline-offset: 0; box-shadow: 0 0 10px #ffe060 !important; }
+.bb35 #caption { flex: 1; font: bold 13px/1.2 Arial, Helvetica, sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bb35 #menuBtn { width: 34px; height: 28px; padding: 0; border: 0; background: linear-gradient(#d8d8dc, #9a9aa0); color: #000; font: bold 9px Arial; cursor: pointer;
+  box-shadow: 0 0 0 1px #000, inset 1px 1px 0 #fff, inset -1px -1px 0 #555; align-self: center; }
+.bb35 #menuBtn:active { box-shadow: 0 0 0 1px #000, inset -1px -1px 0 #fff, inset 1px 1px 0 #555; }
 
-/* ---------------- 3.9 chrome ---------------- */
+/* ---------------- 3.9 chrome ----------------
+   No plaque: the title and the tool bitmaps float straight over the render. */
 .tb39 { position: absolute; left: 0; top: 0; right: 0; height: 62px; z-index: 20; pointer-events: none; }
 .tb39 > * { pointer-events: auto; }
 .tb39 .sec { position: absolute; left: 20px; top: 14px; }
-.tb39 .ttl { position: absolute; left: 72px; top: 6px; color: #fff; text-shadow: 1px 1px 0 #000, 0 0 6px rgba(0,0,0,.9); line-height: 1; pointer-events: none; }
-.tb39 .ttl b { font: bold 26px/1 Arial, sans-serif; display: block; }
-.tb39 .ttl span { font: 19px/1.1 Arial, sans-serif; }
-.tb39 .tools { position: absolute; right: 8px; top: 8px; display: flex; gap: 5px; align-items: center; }
-.tile39 { width: 38px; height: 38px; padding: 3px; border: 0; cursor: pointer; display: grid; place-items: center; background: #101418;
-  box-shadow: inset 0 0 0 1px #6a7078, inset 2px 2px 0 rgba(255,255,255,.25), inset -2px -2px 0 rgba(0,0,0,.6), 0 2px 3px rgba(0,0,0,.6); }
-.tile39 svg { width: 30px; height: 30px; display: block; }
-.tile39:hover { background: #2a3440; } .tile39:active { box-shadow: inset 2px 2px 0 rgba(0,0,0,.6), inset 0 0 0 1px #6a7078; }
-.tile39.round { border-radius: 50%; width: 40px; height: 40px; background: #0a0a0a; }
-.tile39.lit { box-shadow: inset 0 0 0 2px #5aff7a, 0 2px 3px rgba(0,0,0,.6); }
+.tb39 .ttl { position: absolute; left: 72px; top: 6px; color: #fff; text-shadow: 2px 2px 0 #000, 0 0 6px rgba(0,0,0,.9); line-height: 1; pointer-events: none; }
+.tb39 .ttl b { font: bold 28px/1 Arial, Helvetica, sans-serif; display: block; }
+.tb39 .ttl span { font: 20px/1.05 Arial, Helvetica, sans-serif; }
+.tb39 .tools { position: absolute; right: 8px; top: 8px; display: flex; gap: 6px; align-items: center; }
+.tile39 { width: 42px; height: 42px; padding: 3px; border: 0; cursor: pointer; display: grid; place-items: center; background: linear-gradient(145deg, #2a3038, #0a0c10);
+  box-shadow: 0 0 0 1px #000, inset 0 0 0 1px #7a8088, inset 2px 2px 0 rgba(255,255,255,.3), inset -2px -2px 0 rgba(0,0,0,.6), 0 2px 3px rgba(0,0,0,.6); }
+.tile39:hover { background: linear-gradient(145deg, #3a4654, #141a20); } .tile39:active { box-shadow: 0 0 0 1px #000, inset 2px 2px 0 rgba(0,0,0,.6), inset 0 0 0 1px #7a8088; }
+.tile39.round { border-radius: 50%; width: 44px; height: 44px; padding: 2px; background: radial-gradient(#202830, #000); }
+.tile39.lit { box-shadow: 0 0 0 1px #000, inset 0 0 0 2px #5aff7a, 0 2px 3px rgba(0,0,0,.6); }
 .bb39 { position: absolute; left: 0; right: 0; bottom: 0; height: 60px; z-index: 20; pointer-events: none; }
 .bb39 > * { pointer-events: auto; }
-.bb39 #infoBtn { position: absolute; left: 4px; bottom: 4px; width: 52px; height: 52px; padding: 5px; border: 0; cursor: pointer; background: #2a2a2a;
-  box-shadow: inset 0 0 0 2px #8a8a8a, inset 3px 3px 0 rgba(255,255,255,.3), inset -3px -3px 0 rgba(0,0,0,.6); }
-.bb39 #infoBtn svg { width: 40px; height: 40px; display: block; }
-.bb39 #caption { position: absolute; left: 60px; right: 0; bottom: 0; height: 35px; background: #000; color: #fff; font: 13px/35px Arial, sans-serif; padding: 0 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bb39 #infoBtn { position: absolute; left: 4px; bottom: 4px; width: 54px; height: 54px; padding: 5px; border: 0; cursor: pointer; background: linear-gradient(145deg, #5a5c62, #1a1a1e);
+  box-shadow: 0 0 0 1px #000, inset 0 0 0 2px #8a8a8a, inset 3px 3px 0 rgba(255,255,255,.3), inset -3px -3px 0 rgba(0,0,0,.6); }
+.bb39 #caption { position: absolute; left: 62px; right: 0; bottom: 0; height: 35px; background: #000; color: #fff; font: 14px/35px Arial, Helvetica, sans-serif; padding: 0 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 body.notool #top { display: none; }
 body.notool.v39 .bb39 #caption { left: 0; }
 body.notool.v39 .bb39 #infoBtn { display: none; }
-
 /* ---------------- windows inside the stage ---------------- */
 .scrim { position: absolute; inset: 0; background: rgba(0,0,0,.25); }
 .nwin { position: absolute; display: flex; flex-direction: column; max-height: calc(100% - 12px); padding: 3px; background: #c0c0c0; color: #000;

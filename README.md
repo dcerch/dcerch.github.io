@@ -118,15 +118,19 @@ The site has always hidden a small alternate-reality game, and it works in both 
 
 ## 🧱 How it's built
 
-It's static files on GitHub Pages, with no framework, no bundler and no 3D engine in the browser. Like the 1995 original, Navigator's main rooms are **pre-rendered**: each one is modelled in Blender (`tools/nav3d/rooms/*.py`), rendered once with Cycles, and dithered down to a 256-colour 640×480 or 800×600 PNG (`img/nav/`). The render script also exports every clickable object as a screen-space polygon, plus anchor quads for live overlays (clock hands, shelf labels, the family portrait, the boat in the porthole) into `js/nav2d/renders.js`. In the page, `js/nav2d/rendered.js` stacks invisible hotspots over the still image. The Map, Manuals and KidSpace are still SVG.
+It's static files on GitHub Pages, with no framework, no bundler and no 3D engine in the browser. Like the 1995 original, Navigator's main rooms are **pre-rendered**: each one is modelled in Blender (`tools/nav3d/rooms/*.py`), rendered once with Cycles, and dithered down to a 256-colour 640×480 or 800×600 PNG (`img/nav/`). The render script also exports every clickable object as a screen-space polygon, plus anchor quads for live overlays (clock hands, shelf labels, the family portrait, the boat in the porthole) into `js/nav2d/renders.js`. In the page, `js/nav2d/rendered.js` stacks invisible hotspots over the still image. KidSpace works the same way: its four backdrops (Moon, Mars, Jungle, Beach) are rendered by `rooms/kidspace.py`, which places the furniture by casting rays through the 2D sprites' stage coordinates, and the guide, programs and drawers are sprites on top. The Map and Manuals are still SVG.
 
-To rebuild a room (Blender 4.x and Pillow):
+The renders deliberately imitate a 1994–95 raytracer rather than a modern one (`render(style="raytrace95")` in `lib.py`): no filmic tone curve, so colours stay saturated and highlights clip hot; few light bounces, so corners go dark; and shrunken lights for crisp shadows. Rooms are framed the way the period renders were: a low, slightly off-centre camera, sunlit glass walls onto modelled gardens, and furniture pushing into the foreground. The toolbar buttons are small rendered bitmaps too (`icons.py`).
+
+To rebuild a room (Blender 4.x+ and Pillow):
 
 ```bash
 cd tools/nav3d
 python tex.py && python tex_extra.py                  # procedural textures -> tex/
 blender -b --factory-startup -P rooms/v39_gameroom.py  # add -- --fast for a quick preview
 python post.py v39_gameroom                           # -> img/nav/*.png + js/nav2d/renders.js
+blender -b --factory-startup -P rooms/kidspace.py      # KidSpace backdrops; then: python post.py kid_space0 kid_space1 kid_tree0 kid_tree1
+blender -b --factory-startup -P icons.py               # toolbar bitmaps; then: python post.py --icons
 ```
 
 ```

@@ -10,9 +10,24 @@ OUT = os.path.join(HERE, "out")
 IMG = os.path.join(SITE, "img", "nav")
 os.makedirs(IMG, exist_ok=True)
 
-rooms = sys.argv[1:] or sorted(os.path.splitext(os.path.basename(p))[0] for p in glob.glob(os.path.join(OUT, "*.json")))
+rooms = [a for a in sys.argv[1:] if not a.startswith("--")] or sorted(os.path.splitext(os.path.basename(p))[0] for p in glob.glob(os.path.join(OUT, "*.json")))
+if "--icons" in sys.argv:
+    # toolbar icons: 128px renders -> 64px (shown at ~32px, crisp on hi-dpi), 256 colours with alpha
+    TB = os.path.join(IMG, "tb"); os.makedirs(TB, exist_ok=True)
+    for p in sorted(glob.glob(os.path.join(OUT, "icons", "*.png"))):
+        k = os.path.splitext(os.path.basename(p))[0]
+        im = Image.open(p).convert("RGBA")
+        bb = im.getchannel("A").point(lambda a: 255 if a > 8 else 0).getbbox()
+        if bb:  # trim the empty margin so every object fills its tile, then square it up
+            im = im.crop(bb); s = int(max(im.size) * 1.06); sq = Image.new("RGBA", (s, s), (0, 0, 0, 0))
+            sq.paste(im, ((s - im.width) // 2, (s - im.height) // 2)); im = sq
+        im = im.resize((64, 64), Image.LANCZOS)
+        im.quantize(colors=256, method=Image.Quantize.FASTOCTREE, dither=Image.Dither.FLOYDSTEINBERG).save(os.path.join(TB, k + ".png"), optimize=True)
+        print("icon", k)
+    rooms = [a for a in sys.argv[1:] if not a.startswith("--")]
 for room in rooms:
-    meta = json.load(open(os.path.join(OUT, room + ".json")))
+    jp = os.path.join(OUT, room + ".json")
+    meta = json.load(open(jp)) if os.path.exists(jp) else {"W": 800, "H": 600}  # KidSpace stills have no hotspots
     src = os.path.join(OUT, room + ".png")
     if not os.path.exists(src): continue
     im = Image.open(src).convert("RGB").resize((meta["W"], meta["H"]), Image.LANCZOS)

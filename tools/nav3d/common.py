@@ -144,3 +144,91 @@ def opening_right(name, X1, ya, yb, H, wall, trim_m, hall_floor=None, depth=3.0,
     if ceil_m: box(name + "C", X1, X1 + depth, ya - 0.15, yb + 0.15, H, H + 0.05, ceil_m, bevel=0)
     hot = sidequad(name + "Hot", ya, yb, 0, 2.3, X1 - 0.01, mat("void", "#000000", alpha=0.0), facing=-1)
     return fr + [hot]
+
+# ------------------------------------------------------------------ 1995 raytrace kit: real exteriors, rotations, lounge chairs
+from mathutils import Matrix, Vector as _V
+from lib import _new, _set, _mats
+
+def rotate_about(objs, pivot, angle):
+    """Turn already-built objects about a vertical axis through pivot (x, y)."""
+    R = Matrix.Rotation(angle, 4, "Z"); p = _V((pivot[0], pivot[1], 0))
+    for o in objs:
+        for oo in o if isinstance(o, (list, tuple)) else [o]:
+            oo.location = p + R @ (oo.location - p)
+            oo.rotation_euler.z += angle
+    return objs
+
+def water(name="water", color="#1f86d8"):
+    """Glossy pool water with a rippled bump, so the sun throws sparkles like an old raytrace."""
+    key = ("water", name, color)
+    if key in _mats: return _mats[key]
+    m, nt, b = _new(name); N = nt.nodes; L = nt.links
+    _set(b, "Base Color", hexrgb(color)); _set(b, "Roughness", 0.04); _set(b, ["Specular IOR Level", "Specular"], 1.0)
+    _set(b, ["Coat Weight", "Clearcoat"], 1.0)
+    tc = N.new("ShaderNodeTexCoord"); nz = N.new("ShaderNodeTexNoise"); nz.inputs["Scale"].default_value = 3.5; nz.inputs["Detail"].default_value = 4
+    L.new(tc.outputs["Object"], nz.inputs["Vector"])
+    bp = N.new("ShaderNodeBump"); bp.inputs["Strength"].default_value = 0.25
+    L.new(nz.outputs["Fac"], bp.inputs["Height"]); L.new(bp.outputs["Normal"], b.inputs["Normal"])
+    _mats[key] = m
+    return m
+
+def grass(name="grass", base="#3c8a24", dark="#1f5a12", scale=14):
+    key = ("grass", name, base, dark)
+    if key in _mats: return _mats[key]
+    m, nt, b = _new(name); N = nt.nodes; L = nt.links
+    tc = N.new("ShaderNodeTexCoord"); nz = N.new("ShaderNodeTexNoise"); nz.inputs["Scale"].default_value = scale; nz.inputs["Detail"].default_value = 8
+    L.new(tc.outputs["Object"], nz.inputs["Vector"])
+    ramp = N.new("ShaderNodeValToRGB"); e = ramp.color_ramp.elements; e[0].color = hexrgb(dark); e[1].color = hexrgb(base); e[0].position = 0.3; e[1].position = 0.7
+    L.new(nz.outputs["Fac"], ramp.inputs["Fac"]); L.new(ramp.outputs["Color"], b.inputs["Base Color"])
+    _set(b, "Roughness", 0.85)
+    _mats[key] = m
+    return m
+
+def tree(name, x, y, s=1.0, seed=1, kind="round", greens=("#2f7a1c", "#3f9a26", "#24601a", "#4aa82e")):
+    """A chunky low-poly tree made of overlapping leaf balls (round), or a tall poplar (tall)."""
+    rr = random.Random(seed)
+    lm = [mat("treeLeaf" + g, g, rough=0.6) for g in greens]
+    h = (2.6 if kind == "round" else 4.0) * s
+    parts = [cone(name + "Trunk", x, y, 0, h * 0.75, 0.13 * s, 0.06 * s, mat("treeBark", "#4a3018", rough=0.9), verts=10)]
+    n = 16 if kind == "round" else 12
+    for i in range(n):
+        if kind == "round":
+            a = rr.uniform(0, 2 * PI); r = rr.uniform(0.2, 0.85) * s; z = h * 0.7 + rr.uniform(-0.45, 0.6) * s
+            parts.append(sphere(f"{name}F{i}", x + r * math.cos(a), y + r * math.sin(a), z, rr.uniform(0.45, 0.75) * s, lm[i % len(lm)]))
+        else:
+            z = h * (0.3 + 0.7 * i / n); r = 0.55 * s * math.sin(PI * (0.15 + 0.85 * i / n))
+            parts.append(sphere(f"{name}F{i}", x + rr.uniform(-0.1, 0.1) * s, y + rr.uniform(-0.1, 0.1) * s, z, r + 0.15 * s, lm[i % len(lm)], scale=(1, 1, 1.3)))
+    for p in parts[1:]:
+        md = p.modifiers.new("disp", "DISPLACE"); tx = bpy.data.textures.get("leafNoise") or bpy.data.textures.new("leafNoise", "CLOUDS")
+        tx.noise_scale = 0.25; md.texture = tx; md.strength = 0.18 * s
+    return parts
+
+def hedge(name, x0, x1, y0, y1, h, color="#2a6a1a"):
+    b = box(name, x0, x1, y0, y1, 0, h, mat("hedge" + color, color, rough=0.8), bevel=0.15, segs=3)
+    sub = b.modifiers.new("sub", "SUBSURF"); sub.levels = 2
+    md = b.modifiers.new("disp", "DISPLACE"); tx = bpy.data.textures.get("hedgeNoise") or bpy.data.textures.new("hedgeNoise", "CLOUDS")
+    tx.noise_scale = 0.2; md.texture = tx; md.strength = 0.12
+    return b
+
+def lounge(name, x, y, m, angle=0.0, cushion="#b01818", frame=None):
+    """A 1990s cherry-framed lounge chair with a deep red cushion, facing -Y before rotation."""
+    fm = frame or m["cherry"]; cm = mat("cushion" + cushion, cushion, rough=0.7)
+    p = [box(name + "Seat", x - 0.42, x + 0.42, y - 0.4, y + 0.4, 0.34, 0.5, cm, bevel=0.06, segs=3),
+         box(name + "Back", x - 0.42, x + 0.42, y + 0.32, y + 0.48, 0.5, 1.02, cm, bevel=0.06, segs=3)]
+    for sx in (-1, 1):
+        ax = x + sx * 0.47
+        p += [box(f"{name}Arm{sx}", ax - 0.05, ax + 0.05, y - 0.42, y + 0.46, 0.2, 0.7, fm, bevel=0.015),
+              box(f"{name}ArmT{sx}", ax - 0.07, ax + 0.07, y - 0.46, y + 0.48, 0.7, 0.75, fm, bevel=0.015),
+              box(f"{name}LegF{sx}", ax - 0.05, ax + 0.05, y - 0.42, y - 0.34, 0, 0.2, fm, bevel=0.01),
+              box(f"{name}LegB{sx}", ax - 0.05, ax + 0.05, y + 0.38, y + 0.46, 0, 0.2, fm, bevel=0.01)]
+    p.append(box(name + "Rail", x - 0.47, x + 0.47, y + 0.4, y + 0.48, 0.2, 0.34, fm, bevel=0.01))
+    return rotate_about(p, (x, y), angle)
+
+def track_light(name, x0, x1, y, z, n, m, aim_z=0.0, energy=60, color="#fff0d0", aim_dy=0.6):
+    """A black ceiling rail with little can spots hanging off it, each a real spot light."""
+    parts = [box(name + "Rail", x0, x1, y - 0.03, y + 0.03, z - 0.04, z, m["blk"], bevel=0.005)]
+    for i in range(n):
+        x = x0 + (x1 - x0) * (i + 0.5) / n
+        parts.append(cyl(f"{name}C{i}", x, y, z - 0.22, z - 0.06, 0.055, m["blk"], verts=16, rot=(0.5, 0, 0)))
+        spot(f"{name}S{i}", (x, y + 0.05, z - 0.2), (x, y + aim_dy * 3, aim_z), energy, color, angle=38, blend=0.25, radius=0.02)
+    return parts

@@ -266,6 +266,19 @@ def sun(name, direction, energy=3.0, color="#fff2dc", angle=1.0):
     o.rotation_euler = Vector(direction).to_track_quat("-Z", "Y").to_euler()
     return o
 
+def screen_to_world(px, py, W, H, axis, value):
+    """Where the camera ray through stage pixel (px, py) meets the plane axis=value ("x", "y" or "z").
+    Lets a scene place furniture exactly under existing 2D hotspots."""
+    sc = bpy.context.scene; cam = sc.camera
+    sc.render.resolution_x = W; sc.render.resolution_y = H
+    bpy.context.view_layer.update()
+    tr, br, bl, tl = cam.data.view_frame(scene=sc)
+    u, v = px / W, py / H
+    p = tl + (tr - tl) * u + (bl - tl) * v
+    o = cam.matrix_world.translation; d = (cam.matrix_world.to_3x3() @ p).normalized()
+    i = "xyz".index(axis); t = (value - o[i]) / d[i]
+    return o + d * t
+
 def camera(loc, target, lens=24, shift_y=0.0, shift_x=0.0):
     c = bpy.data.cameras.new("cam"); c.lens = lens; c.shift_y = shift_y; c.shift_x = shift_x; c.sensor_fit = "HORIZONTAL"; c.sensor_width = 36
     c.clip_start = 0.05; c.clip_end = 200
@@ -306,21 +319,45 @@ def _gpu(sc):
     except Exception as e:
         print("gpu setup failed", e)
 
-def render(room, W, H, samples=128, scale=2, exposure=0.0, look="Medium High Contrast"):
+def _harden(factor=0.3, sun_max=0.6):
+    """1994 raytracers had point-ish lights: shrink every area light and sun so shadows go crisp."""
+    for o in bpy.context.scene.objects:
+        if o.type != "LIGHT": continue
+        l = o.data
+        if l.type == "AREA" and not o.get("soft"):
+            l.size *= factor
+            if l.shape in ("RECTANGLE", "ELLIPSE"): l.size_y *= factor
+        elif l.type == "SUN": l.angle = min(l.angle, math.radians(sun_max))
+        elif l.type in ("POINT", "SPOT"): l.shadow_soft_size = min(l.shadow_soft_size, 0.03)
+
+def render(room, W, H, samples=128, scale=2, exposure=0.0, look="Medium High Contrast", style="raytrace95", gamma=1.0, hots=True):
+    """style="raytrace95": the 1994-95 Strata/3D Studio look Navigator shipped with — no filmic tone curve
+    (Standard sRGB, so colours stay saturated and highlights clip hot), few bounces (dark, contrasty corners)
+    and crisp shadows. style="modern" keeps the old AgX look."""
     sc = bpy.context.scene
-    export(room, W, H)
+    for a in sys.argv:
+        if a.startswith("--exp="): exposure = float(a[6:])
+        if a.startswith("--style="): style = a[8:]
+    if hots: export(room, W, H)
     sc.render.engine = "CYCLES"; _gpu(sc)
     sc.cycles.samples = samples; sc.cycles.use_denoising = True
     try: sc.cycles.denoiser = "OPENIMAGEDENOISE"
     except Exception: pass
-    sc.cycles.max_bounces = 8; sc.cycles.caustics_reflective = False; sc.cycles.caustics_refractive = False
+    sc.cycles.caustics_reflective = False; sc.cycles.caustics_refractive = False
     sc.cycles.sample_clamp_indirect = 8
     sc.render.resolution_x = W * scale; sc.render.resolution_y = H * scale; sc.render.resolution_percentage = 100
-    try:
-        sc.view_settings.view_transform = "AgX"; sc.view_settings.look = "AgX - " + look
-    except Exception:
-        try: sc.view_settings.view_transform = "Filmic"; sc.view_settings.look = look
-        except Exception: pass
+    if style == "raytrace95":
+        _harden()
+        sc.cycles.max_bounces = 4; sc.cycles.diffuse_bounces = 1; sc.cycles.glossy_bounces = 3; sc.cycles.transmission_bounces = 4
+        sc.view_settings.view_transform = "Standard"; sc.view_settings.look = "None"
+        sc.view_settings.gamma = gamma
+    else:
+        sc.cycles.max_bounces = 8
+        try:
+            sc.view_settings.view_transform = "AgX"; sc.view_settings.look = "AgX - " + look
+        except Exception:
+            try: sc.view_settings.view_transform = "Filmic"; sc.view_settings.look = look
+            except Exception: pass
     sc.view_settings.exposure = exposure
     sc.render.image_settings.file_format = "PNG"
     sc.render.filepath = os.path.join(OUT, room + ".png")
@@ -362,6 +399,7 @@ def _clip(poly, W, H):
 def export(room, W, H):
     """Write out/<room>.json: hot polygons (far to near) and anchor quads, in native pixels."""
     sc = bpy.context.scene; cam = sc.camera
+    bpy.context.view_layer.update()
     sc.render.resolution_x = W; sc.render.resolution_y = H
     dg = bpy.context.evaluated_depsgraph_get()
     def proj(co):

@@ -11,6 +11,8 @@ import { kidspace } from "./kidspace.js";
 import { manualsRoomContent, manualViewer } from "./manuals.js";
 import * as R from "./rendered.js";
 
+// Toolbar buttons are little pre-rendered bitmaps (tools/nav3d/icons.py), like the 1995 originals.
+const tbImg = k => `<img class="tbi" src="img/nav/tb/${k}.png" alt="" draggable="false">`;
 const W = 640, H = 480;
 const svg = (body, extraDefs = "") => `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">${A.defs(extraDefs)}${body}</svg>`;
 const hot = (k, inner) => `<g class="hot" data-hot="${k}">${inner}</g>`;
@@ -370,9 +372,9 @@ export const V35 = {
     manuals: { name: "Electronic Documents", caption: "Just click on the book you need.", render: api => manualsRoomContent(api, "3.5"), get hots() { return manualViewer.hots; }, tipSpots: [[120, 420]] },
     kidspace: { ...kidspace, name: "Ark KidSpace" }
   },
-  topHTML: I => `<div class="tb35"><button class="maptile" data-tool="map" data-label="Map">${I.map}</button><div class="ttl"><b>Navigator</b><span id="roomName"></span></div>
-    <div class="tools">${["media", "windows", "exit", "key", "docs", "prefs", "phone", "run"].map(k => `<button class="tool" data-tool="${k}" data-label="${k}">${I[{ media: "media", windows: "windows", exit: "exit", key: "key", docs: "docs", prefs: "prefs", phone: "phone", run: "run" }[k]]}</button>`).join("")}</div></div>`,
-  botHTML: I => `<div class="bb35"><button id="infoBtn" aria-label="InfoGuide">${I.info}</button><div id="caption" aria-live="polite"></div><button id="menuBtn">Menu</button></div>`,
+  topHTML: I => `<div class="tb35"><button class="maptile" data-tool="map" data-label="Map">${tbImg("map")}</button><div class="ttl"><b>Navigator</b><span id="roomName"></span></div>
+    <div class="tools">${["media", "windows", "exit", "key", "docs", "prefs", "phone", "run"].map(k => `<button class="tool" data-tool="${k}" data-label="${k}">${tbImg(k)}</button>`).join("")}</div></div>`,
+  botHTML: I => `<div class="bb35"><button id="infoBtn" aria-label="InfoGuide">${tbImg("info")}</button><div id="caption" aria-live="polite"></div><button id="menuBtn">Menu</button></div>`,
   splashHTML: `<div class="spl35"><div class="logo"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="#f8f4e8" stroke="#c9a54a" stroke-width="5"/><path d="M50 8 L58 50 L50 92 L42 50 Z" fill="#b5121b"/><path d="M8 50 L50 42 L92 50 L50 58 Z" fill="#1a2a6a"/><circle cx="50" cy="50" r="6" fill="#c9a54a"/></svg><div><b>Navigator</b><span>Version 3.5</span></div></div><p>A fan-made homage to the 1995 family-PC house. Click to begin.</p></div>`,
   welcomeLine: "Welcome to Navigator. To get started, choose one of the three options on the screen.",
   welcome(api, h) {

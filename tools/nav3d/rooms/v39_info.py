@@ -6,18 +6,18 @@ from common import *
 
 reset(); m = M()
 X0, X1, Y1, H = -3.6, 3.6, 4.4, 3.2
-dark = mat("darkWall", "#5a5248", rough=0.8, spec=0.2)
-darkL = mat("darkWallL", "#4a443c", rough=0.8, spec=0.2)
+dark = mat("darkWall", "#b89a74", rough=0.8, spec=0.2)
+darkL = mat("darkWallL", "#a88a64", rough=0.8, spec=0.2)
 ceil = mat("ceilDark", "#3a3632", rough=0.9)
-carpet = mat("carpet", "#9a948a", rough=0.95, spec=0.05)
+carpet = mat("carpet", "#4e5a66", rough=0.95, spec=0.05)
 floorW = image("floorC", T("floor_cherry.png"), rough=0.2, spec=0.6, world_scale=0.35)
 box("floor", X0, X1, -2, Y1, -0.05, 0, floorW, bevel=0)
-floorquad("carpet", -2.6, 2.4, 0.6, 3.6, 0.004, carpet)
+floorquad("carpet", -1.4, 2.6, 0.3, 3.3, 0.004, carpet)
 box("ceiling", X0, X1, -2, Y1, H, H + 0.05, ceil, bevel=0)
 box("back", X0, X1, Y1, Y1 + 0.15, 0, H, dark, bevel=0)
 box("left", X0 - 0.15, X0, -2, Y1, 0, H, darkL, bevel=0)
 # right: the doorway back to the bright Living Room
-box("rightNear", X1, X1 + 0.15, -2, 1.6, 0, H, darkL, bevel=0); box("rightFar", X1, X1 + 0.15, 3.0, Y1, 0, H, darkL, bevel=0)
+box("rightNear", X1, X1 + 0.15, -2, 1.6, 0, H, darkL, bevel=0); box("rightFar", X1, X1 + 0.15, 3.0, Y1, 0, 1.8, darkL, bevel=0); box("rightFarHi", X1, X1 + 0.15, 3.0, Y1, 2.7, H, darkL, bevel=0); box("rightFarJ", X1, X1 + 0.15, 3.0, 3.25, 1.8, 2.7, darkL, bevel=0)
 box("rightHead", X1, X1 + 0.15, 1.6, 3.0, 2.4, H, darkL, bevel=0)
 lr = [box("lrJ1", X1 - 0.06, X1 + 0.02, 1.52, 1.62, 0, 2.48, mat("frameDark", "#2a2622", rough=0.4)), box("lrJ2", X1 - 0.06, X1 + 0.02, 2.98, 3.08, 0, 2.48, mat("frameDark", "#2a2622", rough=0.4)),
       box("lrJ3", X1 - 0.06, X1 + 0.02, 1.52, 3.08, 2.4, 2.48, mat("frameDark", "#2a2622", rough=0.4))]
@@ -30,7 +30,7 @@ lr.append(sidequad("lrHot", 1.6, 3.0, 0, 2.4, X1 - 0.01, m["void"], facing=-1))
 group("living", *lr)
 
 # ---------------------------------------------------------------- the tutorial cabinet (left), lit warm orange from inside
-TY = 3.0
+TY = 2.4
 orange = mat("orangeCab", "#e8822a", rough=0.35, coat=0.5)
 box("tutBody", -3.4, -1.3, TY, TY + 0.6, 0, 2.5, orange)
 box("tutInside", -3.25, -1.45, TY - 0.01, TY + 0.02, 0.35, 2.15, mat("tutIn", "#a84a10", rough=0.5, emit="#ff9a40", emit_str=0.35), bevel=0)
@@ -67,6 +67,18 @@ for r, z in enumerate((1.45, 0.62)):
 point("onGlow", (1.8, OY - 0.3, 2.2), 30, "#ffe0b0", radius=0.2)
 
 plant("plant", 3.1, 1.2, s=1.0)
+lounge("readChairL", -1.25, 0.35, m, angle=2.6, cushion="#2a3a6a")
+lounge("readChairR", 2.45, 1.05, m, angle=2.35, cushion="#2a3a6a")
+cyl("sideTbl", 2.6, 2.45, 0, 0.5, 0.3, m["cherry"], bevel=0.01)
+cyl("sideLampB", 2.6, 2.45, 0.5, 0.75, 0.07, m["chrome"])
+cone("sideLampS", 2.6, 2.45, 0.75, 1.0, 0.18, 0.1, mat("shadeW", "#f6eedc", rough=0.7, emit="#fff0c8", emit_str=1.2))
+point("sideLampL", (2.6, 2.45, 0.85), 18, "#ffe0a8", radius=0.04)
+box("magazine", 2.45, 2.7, 2.35, 2.55, 0.5, 0.51, mat("mag", "#c83a2a", rough=0.5), bevel=0)
+# swing the tutorial cabinet round to face the visitor, as the period renders loved a three-quarter view
+tutParts = [o for o in bpy.data.objects if o.name.startswith(("tut", "lblTut"))]
+rotate_about(tutParts, (-2.35, TY + 0.3), 0.55)
+# a high window on the right throws a bar of afternoon sun across the floor
+box("hiWinSill", X1 - 0.02, X1 + 0.15, 3.1, Y1, 1.8, 1.85, mat("trim", "#f2f2f0", rough=0.4), bevel=0)
 
 # ---------------------------------------------------------------- track lights + camera
 for i, x in enumerate((-2.4, -0.4, 1.8)):
@@ -76,7 +88,8 @@ for i, x in enumerate((-2.4, -0.4, 1.8)):
 spot("spotTut", (-2.4, 1.6, H - 0.2), (-2.35, TY, 1.4), 260, "#ffd8a0", angle=40, blend=0.5)
 spot("spotMan", (-0.4, 2.2, H - 0.2), (-0.35, Y1, 1.3), 300, "#fff0d0", angle=36, blend=0.5)
 spot("spotOn", (1.8, 1.8, H - 0.2), (1.8, OY, 1.2), 300, "#fff0d0", angle=42, blend=0.5)
-area("fill", (0, -1.2, 2.5), 3.0, 60, "#fff0e0", target=(0, 3, 1))
-world("#202024", 0.3)
-camera((0.0, -1.2, 1.6), (0.0, 6.0, 1.6), lens=18, shift_y=0.02)
-render("v39_info", 800, 600, samples=160, look="Punchy", exposure=-0.1)
+area("fill", (0, -1.2, 2.5), 3.0, 110, "#fff0e0", target=(0, 3, 1))["soft"] = 1
+sun("sun", (-0.85, 0.1, -0.5), energy=5.0, color="#fff0c8", angle=0.5)
+world("#a8c4e0", 0.25)
+camera((1.0, -1.05, 1.42), (-0.6, 5.0, 1.25), lens=18, shift_y=-0.02)
+render("v39_info", 800, 600, samples=160, exposure=-0.3)

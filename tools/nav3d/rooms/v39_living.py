@@ -144,5 +144,5 @@ area("ceilingMain", (0.5, 3.0, H - 0.05), 4.0, 380, "#ffe8c8", target=(0.5, 3.0,
 area("underMezz", (1.0, 6.2, MZ - 0.25), 3.0, 220, "#fff0d8", target=(1.0, 6.2, 0), size_y=1.2)
 area("frontFill", (0.5, -1.4, 2.6), 3.0, 120, "#fff4e4", target=(0, 4, 1))
 for i, x in enumerate((-2.5, 0.5, 3.0)): cyl(f"can{i}", x, 3.5, H - 0.01, H, 0.12, mat("can", "#fffaf0", emit="#fff4dc", emit_str=8))
-camera((0.0, -1.9, 1.7), (0.0, 7.0, 1.7), lens=17, shift_y=0.0)
-render("v39_living", 800, 600, samples=160, look="Punchy", exposure=-0.45)
+camera((1.1, -1.85, 1.5), (-0.55, 7.0, 1.95), lens=17, shift_y=-0.02)
+render("v39_living", 800, 600, samples=160, exposure=-0.75)

@@ -14,6 +14,8 @@ import { manualsRoomContent, manualViewer } from "./manuals.js";
 import { symbolsClick, faq, retired } from "./v35.js";
 import * as R from "./rendered.js";
 
+// Toolbar buttons are little pre-rendered bitmaps (tools/nav3d/icons.py), like the 1995 originals.
+const tbImg = k => `<img class="tbi" src="img/nav/tb/${k}.png" alt="" draggable="false">`;
 const W = 800, H = 600;
 const svg = (body, extraDefs = "") => `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">${A.defs(extraDefs)}${body}</svg>`;
 const hot = (k, inner) => `<g class="hot" data-hot="${k}">${inner}</g>`;
@@ -444,9 +446,9 @@ export const V39 = {
     gameroom: { name: "GameRoom", caption: "The GameRoom. Click a game to play.", render: gameroom, hots: hots.gameroom },
     kidspace: { ...kidspace, name: "KidSpace" }
   },
-  topHTML: I => `<div class="tb39"><button class="tile39 sec" data-tool="users" data-label="Security">${I.users}</button><div class="ttl"><b>Navigator</b><span id="roomName"></span></div>
-    <div class="tools"><button class="tile39 round" data-tool="globe" data-label="Internet">${I.globe}</button>${["task", "voice", "phone", "media", "prefs", "run", "windows"].map(k => `<button class="tile39" data-tool="${k}" data-label="${k}">${I[k]}</button>`).join("")}<button class="tile39" data-tool="exit" data-label="Exit">${I.power}</button></div></div>`,
-  botHTML: I => `<div class="bb39"><button id="infoBtn" aria-label="InfoGuide">${I.info}</button><div id="caption" aria-live="polite"></div></div>`,
+  topHTML: I => `<div class="tb39"><button class="tile39 sec" data-tool="users" data-label="Security">${tbImg("users")}</button><div class="ttl"><b>Navigator</b><span id="roomName"></span></div>
+    <div class="tools"><button class="tile39 round" data-tool="globe" data-label="Internet">${tbImg("globe")}</button>${["task", "voice", "phone", "media", "prefs", "run", "windows"].map(k => `<button class="tile39" data-tool="${k}" data-label="${k}">${tbImg(k)}</button>`).join("")}<button class="tile39" data-tool="exit" data-label="Exit">${tbImg("power")}</button></div></div>`,
+  botHTML: I => `<div class="bb39"><button id="infoBtn" aria-label="InfoGuide">${tbImg("info")}</button><div id="caption" aria-live="polite"></div></div>`,
   splashHTML: `<div class="spl39"><div class="orb"></div><b>Navigator</b><span>Version 3.9</span><p>A fan-made homage to the 1997 family-PC house. Click to begin.</p></div>`,
   welcomeLine: "Welcome to Navigator. Choose one of the four buttons to get started.",
   welcome(api, h) {
