@@ -52,6 +52,14 @@ export const sfx = {
   rocket() { noise(1.6, { vol: 0.2, freq: 400, q: 0.5, type: "lowpass" }); tone(120, 1.4, { type: "sawtooth", vol: 0.05, slide: 4 }); },
   crumple() { for (let i = 0; i < 7; i++) noise(0.05, { vol: 0.18, freq: 1800 + Math.random() * 2000, q: 1, at: i * 0.05 + Math.random() * 0.03 }); },
   talk() { for (let i = 0; i < 5; i++) tone(420 + Math.random() * 260, 0.06, { type: "square", vol: 0.035, at: i * 0.07 }); },
+  // CRT monitor: the tube collapsing (thump + dying flyback whine) and warming back up (degauss hum)
+  crtOff() { tone(7800, 0.4, { type: "sine", vol: 0.025, slide: 0.2 }); noise(0.3, { vol: 0.3, freq: 150, q: 0.7, type: "lowpass" }); tone(70, 0.35, { type: "sine", vol: 0.2, slide: 0.45 }); },
+  crtOn() {
+    tone(1100, 0.05, { type: "square", vol: 0.06 }); noise(0.08, { vol: 0.35, freq: 180, q: 0.8, type: "lowpass", at: 0.05 });
+    tone(60, 1.2, { type: "sawtooth", vol: 0.07, at: 0.12, attack: 0.04 }); tone(120, 0.9, { type: "sine", vol: 0.05, at: 0.12 });
+    for (let i = 0; i < 6; i++) noise(0.03, { vol: 0.12, freq: 3000 + Math.random() * 3000, q: 1, at: 0.2 + Math.random() * 0.6 });
+    tone(8200, 1.2, { type: "sine", vol: 0.012, at: 0.3, attack: 0.4 });
+  },
   // A short, original "welcome home" jingle in a mid-90s multimedia style.
   startup() {
     const notes = [[523, 0], [659, 0.18], [784, 0.36], [1047, 0.54], [988, 0.9], [784, 1.08], [880, 1.26], [1047, 1.6]];

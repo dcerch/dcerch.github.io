@@ -1,0 +1,128 @@
+<!doctype html>
+<!--
+  dom 95 Arcade — a small cabinet that plays classic games from the places that host them.
+  Nothing here is copied from the games: each one loads in its host's official player
+  (Miniplay embed, itch.io embed, Internet Archive emulation) or opens on the host's site.
+  Usage: arcade.html?g=<id>   (ids are the keys of GAMES below)
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Arcade</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #000; overflow: hidden; font: 12px Tahoma, "MS Sans Serif", sans-serif; color: #c0c0c0; user-select: none; }
+    #stage { position: absolute; inset: 0 0 22px 0; }
+    #stage iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: #000; }
+    #title { position: absolute; inset: 0 0 22px 0; display: grid; place-items: center; text-align: center; padding: 16px; box-sizing: border-box; overflow: auto;
+      background: radial-gradient(ellipse at 50% 40%, var(--glow, #123) 0%, #000 70%); }
+    #title::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(0,0,0,.28) 0 1px, transparent 1px 3px); }
+    #title[hidden] { display: none; }
+    .card { position: relative; z-index: 1; max-width: 520px; }
+    .marquee { font: bold clamp(22px, 6vw, 40px)/1.05 "Arial Black", Impact, sans-serif; letter-spacing: 1px; color: var(--ink, #ffd800); text-shadow: 3px 3px 0 var(--shade, #b02000), 0 0 18px var(--glow2, rgba(255,216,0,.35)); text-transform: uppercase; }
+    .sub { margin: 6px 0 14px; font: italic bold 14px Georgia, serif; color: #8fd8ff; }
+    .blurb { color: #ddd; font-size: 13px; line-height: 1.45; margin: 0 auto 16px; max-width: 460px; }
+    .meta { color: #8a8a8a; font-size: 11px; margin-top: 14px; }
+    .meta a { color: #8fd8ff; }
+    .btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .btn { min-width: 120px; min-height: 26px; padding: 4px 14px; border: 0; background: #c0c0c0; color: #000; font: inherit; cursor: pointer;
+      box-shadow: inset -1px -1px #000, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf; }
+    .btn:active { box-shadow: inset -1px -1px #fff, inset 1px 1px #000, inset -2px -2px #dfdfdf, inset 2px 2px #808080; padding: 5px 13px 3px 15px; }
+    .btn.go { font-weight: bold; outline: 1px solid #000; }
+    .coin { display: inline-block; margin-bottom: 10px; color: #ff4040; font: bold 12px "Courier New", monospace; letter-spacing: 2px; animation: blink 1.1s steps(2, start) infinite; }
+    @keyframes blink { to { visibility: hidden; } }
+    #bar { position: absolute; left: 0; right: 0; bottom: 0; height: 22px; display: flex; align-items: center; gap: 12px; padding: 0 8px; background: #c0c0c0; color: #000; white-space: nowrap; overflow: hidden; }
+    #bar a { color: #000080; }
+    #bar .r { margin-left: auto; }
+  </style>
+</head>
+<body>
+  <div id="stage"></div>
+  <div id="title"><div class="card">
+    <div class="coin">INSERT COIN</div>
+    <div class="marquee" id="name"></div>
+    <div class="sub" id="sub"></div>
+    <p class="blurb" id="blurb"></p>
+    <div class="btns" id="btns"></div>
+    <div class="meta" id="meta"></div>
+  </div></div>
+  <div id="bar"><span id="keys"></span><span class="r" id="credit"></span></div>
+  <script>
+    "use strict";
+    // host: who runs the game; embed: their official embeddable player (omit when the host can't be framed)
+    const IA = id => ({ embed: "https://archive.org/embed/" + id, page: "https://archive.org/details/" + id, host: "the Internet Archive", hostUrl: "https://archive.org/details/" + id });
+    const GAMES = {
+      ontherun: {
+        name: "On the Run", sub: "Officine Pixel for Miniclip · Shockwave", look: ["#ff6a00", "#5a1600", "#3a1200"],
+        blurb: "Take the wheel and make your getaway: the cops are on your tail, so reach the next checkpoint before time runs out. Miniclip's web games went dark and the original won't run anywhere any more, so I built a tribute you can still play.",
+        keys: "Getaway: ↑ gas · ↓ brake · ←/→ steer · M sound · P pause",
+        embed: "getaway.html", playLabel: "▶ Play Getaway (tribute)", host: "this site", hostUrl: "getaway.html",
+        page: "https://www.youtube.com/watch?v=vokULrYJQSg", altLabel: "Watch the original",
+        more: [["Flash Gaming Wiki", "https://flashgaming.fandom.com/wiki/On_The_Run"]], credit: "Getaway is original code & art"
+      },
+      robotrage: {
+        name: "Robot Rage", sub: "remade by KonsomeJona", look: ["#3ad0ff", "#00305a", "#06223a"],
+        blurb: "Customize a robot, drive it into the arena, and knock everyone else out. A modern online remake of the old game, with real opponents.",
+        keys: "WASD / arrows drive · mouse aims and fires · it's online multiplayer",
+        embed: "https://itch.io/embed-upload/19770901?color=000000", page: "https://konsomejona.itch.io/robot-rage", host: "itch.io", hostUrl: "https://konsomejona.itch.io/robot-rage",
+        credit: "by KonsomeJona"
+      },
+      victorvector: {
+        name: "Victor Vector & Yondo", sub: "The Cyberplasm Formula · Sanctuary Woods, 1993", look: ["#9cff3a", "#1d4a00", "#0e2a00"],
+        blurb: "A comic-book adventure on CD-ROM: Victor Vector and his dog Yondo, and a whole lot of clicking on things to see what they do.",
+        keys: "Runs in a Windows 3.1 machine in the cloud · free sign-in required",
+        page: "https://yag.im/games/1148/the-awesome-adventures-of-victor-vector-and-yondo-the-cyberplasm-formula", host: "yag.im", hostUrl: "https://yag.im/",
+        why: "yag.im streams the game from a real emulated PC and needs you to sign in, so it opens in its own window."
+      },
+      arkanoid: Object.assign(IA("arkanoid_1988"), {
+        name: "Arkanoid", sub: "Taito · arcade 1986 · this is the 1988 DOS port", look: ["#ff3ad0", "#4a0040", "#2a0026"],
+        blurb: "Steer the Vaus, bounce the energy ball, break every brick and grab the capsules. Thirty-two rounds stand between you and DOH.",
+        keys: "Click the power button to boot DOS · mouse or arrows move · button/space fires",
+        more: [["Play the original arcade version", "https://pexy.io/game/arkanoid-arcade/"]]
+      }),
+      arena: Object.assign(IA("ARENA_201902"), {
+        name: "The Elder Scrolls: Arena", sub: "Bethesda Softworks, 1994", look: ["#ffcf6a", "#4a2a00", "#2a1800"],
+        blurb: "Where Tamriel started. Escape the Imperial dungeon and go hunting for the eight pieces of the Staff of Chaos, across the whole continent.",
+        keys: "Click the power button to boot DOS · mouse drives everything · right-drag to swing",
+        more: [["Free on Steam", "https://store.steampowered.com/app/1812290/"], ["Also on PlayClassic", "https://playclassic.games/games/role-playing-dos-games-online/play-the-elder-scrolls-arena-online/play/"]]
+      }),
+      daggerfall: Object.assign(IA("msdos_The_Elder_Scrolls_-_Daggerfall_1996"), {
+        name: "The Elder Scrolls II: Daggerfall", sub: "Bethesda Softworks, 1996", look: ["#d0d0ff", "#20204a", "#10102a"],
+        blurb: "A map the size of Great Britain, dungeons you can actually get lost in for good, and a missing letter the Emperor wants back. Give DOS a minute to load it.",
+        keys: "Click the power button to boot DOS (large download) · WASD/arrows move · mouse looks",
+        more: [["Free on Steam", "https://store.steampowered.com/app/1812390/"], ["Daggerfall Unity", "https://www.dfworkshop.net/"], ["Also on DOS Zone", "https://dos.zone/daggerfall/"]]
+      })
+    };
+
+    const $ = id => document.getElementById(id);
+    const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+    const g = GAMES[new URLSearchParams(location.search).get("g")];
+    if (!g) { $("name").textContent = "Game Over"; $("blurb").textContent = "No game by that name in this cabinet."; }
+    else {
+      document.title = g.name;
+      const [ink, shade, glow] = g.look, ts = document.documentElement.style;
+      ts.setProperty("--ink", ink); ts.setProperty("--shade", shade); ts.setProperty("--glow", glow); ts.setProperty("--glow2", ink + "55");
+      $("name").textContent = g.name; $("sub").textContent = g.sub; $("blurb").textContent = g.blurb;
+      $("keys").textContent = g.keys;
+      const hostLink = `<a href="${esc(g.hostUrl)}" target="_blank" rel="noopener">${esc(g.host)}</a>`;
+      $("credit").innerHTML = (g.credit ? esc(g.credit) + " · " : "") + "hosted by " + hostLink + ` · <a href="${esc(g.page)}" target="_blank" rel="noopener">${esc((g.altLabel || "open in new window").toLowerCase())}</a>`;
+      const more = (g.more || []).map(([t, u]) => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(t)}</a>`);
+      $("meta").innerHTML = (g.why ? esc(g.why) + "<br>" : "") + "Plays from " + hostLink + "." + (more.length ? "<br>" + more.join(" · ") : "");
+      const btns = $("btns");
+      const openNew = () => window.open(g.page, "_blank", "noopener");
+      if (g.embed) {
+        const play = document.createElement("button"); play.className = "btn go"; play.textContent = g.playLabel || "▶ Play";
+        play.addEventListener("click", () => {
+          const f = document.createElement("iframe");
+          f.src = g.embed; f.title = g.name; f.allow = "autoplay; fullscreen; gamepad"; f.allowFullscreen = true;
+          $("stage").appendChild(f); $("title").hidden = true; f.focus();
+          try { parent.postMessage({ type: "win-title", title: g.name }, location.origin); } catch (e) {}
+        });
+        btns.appendChild(play);
+      }
+      const nw = document.createElement("button"); nw.className = "btn" + (g.embed ? "" : " go"); nw.textContent = g.altLabel || (g.embed ? "Open in new window" : "▶ Play on " + g.host);
+      nw.addEventListener("click", openNew); btns.appendChild(nw);
+    }
+  </script>
+</body>
+</html>

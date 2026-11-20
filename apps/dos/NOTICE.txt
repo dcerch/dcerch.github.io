@@ -1,0 +1,12 @@
+DOS emulator on dominiccerchio.com
+==================================
+
+js-dos 6.22.60 by Alexander Guryanov (caiiiycuk), a WebAssembly build of DOSBox.
+        https://github.com/caiiiycuk/js-dos (branch 6.22)
+        License: GNU General Public License v2.0 (see LICENSE.txt in this folder).
+        DOSBox is (C) The DOSBox Team, GPL-2.0.
+        js-dos.js, wdosbox.js and wdosbox.wasm.js are the unmodified files from
+        the js-dos@6.22.60 npm package. Complete corresponding source code is
+        available at the URL above.
+
+Used by the DOS games in apps/ (currently apps/keen4).

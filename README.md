@@ -48,6 +48,9 @@ Double-click around. Drag icons wherever you like or rubber-band a few at once, 
 | 🚀 | **Space Pinball** | An original table in the spirit of *3D Pinball – Space Cadet*. |
 | 🎨 | **Paint** | 16 tools, the 28-color palette, magnifier, select/move, undo, and save as PNG. |
 | 👹 | **DOOM** | The real shareware episode, running in WebAssembly. |
+| 👦 | **Commander Keen 4** | Apogee's shareware episode, *Secret of the Oracle*, running in DOSBox (js-dos) from this repo. |
+| 🕹️ | **The arcade cabinets** | Arkanoid, *The Elder Scrolls: Arena* and *Daggerfall* (Internet Archive emulation), *Robot Rage* (itch.io embed) and *Victor Vector & Yondo* (yag.im), each behind an insert-coin title card in the Games folder. |
+| 🚓 | **On the Run → Getaway** | Miniclip's *On the Run* can't be played anywhere now, so **Getaway** is an original pseudo-3D getaway driver in its honour: checkpoints, traffic and the cops on your tail. |
 | 🧃 | **Squeeze Play** | Cold-press juice recipes for the Nama J2. |
 | 📁 | **My Apps / Toolbox** | My full apps, and 21 tiny tools restyled as proper Win95 dialogs. |
 | 🗑️ | **Recycle Bin** | My old green-screen homepage, plus an **Archived** folder with a `.TXT` note for every app I've retired. |
@@ -56,7 +59,7 @@ Double-click around. Drag icons wherever you like or rubber-band a few at once, 
 
 ![The desktop](docs/img/desktop.jpg)
 
-> **Try:** Start ▸ Run… and type `kidspace`, `nav39`, `iexplore`, `aol`, `calc`, `winmine`, `pbrush`, `dos` or `help`. Shut Down… works too.
+> **Try:** Start ▸ Run… and type `kidspace`, `nav39`, `iexplore`, `aol`, `calc`, `winmine`, `pbrush`, `dos` or `help`. Shut Down… works too: the tube collapses to a white line like an old CRT, and the monitor's power button brings it back.
 
 ---
 
@@ -141,6 +144,8 @@ python post.py v39_gameroom                           # -> img/nav/*.png + js/na
 |-- img/nav/                  <- pre-rendered Navigator rooms
 |-- tools/nav3d/              <- Blender scenes that render them
 |-- apps/                     <- win95 games, DOOM, and my full apps
+|   |-- keen4/ · dos/          <- Commander Keen 4 shareware + js-dos (DOSBox)
+|   `-- games/                <- arcade.html (title cards + official embeds), getaway.html
 |-- terminal.html             <- the previous green-screen site, preserved
 `-- toolbox.html · apps.html · 404.html
 ```
@@ -164,6 +169,8 @@ python -m http.server 8000      # then open http://localhost:8000
 * **Inspiration:** *Packard Bell Navigator* and *Ark KidSpace* (Ark Interface / Packard Bell, 1994–97). This is a fan-made homage and isn't affiliated with either. No original assets, sounds or narration are used: every room is an original Blender scene or original SVG.
 * **Windows** is a trademark of Microsoft. This desktop is a lookalike with original artwork and no Microsoft files. The wallpapers are painted in code "in the spirit of" each era.
 * **DOOM:** engine [jacobenget/doom.wasm](https://github.com/jacobenget/doom.wasm) (**GPL-2.0**). The game data is the freely distributable DOOM shareware WAD, © id Software. See [`apps/doom/NOTICE.txt`](apps/doom/NOTICE.txt).
+* **Commander Keen 4:** the unaltered Apogee shareware package (© 1991 id Software), freely distributable under its included LICENSE.DOC, run by [js-dos 6.22](https://github.com/caiiiycuk/js-dos) (**GPL-2.0**, DOSBox). See [`apps/keen4/NOTICE.txt`](apps/keen4/NOTICE.txt) and [`apps/dos/NOTICE.txt`](apps/dos/NOTICE.txt).
+* **Arcade cabinets:** no game files from Arkanoid (Taito), *Arena* / *Daggerfall* (Bethesda), *Robot Rage* (KonsomeJona) or *Victor Vector & Yondo* (Sanctuary Woods) are in this repo. They load from the Internet Archive, itch.io and yag.im. **Getaway** is original code and art, a tribute to *On the Run* (Officine Pixel / Miniclip).
 * **Solitaire, Minesweeper, Space Pinball and Paint** are original recreations written for this site.
 * **Other credits:** the *Leviathan* excerpt is Hobbes (1651, public domain). "Khajiit has wares" nods to *Skyrim*.
 <pre align="center">

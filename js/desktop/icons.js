@@ -187,7 +187,57 @@ export const ICONS = {
   screensaver: svg(`
     <rect x="3" y="4" width="26" height="19" fill="#c0c0c0" stroke="#000"/><rect x="6" y="7" width="20" height="13" fill="#000"/>
     <g fill="#fff"><rect x="9" y="9" width="1" height="1"/><rect x="20" y="10" width="2" height="2"/><rect x="14" y="15" width="1" height="1"/><rect x="11" y="17" width="2" height="2"/></g>
-    <rect x="12" y="23" width="8" height="3" fill="#808080" stroke="#000"/><rect x="8" y="26" width="16" height="3" fill="#c0c0c0" stroke="#000"/>`)
+    <rect x="12" y="23" width="8" height="3" fill="#808080" stroke="#000"/><rect x="8" y="26" width="16" height="3" fill="#c0c0c0" stroke="#000"/>`),
+  // ---- arcade games (original pixel icons, no game artwork)
+  keen: svg(`
+    <rect x="2" y="2" width="28" height="28" fill="#5555ff" stroke="#000"/>
+    <path d="M9 13 Q9 5 16 5 Q23 5 23 13 Z" fill="#ffff55" stroke="#000" shape-rendering="geometricPrecision"/>
+    <rect x="15" y="2" width="2" height="4" fill="#ff5555"/>
+    <rect x="10" y="13" width="12" height="9" fill="#ffccaa" stroke="#000"/>
+    <rect x="12" y="15" width="2" height="2" fill="#000"/><rect x="18" y="15" width="2" height="2" fill="#000"/>
+    <rect x="14" y="19" width="4" height="1" fill="#a00"/>
+    <rect x="11" y="22" width="10" height="5" fill="#55ff55" stroke="#000"/>
+    <rect x="3" y="27" width="26" height="2" fill="#00aa00"/>`),
+  ontherun: svg(`
+    <rect x="2" y="2" width="28" height="28" fill="#1a1a2a" stroke="#000"/>
+    <path d="M2 30 L13 12 H19 L30 30 Z" fill="#555"/>
+    <path d="M15.5 14 V17 M15.5 20 V24 M15.5 27 V30" stroke="#ff0"/>
+    <rect x="10" y="20" width="12" height="6" fill="#d22" stroke="#000"/><rect x="12" y="17" width="8" height="4" fill="#8cf" stroke="#000"/>
+    <rect x="9" y="25" width="3" height="3" fill="#000"/><rect x="20" y="25" width="3" height="3" fill="#000"/>
+    <rect x="4" y="4" width="4" height="3" fill="#f00"/><rect x="8" y="4" width="4" height="3" fill="#00f"/>`),
+  robotrage: svg(`
+    <rect x="2" y="2" width="28" height="28" fill="#2a2a2a" stroke="#000"/>
+    <rect x="8" y="7" width="16" height="11" fill="#9ab" stroke="#000"/>
+    <rect x="10" y="10" width="4" height="3" fill="#f22"/><rect x="18" y="10" width="4" height="3" fill="#f22"/>
+    <path d="M10 15 L12 16 L14 15 L16 16 L18 15 L20 16 L22 15" stroke="#000" fill="none"/>
+    <rect x="15" y="3" width="2" height="4" fill="#666"/><rect x="14" y="2" width="4" height="2" fill="#fc0"/>
+    <rect x="5" y="19" width="22" height="6" fill="#678" stroke="#000"/>
+    <circle cx="9" cy="27" r="2.5" fill="#111" stroke="#888" shape-rendering="geometricPrecision"/><circle cx="23" cy="27" r="2.5" fill="#111" stroke="#888" shape-rendering="geometricPrecision"/>`),
+  victorvector: svg(`
+    <rect x="2" y="2" width="28" height="28" fill="#0b2a10" stroke="#000"/>
+    <circle cx="16" cy="16" r="11" fill="none" stroke="#9cff3a" stroke-width="2" shape-rendering="geometricPrecision"/>
+    <path d="M9 10 L16 24 L23 10" fill="none" stroke="#fff" stroke-width="3" shape-rendering="geometricPrecision"/>
+    <path d="M9 10 L16 24 L23 10" fill="none" stroke="#3ad0ff" stroke-width="1.5" shape-rendering="geometricPrecision"/>
+    <rect x="22" y="22" width="6" height="4" fill="#c8a060" stroke="#000"/><rect x="26" y="20" width="2" height="2" fill="#c8a060"/>`),
+  arkanoid: svg(`
+    <rect x="2" y="2" width="28" height="28" fill="#000" stroke="#000"/>
+    <rect x="2" y="2" width="28" height="2" fill="#aaa"/><rect x="2" y="2" width="2" height="28" fill="#aaa"/><rect x="28" y="2" width="2" height="28" fill="#aaa"/>
+    <g stroke="#000"><rect x="5" y="6" width="5" height="3" fill="#ccc"/><rect x="10" y="6" width="6" height="3" fill="#ccc"/><rect x="16" y="6" width="6" height="3" fill="#ccc"/><rect x="22" y="6" width="5" height="3" fill="#ccc"/>
+    <rect x="5" y="9" width="5" height="3" fill="#e33"/><rect x="10" y="9" width="6" height="3" fill="#e33"/><rect x="16" y="9" width="6" height="3" fill="#fd3"/><rect x="22" y="9" width="5" height="3" fill="#fd3"/>
+    <rect x="5" y="12" width="5" height="3" fill="#36f"/><rect x="16" y="12" width="6" height="3" fill="#f3c"/><rect x="22" y="12" width="5" height="3" fill="#3d3"/></g>
+    <rect x="15" y="19" width="2" height="2" fill="#fff"/>
+    <rect x="10" y="25" width="12" height="3" fill="#ccc" stroke="#000"/><rect x="10" y="25" width="2" height="3" fill="#e33"/><rect x="20" y="25" width="2" height="3" fill="#e33"/>`),
+  arena: svg(`
+    <path d="M6 4 H26 V15 Q26 25 16 29 Q6 25 6 15 Z" fill="#7a1a10" stroke="#000" shape-rendering="geometricPrecision"/>
+    <path d="M9 7 H23 V15 Q23 22 16 25 Q9 22 9 15 Z" fill="#d8b030" stroke="#000" shape-rendering="geometricPrecision"/>
+    <path d="M11 9 L21 21 M21 9 L11 21" stroke="#e8e8e8" stroke-width="2.5" shape-rendering="geometricPrecision"/>
+    <path d="M11 9 L21 21 M21 9 L11 21" stroke="#555" stroke-width="1" shape-rendering="geometricPrecision"/>`),
+  daggerfall: svg(`
+    <rect x="2" y="2" width="28" height="28" fill="#1a1630" stroke="#000"/>
+    <circle cx="23" cy="8" r="3.5" fill="#eee" shape-rendering="geometricPrecision"/>
+    <path d="M15 3 L18 3 L17.5 19 L15.5 19 Z" fill="#ddd" stroke="#000" shape-rendering="geometricPrecision"/>
+    <rect x="11" y="19" width="11" height="2" fill="#c9a54a" stroke="#000"/>
+    <rect x="15" y="21" width="3" height="6" fill="#6a3a1a" stroke="#000"/><rect x="14.5" y="27" width="4" height="2" fill="#c9a54a" stroke="#000"/>`)
 };
 
 // Generic per-app icon for tools that live in the toolbox folder.

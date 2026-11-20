@@ -1,0 +1,16 @@
+Commander Keen 4 on dominiccerchio.com
+======================================
+
+Game:   Commander Keen in "Secret of the Oracle" (episode 4), shareware v1.4.
+        Copyright (c) 1991 id Software, Inc. Distributed by Apogee Software.
+        assets/keen4.zip is the complete, unaltered shareware package
+        (KEEN4E.EXE, data files, CATALOG.EXE, DEALERS.EXE, ORDER.FRM,
+        README.DOC and Apogee's LICENSE.DOC) exactly as released, with all
+        copyright notices intact. It is offered free of charge and never sold.
+        Episodes 5 and 6 (the registered episodes) are not included.
+        Buy the full trilogy: https://store.steampowered.com/app/9180/
+
+Emulator: js-dos 6.22 (DOSBox, GPL-2.0), see ../dos/NOTICE.txt.
+
+index.html in this folder is a small wrapper (scaling, focus overlay and the
+keyboard help bar) written for this site.

@@ -1,0 +1,63 @@
+<!doctype html>
+<!--
+  Commander Keen 4: Secret of the Oracle (shareware episode) in DOSBox.
+  Emulator: js-dos 6.22 (GPL-2.0) — https://github.com/caiiiycuk/js-dos — see ../dos/NOTICE.txt.
+  Game data: the unaltered Apogee shareware package, assets/keen4.zip (id Software, 1991). Free, never sold.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <title>Commander Keen 4 (shareware)</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #000; overflow: hidden; font: 12px Tahoma, "MS Sans Serif", sans-serif; color: #c0c0c0; user-select: none; }
+    #wrap { position: absolute; inset: 0 0 22px 0; display: grid; place-items: center; }
+    .dosbox-container { position: relative; }
+    canvas#jsdos { display: block; image-rendering: pixelated; image-rendering: crisp-edges; outline: none; background: #000; }
+    .dosbox-overlay, .dosbox-loader { display: none !important; }
+    #overlay { position: absolute; inset: 0 0 22px 0; display: grid; place-items: center; background: rgba(0,0,0,.7); cursor: pointer; text-align: center; }
+    #overlay b { display: block; font: bold 30px "Arial Black", Impact, sans-serif; color: #ffd800; letter-spacing: 1px; text-shadow: 3px 3px 0 #b02000; }
+    #overlay i { display: block; font: italic bold 14px Georgia, serif; color: #8fd8ff; margin: 2px 0 10px; }
+    #overlay span { color: #ddd; }
+    #overlay[hidden] { display: none; }
+    #bar { position: absolute; left: 0; right: 0; bottom: 0; height: 22px; display: flex; align-items: center; gap: 12px; padding: 0 8px; background: #c0c0c0; color: #000; white-space: nowrap; overflow: hidden; }
+    #bar a { color: #000080; }
+  </style>
+</head>
+<body>
+  <div id="wrap"><canvas id="jsdos" tabindex="0"></canvas></div>
+  <div id="overlay"><div><b>COMMANDER KEEN</b><i>in "Secret of the Oracle"</i><span id="msg">Loading DOS…</span></div></div>
+  <div id="bar">
+    <span>Arrows move · Ctrl jump · Alt pogo · Space shoot · Enter status · Esc menu</span>
+    <span style="margin-left:auto">Shareware episode · id Software / Apogee · <a href="NOTICE.txt" target="_blank">notice</a> · emulator <a href="https://github.com/caiiiycuk/js-dos" target="_blank" rel="noopener">js-dos</a> (GPL-2.0)</span>
+  </div>
+  <script src="../dos/js-dos.js"></script>
+  <script>
+    "use strict";
+    const canvas = document.getElementById("jsdos"), overlay = document.getElementById("overlay"), msg = document.getElementById("msg");
+    let ready = false, ci = null;
+
+    // DOSBox renders 320x200 EGA on 4:3 glass
+    function fit() {
+      const W = innerWidth, H = innerHeight - 22, ar = 4 / 3;
+      let w = W, h = W / ar; if (h > H) { h = H; w = H * ar; }
+      canvas.style.width = Math.floor(w) + "px"; canvas.style.height = Math.floor(h) + "px";
+    }
+    addEventListener("resize", fit); fit();
+
+    Dos(canvas, { wdosboxUrl: "../dos/wdosbox.js", cycles: "auto", autolock: false, onprogress: (stage, total, loaded) => {
+      if (total) msg.textContent = "Loading " + stage.replace(/\s*\(.*\)/, "") + "… " + Math.round(loaded * 100 / total) + "%";
+    } }).ready((fs, main) => {
+      fs.extract("assets/keen4.zip").then(() => main(["-c", "KEEN4E.EXE"])).then(c => {
+        ci = c; ready = true; fit();
+        msg.textContent = "Click to play";
+      });
+    }).catch(err => { msg.textContent = "Couldn't start DOS: " + String(err && err.message || err); });
+
+    const start = () => { if (!ready) return; overlay.hidden = true; window.focus(); canvas.focus(); };
+    overlay.addEventListener("click", start);
+    canvas.addEventListener("blur", () => { if (ready) { msg.textContent = "Click to keep playing"; overlay.hidden = false; } });
+    addEventListener("focus", () => { if (ready && overlay.hidden) canvas.focus(); });
+  </script>
+</body>
+</html>

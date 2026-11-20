@@ -45,7 +45,10 @@ WHAT'S ON THIS COMPUTER
                      Name Generator, Lost at Sea, Squeeze Play
                      (cold-press juice recipes) and more
   Toolbox .......... ${TRINKETS.length} tiny web tools (the junk drawer)
-  Games ............ Solitaire, Minesweeper, Space Pinball, DOOM
+  Games ............ Solitaire, Minesweeper, Space Pinball, DOOM,
+                     Commander Keen 4, Arkanoid, Elder Scrolls
+                     Arena + Daggerfall, Robot Rage, On the Run,
+                     Victor Vector & Yondo
   Paint ............ go on, draw something
   Recycle Bin ...... my old green-screen homepage and the apps
                      I've retired. I couldn't bring myself to
@@ -88,6 +91,13 @@ const P = {
   pinball: { title: "Space Pinball", icon: "pinball", url: "apps/win95/pinball.html?embed=1", w: 820, h: 640, label: "3D Pinball" },
   paint: { title: "untitled - Paint", icon: "paint", url: "apps/win95/paint.html?embed=1", w: 820, h: 600, label: "Paint" },
   doom: { title: "DOOM", icon: "doom", url: "apps/doom/index.html", w: 660, h: 470 },
+  keen4: { title: "Commander Keen 4", icon: "keen", url: "apps/keen4/index.html", w: 660, h: 500, label: "Commander Keen 4", desc: "Secret of the Oracle (1991), the freely-distributable shareware episode in DOSBox" },
+  ontherun: { title: "On the Run", icon: "ontherun", url: "apps/games/arcade.html?g=ontherun", w: 820, h: 600, desc: "The Miniclip getaway driver, plus a tribute you can still play" },
+  robotrage: { title: "Robot Rage", icon: "robotrage", url: "apps/games/arcade.html?g=robotrage", w: 820, h: 620, desc: "Robot arena combat, remade online by KonsomeJona (itch.io)" },
+  victorvector: { title: "Victor Vector & Yondo", icon: "victorvector", url: "apps/games/arcade.html?g=victorvector", w: 700, h: 480, desc: "The Cyberplasm Formula (Sanctuary Woods, 1993), streamed by yag.im" },
+  arkanoid: { title: "Arkanoid", icon: "arkanoid", url: "apps/games/arcade.html?g=arkanoid", w: 760, h: 560, desc: "Taito's brick breaker (DOS, 1988) via the Internet Archive" },
+  arena: { title: "The Elder Scrolls: Arena", icon: "arena", url: "apps/games/arcade.html?g=arena", w: 820, h: 600, label: "TES Arena", desc: "Bethesda, 1994, via the Internet Archive" },
+  daggerfall: { title: "The Elder Scrolls II: Daggerfall", icon: "daggerfall", url: "apps/games/arcade.html?g=daggerfall", w: 820, h: 600, label: "TES Daggerfall", desc: "Bethesda, 1996, via the Internet Archive" },
   iexplore: { title: "dom 95 Start Page - Internet Explorer", icon: "iexplore", url: "apps/win95/iexplore.html?embed=1", w: 820, h: 600, label: "Internet Explorer", desc: "Browse the 1990s web through the Internet Archive's Wayback Machine" },
   domonline: { title: "dom Online", icon: "domonline", url: "apps/win95/domonline.html?embed=1", w: 780, h: 560, label: "dom Online", desc: "Dial in to dom Online (a parody of 90s online services). Speakers up." },
   inbox: { title: "Inbox - Outlook Express", icon: "inbox", url: "apps/win95/inbox.html?embed=1", w: 760, h: 540, label: "Inbox", desc: "Letters from Dom. Write back through LinkedIn." },
@@ -97,7 +107,7 @@ const P = {
   calc: { title: "Calculator", icon: "calc", url: "apps/win95/calc.html?embed=1", w: 262, h: 236 },
   wordpad: { title: "Document - WordPad", icon: "wordpad", url: "apps/win95/wordpad.html?embed=1", w: 646, h: 462, label: "WordPad" },
   apps: { title: "My Apps", icon: "apps", folder: [], w: 480, h: 300 },
-  games: { title: "Games", icon: "folder", folder: ["solitaire", "freecell", "hearts", "minesweeper", "pinball", "ski", "doom", "app-kojima", "app-lostatsea", "app-everybodyisjohn"], w: 500, h: 300 },
+  games: { title: "Games", icon: "folder", w: 560, h: 380, folder: ["solitaire", "freecell", "hearts", "minesweeper", "pinball", "ski", "doom", "keen4", "ontherun", "robotrage", "victorvector", "arkanoid", "arena", "daggerfall", "app-kojima", "app-lostatsea", "app-everybodyisjohn"] },
   accessories: { title: "Accessories", icon: "folder", folder: ["calc", "notepad", "paint", "wordpad", "iexplore", "inbox", "domonline"], w: 460, h: 260 },
   toolbox: { title: "Toolbox", icon: "toolbox", folder: [], w: 560, h: 380 },
   recycle: { title: "Recycle Bin", icon: "recycle", folder: ["archivedfolder", "oldsite"], w: 400, h: 250 },
@@ -536,10 +546,10 @@ const VIEWS = {
       <p><b>Getting around.</b> Double-click a desktop icon to open it (tap on phones). Drag windows by their title bars; resize from the bottom-right corner. Use the taskbar to switch between windows.</p>
       <p><b>The Start menu</b> has everything: Programs, Documents, Settings, Run… and Shut Down.</p>
       <p><b>Navigator 3.5 and 3.9</b> are 2D homages to Packard Bell Navigator, the house-shaped shell that came on 1990s family PCs. Every room holds some of my projects. Point at things to see what they are; click to use them; the red "i" InfoGuide explains anything. KidSpace is in there too.</p>
-      <p><b>Games.</b> Solitaire, FreeCell, Hearts, Minesweeper, SkiDom and Space Pinball are original recreations written for this site. DOOM is the freely-distributable shareware episode running on <a href="https://github.com/jacobenget/doom.wasm" target="_blank" rel="noopener">doom.wasm</a>.</p>
+      <p><b>Games.</b> Solitaire, FreeCell, Hearts, Minesweeper, SkiDom and Space Pinball are original recreations written for this site. DOOM is the freely-distributable shareware episode running on <a href="https://github.com/jacobenget/doom.wasm" target="_blank" rel="noopener">doom.wasm</a>, and Commander Keen 4 is Apogee's shareware episode running in <a href="https://github.com/caiiiycuk/js-dos" target="_blank" rel="noopener">js-dos</a>. The other classics (Arkanoid, Arena, Daggerfall, Robot Rage, Victor Vector &amp; Yondo) play from the sites that preserve them: the Internet Archive, itch.io and yag.im. On the Run's home is gone, so there's a tribute to it instead.</p>
       <p><b>Getting online.</b> Internet Explorer visits the 1990s web through the Internet Archive's Wayback Machine: pick a year next to the address bar and type any site. dom Online dials in (speakers up), and the Inbox has letters from me. Writing back goes through LinkedIn.</p>
       <p><b>Screen savers and colour schemes</b> are in Display Properties (right-click the desktop, then Properties).</p>
-      <p><b>Run commands:</b> help, navigator, kidspace, notepad, wordpad, calc, paint, iexplore, mail, aol, doom, pinball, solitaire, freecell, hearts, ski, winmine, linkedin, juice, dos, about.</p>
+      <p><b>Run commands:</b> help, navigator, kidspace, notepad, wordpad, calc, paint, iexplore, mail, aol, doom, pinball, solitaire, freecell, hearts, ski, winmine, keen, arkanoid, arena, daggerfall, robotrage, ontherun, victor, linkedin, juice, dos, about.</p>
       <p style="color:#555">A fan-made homage. Windows is a trademark of Microsoft; Packard Bell Navigator was made by Ark Interface/Packard Bell. Not affiliated. All artwork here is original.</p></div>`;
   },
   run(win) {
@@ -603,7 +613,7 @@ function download(name, text) {
 }
 
 // ---------------------------------------------------------------- Run command
-const ALIASES = { winmine: "minesweeper", mines: "minesweeper", sol: "solitaire", mspaint: "paint", pbrush: "paint", paintbrush: "paint", cmd: "terminal", command: "terminal", dos: "terminal", explorer: "mycomputer", control: "controlpanel", kidspace: "navigator#kidspace", nav: "navigator", "doom.exe": "doom", pinball: "pinball", about: "about", "about.txt": "about", readme: "about", "readme.txt": "about", nav35: "navigator", "navigator3.5": "navigator", nav39: "navigator39", "navigator3.9": "navigator39", linkedin: "linkedin", calc: "calc", juice: "app-juicer", juicer: "app-juicer", nama: "app-juicer", iexplore: "iexplore", ie: "iexplore", internet: "iexplore", msie: "iexplore", outlook: "inbox", msimn: "inbox", mail: "inbox", inbox: "inbox", email: "inbox", aol: "domonline", online: "domonline", domonline: "domonline", dialup: "domonline", rasphone: "domonline", wordpad: "wordpad", write: "wordpad", freecell: "freecell", hearts: "hearts", mshearts: "hearts", ski: "ski", skifree: "ski", skidom: "ski", calculator: "calc", pmpcalc: "tk-pmpcalc", desk: "controlpanel", "desk.cpl": "controlpanel", ssaver: "controlpanel#ss", screensaver: "controlpanel#ss", accessories: "accessories", games: "games" };
+const ALIASES = { winmine: "minesweeper", mines: "minesweeper", sol: "solitaire", mspaint: "paint", pbrush: "paint", paintbrush: "paint", cmd: "terminal", command: "terminal", dos: "terminal", explorer: "mycomputer", control: "controlpanel", kidspace: "navigator#kidspace", nav: "navigator", "doom.exe": "doom", pinball: "pinball", about: "about", "about.txt": "about", readme: "about", "readme.txt": "about", nav35: "navigator", "navigator3.5": "navigator", nav39: "navigator39", "navigator3.9": "navigator39", linkedin: "linkedin", calc: "calc", juice: "app-juicer", juicer: "app-juicer", nama: "app-juicer", iexplore: "iexplore", ie: "iexplore", internet: "iexplore", msie: "iexplore", outlook: "inbox", msimn: "inbox", mail: "inbox", inbox: "inbox", email: "inbox", aol: "domonline", online: "domonline", domonline: "domonline", dialup: "domonline", rasphone: "domonline", wordpad: "wordpad", write: "wordpad", freecell: "freecell", hearts: "hearts", mshearts: "hearts", ski: "ski", skifree: "ski", skidom: "ski", calculator: "calc", pmpcalc: "tk-pmpcalc", desk: "controlpanel", "desk.cpl": "controlpanel", ssaver: "controlpanel#ss", screensaver: "controlpanel#ss", accessories: "accessories", games: "games", keen: "keen4", keen4e: "keen4", commanderkeen: "keen4", ontherun: "ontherun", otr: "ontherun", getaway: "ontherun", robotrage: "robotrage", robot: "robotrage", victor: "victorvector", yondo: "victorvector", vector: "victorvector", arkanoid: "arkanoid", arena: "arena", tesarena: "arena", daggerfall: "daggerfall", dagger: "daggerfall", fall: "daggerfall", "dagger.exe": "daggerfall" };
 function runCommand(v) {
   const c = v.toLowerCase().replace(/\.exe$/, "");
   if (!c) return;
@@ -631,7 +641,7 @@ const startBtn = $("#startBtn"), startMenu = $("#startMenu");
 const START = [
   { label: "Programs", icon: "apps", sub: [
     { label: "Accessories", icon: "folder", sub: [{ label: "Games", icon: "folder", sub: ["freecell", "hearts", "minesweeper", "solitaire", "ski"] }, "-", "calc", "notepad", "paint", "wordpad", "find"] },
-    { label: "Games", icon: "folder", sub: ["solitaire", "freecell", "hearts", "minesweeper", "pinball", "ski", "doom"] },
+    { label: "Games", icon: "folder", sub: ["solitaire", "freecell", "hearts", "minesweeper", "pinball", "ski", "doom", "-", "keen4", "ontherun", "robotrage", "victorvector", "arkanoid", "arena", "daggerfall"] },
     { label: "My Apps", icon: "folder", sub: Object.keys(APPS).map(k => "app-" + k) },
     { label: "Online Services", icon: "folder", sub: ["domonline"] },
     { label: "Packard Bell", icon: "folder", sub: ["navigator", "navigator39"] }, "iexplore", "inbox", "linkedin", "toolbox", "terminal"] },
@@ -704,9 +714,74 @@ function shutdownDialog() {
     const v = $("input[name=sd]:checked", win.body).value; close(win); done();
     if (v === "restart") location.reload();
     else if (v === "dos") location.href = "terminal.html";
-    else { const s = h(`<div id="shutdown"><p>It's now safe to turn off<br>your computer.</p></div>`); document.body.appendChild(s); s.addEventListener("click", () => location.reload()); }
+    else powerOff();
   });
 }
+
+// ---------------------------------------------------------------- CRT power off / on
+// "It's now safe to turn off your computer", then the tube collapses to a white line and a dot,
+// and we pull back to see the monitor sitting on the desk. Its power button turns dom 95 back on.
+let poweredOff = false;
+const POWER_SVG = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v8" stroke="#5a5446" stroke-width="2.6" stroke-linecap="round"/><path d="M7 6.5a7.5 7.5 0 1 0 10 0" fill="none" stroke="#5a5446" stroke-width="2.6" stroke-linecap="round"/></svg>`;
+function powerOff() {
+  poweredOff = true; clearTimeout(saverT); closeStart(); closeMenus();
+  const s = h(`<div id="shutdown"><p>It's now safe to turn off<br>your computer.</p></div>`); document.body.appendChild(s);
+  let gone = false;
+  const go = () => { if (gone) return; gone = true; clearTimeout(t); collapse(); };
+  const t = setTimeout(go, 1600);
+  s.addEventListener("click", go);
+}
+function collapse() {
+  const body = document.body;
+  document.documentElement.classList.add("crt"); sfx.crtOff();
+  body.classList.add("crt-off");
+  let done = false;
+  const after = () => {
+    if (done) return; done = true;
+    [...wins.values()].forEach(close);
+    document.querySelectorAll("#shutdown,#dim").forEach(e => e.remove());
+    body.classList.remove("crt-off"); body.style.visibility = "hidden";
+    showMonitor(false);
+  };
+  body.addEventListener("animationend", e => { if (e.target === body && e.animationName === "crtOff") after(); });
+  setTimeout(after, 1000);
+}
+function showMonitor(instant) {
+  const old = $("#crt"); if (old) old.remove();
+  const vw = window.innerWidth, vh = window.innerHeight, k = 0.72;
+  const gw = Math.round(vw * k), gh = Math.round(vh * k), s = vw / gw;
+  const bz = Math.round(Math.max(12, Math.min(vw, vh) * 0.04)), chin = Math.round(Math.max(36, vh * 0.085));
+  const mw = gw + bz * 2, mh = gh + bz * 2 + chin;
+  const left = Math.round((vw - mw) / 2), top = Math.max(6, Math.round((vh * 0.95 - mh) / 2));
+  const el = h(`<div id="crt" role="dialog" aria-label="The computer is off">
+    <div class="tube" style="left:${left}px;top:${top}px;--bz:${bz}px;--chin:${chin}px">
+      <div class="shell"><div class="glass" style="width:${gw}px;height:${gh}px">${instant ? "" : `<div class="dot"></div>`}</div></div>
+      <div class="chin"><span class="badge">dom<b>95</b></span><span class="vents"></span><i class="led" title="Standby"></i><button class="power" aria-label="Power" title="Power">${POWER_SVG}</button></div>
+    </div><p class="hint">Press the power button to turn dom 95 back on</p></div>`);
+  document.body.appendChild(el);
+  const mon = $(".tube", el), btn = $(".power", el);
+  // the zoom starts with the glass filling the window exactly, so it reads as one continuous shot
+  const full = `translate(${vw / 2 - left - (bz + gw / 2) * s}px, ${vh / 2 - top - (bz + gh / 2) * s}px) scale(${s})`;
+  const ready = () => { el.classList.add("ready"); btn.focus({ preventScroll: true }); };
+  if (instant) ready();
+  else {
+    mon.style.transform = full;
+    requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(() => { mon.classList.add("zoom"); mon.style.transform = "none"; }, 380)));
+    mon.addEventListener("transitionend", ready, { once: true });
+    setTimeout(ready, 2600);
+  }
+  btn.addEventListener("click", () => powerOn(el, mon, full), { once: true });
+}
+function powerOn(el, mon, full) {
+  window.removeEventListener("resize", onOffResize);
+  const btn = $(".power", el); btn.classList.add("down"); setTimeout(() => btn.classList.remove("down"), 170);
+  $(".led", el).classList.add("green"); el.classList.remove("ready"); sfx.crtOn();
+  setTimeout(() => $(".glass", el).classList.add("on"), 220);
+  setTimeout(() => { mon.classList.add("zoom"); mon.style.transform = full; }, 420);
+  setTimeout(() => { sessionStorage.setItem("w95.poweron", "1"); sessionStorage.removeItem("w95.chimed"); location.reload(); }, 420 + 1550);
+}
+function onOffResize() { if (poweredOff && $("#crt") && $("#crt").classList.contains("ready")) showMonitor(true); }
+window.addEventListener("resize", onOffResize);
 VIEWS.shutdown = win => {
   win.body.innerHTML = `<div class="dlg"><div class="row"><span class="big">${ICONS.shutdown}</span><div><p>Are you sure you want to:</p>
     <label><input type="radio" name="sd" value="off" checked> Shut down the computer?</label>
@@ -755,7 +830,7 @@ window.addEventListener("message", e => {
 // ---------------------------------------------------------------- screen saver
 let saverT = 0, saverEl = null, saverStop = null, lastAct = Date.now();
 function startSaver(id = curSaver()) {
-  if (saverEl || id === "none") return;
+  if (saverEl || id === "none" || poweredOff) return;
   closeStart(); closeMenus();
   saverEl = h(`<div id="saver"><canvas></canvas></div>`); document.body.appendChild(saverEl);
   const cv = $("canvas", saverEl), dpr = Math.min(window.devicePixelRatio || 1, 1.5);
@@ -792,6 +867,8 @@ let chimed = sessionStorage.getItem("w95.chimed") === "1";
 document.addEventListener("pointerdown", () => { if (!chimed) { chimed = true; sessionStorage.setItem("w95.chimed", "1"); sfx.unlock(); sfx.startup(); } }, { once: true, capture: true });
 
 // ---------------------------------------------------------------- boot
+// coming back from the CRT power button: index.html already set html.crt-boot so the tube warms up
+if (sessionStorage.getItem("w95.poweron")) { sessionStorage.removeItem("w95.poweron"); setTimeout(() => document.documentElement.classList.remove("crt-boot"), 900); }
 const want = decodeURIComponent((location.hash || "").slice(1));
 if (has(want)) open(want);
 else if (/^(nav39-)?[a-z]+$/.test(want) && ["living", "info", "software", "map", "manuals", "kidspace", "workspace", "myspace", "gameroom"].includes(want.replace("nav39-", ""))) openNavRoom(want.startsWith("nav39-") ? "navigator39" : "navigator", want.replace("nav39-", ""));

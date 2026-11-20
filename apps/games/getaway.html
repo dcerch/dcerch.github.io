@@ -1,0 +1,315 @@
+<!doctype html>
+<!--
+  GETAWAY — an original pseudo-3D getaway driver for dom 95, written for this site as a tribute to
+  "On the Run" (Officine Pixel / Miniclip), which nobody can play any more since Miniclip's web
+  games went dark. All code, art and sound here are original; nothing is taken from that game.
+  Road renderer: the classic segment-projection technique (as in 80s arcade racers).
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <title>Getaway</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #000; overflow: hidden; font: 12px Tahoma, "MS Sans Serif", sans-serif; user-select: none; touch-action: none; }
+    canvas { position: absolute; inset: 0 0 22px 0; width: 100%; height: calc(100% - 22px); image-rendering: pixelated; image-rendering: crisp-edges; outline: none; }
+    #bar { position: absolute; left: 0; right: 0; bottom: 0; height: 22px; display: flex; align-items: center; gap: 12px; padding: 0 8px; background: #c0c0c0; color: #000; white-space: nowrap; overflow: hidden; }
+    #bar a { color: #000080; } #bar .r { margin-left: auto; }
+    #pads { position: absolute; inset: 0 0 22px 0; display: none; pointer-events: none; }
+    body.touch #pads { display: block; }
+    .pad { position: absolute; bottom: 14px; width: 64px; height: 64px; border-radius: 12px; pointer-events: auto; background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.4); color: #fff; font: bold 18px Arial; }
+    .pad.on { background: rgba(255,255,255,.4); }
+  </style>
+</head>
+<body>
+  <canvas id="c" tabindex="0"></canvas>
+  <div id="pads">
+    <button class="pad" data-k="left" style="left:12px">◀</button>
+    <button class="pad" data-k="right" style="left:86px">▶</button>
+    <button class="pad" data-k="brake" style="right:86px;font-size:12px">BRAKE</button>
+    <button class="pad" data-k="gas" style="right:12px;font-size:12px;background:rgba(0,200,0,.3)">GAS</button>
+  </div>
+  <div id="bar"><span>↑/W gas · ↓/S brake · ←/→ steer · M sound · P pause</span><span class="r">An original tribute to <i>On the Run</i> (Officine Pixel / Miniclip)</span></div>
+  <script>
+  "use strict";
+  // ------------------------------------------------------------ setup
+  const cv = document.getElementById("c"), ctx = cv.getContext("2d");
+  let W = 480, H = 300;
+  function size() { const r = cv.getBoundingClientRect(); H = 300; W = Math.max(320, Math.round(H * r.width / Math.max(1, r.height))); cv.width = W; cv.height = H; }
+  addEventListener("resize", size); size();
+
+  const SEG = 200, RUMBLE = 3, ROAD = 2000, LANES = 3, FOV = 100, CAM_H = 1000, DRAW = 220;
+  const DEPTH = 1 / Math.tan((FOV / 2) * Math.PI / 180), PLAYER_Z = CAM_H * DEPTH;
+  const MAX = SEG * 60, ACCEL = MAX / 5, BRAKE = -MAX, DECEL = -MAX / 5, OFF_DECEL = -MAX / 2, OFF_LIMIT = MAX / 4, CENTRIFUGAL = 0.3;
+  const CAR_W = 0.36, CHECKPOINT = 4000; // metres between checkpoints (1 segment = 2 m)
+
+  const lerp = (a, b, p) => a + (b - a) * p, clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const easeIn = (a, b, p) => a + (b - a) * p * p, easeInOut = (a, b, p) => a + (b - a) * ((-Math.cos(p * Math.PI) / 2) + 0.5);
+  const overlap = (x1, w1, x2, w2, k = 1) => { const h = k / 2; return !((x1 + w1 * h) < (x2 - w2 * h) || (x1 - w1 * h) > (x2 + w2 * h)); };
+  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+
+  // ------------------------------------------------------------ track
+  const segs = [];
+  const lastY = () => segs.length ? segs[segs.length - 1].p2.world.y : 0;
+  function addSeg(curve, y) {
+    const n = segs.length;
+    segs.push({ i: n, curve, sprites: [], cars: [], alt: Math.floor(n / RUMBLE) % 2,
+      p1: { world: { y: lastY(), z: n * SEG }, camera: {}, screen: {} }, p2: { world: { y, z: (n + 1) * SEG }, camera: {}, screen: {} } });
+  }
+  function addRoad(enter, hold, leave, curve, hill) {
+    const y0 = lastY(), y1 = y0 + hill * SEG, t = enter + hold + leave;
+    for (let n = 0; n < enter; n++) addSeg(easeIn(0, curve, n / enter), easeInOut(y0, y1, n / t));
+    for (let n = 0; n < hold; n++) addSeg(curve, easeInOut(y0, y1, (enter + n) / t));
+    for (let n = 0; n < leave; n++) addSeg(easeInOut(curve, 0, n / leave), easeInOut(y0, y1, (enter + hold + n) / t));
+  }
+  const S = 25, M = 50, L = 100;
+  addRoad(M, M, M, 0, 0);
+  addRoad(S, M, S, 2, 20);
+  addRoad(M, M, M, 0, -10);
+  addRoad(S, S, S, -4, 0); addRoad(S, S, S, 4, 10); addRoad(S, S, S, -3, -10);
+  addRoad(L, L, L, 0, 30);
+  addRoad(M, L, M, -3, -20);
+  for (let k = 0; k < 6; k++) addRoad(10, 10, 10, 0, k % 2 ? -4 : 4);
+  addRoad(M, M, M, 5, 0);
+  addRoad(L, M, L, 0, -30);
+  addRoad(S, M, S, -5, 15); addRoad(S, M, S, 5, -15);
+  addRoad(L, L, L, 2, 0);
+  addRoad(M, M, M, -2, 40);
+  addRoad(M, L, M, 0, -lastY() / SEG); // back down to sea level so the loop joins up
+  const N = segs.length, TRACK = N * SEG;
+  const seg = z => segs[Math.floor(z / SEG) % N];
+
+  // scenery: kind, side offset (road half-widths)
+  for (let n = 20; n < N; n += 3 + Math.floor(rnd() * 5)) {
+    const side = rnd() < 0.5 ? -1 : 1, kinds = ["palm", "palm", "lamp", "block", "bush", "sign"];
+    segs[n].sprites.push({ kind: kinds[Math.floor(rnd() * kinds.length)], offset: side * (1.35 + rnd() * 2.2), tint: rnd() });
+  }
+  for (let n = 10; n < N; n += 40) { segs[n].sprites.push({ kind: "lamp", offset: -1.3, tint: 0 }, { kind: "lamp", offset: 1.3, tint: 0 }); }
+
+  // ------------------------------------------------------------ game state
+  const STAGES = [
+    { name: "DOWNTOWN", sky: ["#3a8fe0", "#bfe4ff"], grass: ["#2f9a35", "#2a8c30"], rumble: ["#ddd", "#c22"], road: ["#6b6b6b", "#666"], lane: "#eee", dark: 0 },
+    { name: "SUNSET STRIP", sky: ["#5a2a80", "#ff9a4a"], grass: ["#4d7a2a", "#466f26"], rumble: ["#eee", "#333"], road: ["#5a5560", "#55505a"], lane: "#ffd060", dark: 0.15 },
+    { name: "HIGHWAY AFTER DARK", sky: ["#020618", "#1a2550"], grass: ["#0e2a14", "#0b2410"], rumble: ["#888", "#a22"], road: ["#2a2a32", "#26262e"], lane: "#aaa", dark: 0.45 },
+    { name: "THE DOCKS", sky: ["#30384a", "#8a96a8"], grass: ["#3a4a3a", "#344234"], rumble: ["#ccc", "#d80"], road: ["#555", "#505050"], lane: "#ddd", dark: 0.25 }
+  ];
+  const CAR_COLORS = ["#2a6ad8", "#e8c020", "#ffffff", "#3aa43a", "#8a2ad8", "#e87020", "#20b8c8", "#c0c0c0"];
+  let st, keys = { left: 0, right: 0, gas: 0, brake: 0 }, best = +localStorage.getItem("getaway.best") || 0;
+  function reset() {
+    segs.forEach(s => s.cars.length = 0);
+    const cars = [];
+    for (let k = 0; k < 70; k++) {
+      const z = Math.floor(rnd() * N) * SEG, c = { z, offset: [-0.66, 0, 0.66][Math.floor(rnd() * 3)], speed: MAX * (0.25 + rnd() * 0.3), color: CAR_COLORS[Math.floor(rnd() * CAR_COLORS.length)] };
+      if (z / SEG > 30) { seg(z).cars.push(c); cars.push(c); }
+    }
+    st = { mode: "title", pos: 0, x: 0, speed: 0, dist: 0, time: 45, stage: 0, nextCP: CHECKPOINT, gap: 260, cpFlash: 0, crash: 0, cars, t: 0, paused: false, msg: "" };
+  }
+  reset();
+
+  // ------------------------------------------------------------ sound (all synthesised)
+  let ac = null, eng = null, sir = null, muted = localStorage.getItem("nav.muted") === "1";
+  function audio() {
+    if (ac || muted) return; const A = window.AudioContext || window.webkitAudioContext; if (!A) return;
+    ac = new A(); const out = ac.createGain(); out.gain.value = 0.35; out.connect(ac.destination);
+    const o = ac.createOscillator(), f = ac.createBiquadFilter(), g = ac.createGain(); o.type = "sawtooth"; f.type = "lowpass"; f.frequency.value = 600; g.gain.value = 0;
+    o.connect(f); f.connect(g); g.connect(out); o.start(); eng = { o, g };
+    const s = ac.createOscillator(), sg = ac.createGain(); s.type = "square"; sg.gain.value = 0; s.connect(sg); sg.connect(out); s.start(); sir = { o: s, g: sg };
+    audio.out = out;
+  }
+  function bang() { if (!ac || muted) return; const t = ac.currentTime, len = ac.sampleRate * 0.35, b = ac.createBuffer(1, len, ac.sampleRate), d = b.getChannelData(0); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len); const s = ac.createBufferSource(), g = ac.createGain(); g.gain.value = 0.6; s.buffer = b; s.connect(g); g.connect(audio.out); s.start(t); }
+  function chime() { if (!ac || muted) return; [660, 880, 1320].forEach((f, i) => { const o = ac.createOscillator(), g = ac.createGain(), t = ac.currentTime + i * 0.09; o.type = "triangle"; o.frequency.value = f; g.gain.setValueAtTime(0.2, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.3); o.connect(g); g.connect(audio.out); o.start(t); o.stop(t + 0.35); }); }
+  function sound() {
+    if (!ac) return; const t = ac.currentTime, on = st.mode === "play" && !st.paused && !muted;
+    eng.o.frequency.setTargetAtTime(45 + 140 * st.speed / MAX, t, 0.05); eng.g.gain.setTargetAtTime(on ? 0.12 : 0, t, 0.08);
+    const near = clamp(1 - st.gap / 220, 0, 1);
+    sir.o.frequency.setTargetAtTime((Math.floor(st.t * 2.2) % 2) ? 960 : 700, t, 0.01); sir.g.gain.setTargetAtTime(on ? near * 0.07 : 0, t, 0.05);
+  }
+
+  // ------------------------------------------------------------ input
+  const KM = { ArrowLeft: "left", a: "left", A: "left", ArrowRight: "right", d: "right", D: "right", ArrowUp: "gas", w: "gas", W: "gas", ArrowDown: "brake", s: "brake", S: "brake", " ": "brake" };
+  addEventListener("keydown", e => {
+    if (KM[e.key]) { keys[KM[e.key]] = 1; e.preventDefault(); }
+    if (e.key === "Enter" || (e.key === " " && st.mode !== "play")) start();
+    if ((e.key === "p" || e.key === "P" || e.key === "Escape") && st.mode === "play") st.paused = !st.paused;
+    if (e.key === "m" || e.key === "M") { muted = !muted; if (!muted) audio(); }
+  });
+  addEventListener("keyup", e => { if (KM[e.key]) keys[KM[e.key]] = 0; });
+  cv.addEventListener("pointerdown", () => { cv.focus(); if (st.mode !== "play") start(); });
+  document.querySelectorAll(".pad").forEach(b => {
+    const on = e => { e.preventDefault(); keys[b.dataset.k] = 1; b.classList.add("on"); if (st.mode !== "play") start(); };
+    const off = e => { e.preventDefault(); keys[b.dataset.k] = 0; b.classList.remove("on"); };
+    b.addEventListener("pointerdown", on); ["pointerup", "pointercancel", "pointerleave"].forEach(t => b.addEventListener(t, off));
+  });
+  if (matchMedia("(pointer: coarse)").matches) document.body.classList.add("touch");
+  addEventListener("blur", () => { keys = { left: 0, right: 0, gas: 0, brake: 0 }; if (st.mode === "play") st.paused = true; });
+  function start() { if (st.mode === "play") return; if (st.mode !== "title") reset(); st.mode = "play"; audio(); if (ac && ac.state === "suspended") ac.resume(); }
+
+  // ------------------------------------------------------------ update
+  function update(dt) {
+    st.t += dt;
+    if (st.mode !== "play" || st.paused) { if (st.mode !== "play") st.pos = (st.pos + dt * MAX * 0.35) % TRACK; return; }
+    const ps = seg(st.pos + PLAYER_Z), sp = st.speed / MAX, dx = dt * 2 * sp;
+    st.pos = (st.pos + dt * st.speed) % TRACK;
+    if (keys.left) st.x -= dx; else if (keys.right) st.x += dx;
+    st.x -= dx * sp * ps.curve * CENTRIFUGAL;
+    st.speed += dt * (keys.gas ? ACCEL : keys.brake ? BRAKE : DECEL);
+    if ((st.x < -1 || st.x > 1) && st.speed > OFF_LIMIT) st.speed += dt * OFF_DECEL;
+    // roadside objects
+    if (st.x < -1 || st.x > 1) for (const s of ps.sprites) if (!st.crash && overlap(st.x, CAR_W, s.offset, s.kind === "block" ? 0.9 : 0.3)) { st.speed = Math.min(st.speed, MAX / 5); crash(); break; }
+    // traffic
+    for (const c of ps.cars) if (st.speed > c.speed && overlap(st.x, CAR_W, c.offset, CAR_W, 0.85)) { st.speed = c.speed * (c.speed / st.speed); st.pos = (c.z - PLAYER_Z + TRACK) % TRACK; crash(); break; }
+    st.x = clamp(st.x, -3, 3); st.speed = clamp(st.speed, 0, MAX);
+    for (const c of st.cars) { const old = seg(c.z); c.z = (c.z + dt * c.speed) % TRACK; const nu = seg(c.z); if (old !== nu) { old.cars.splice(old.cars.indexOf(c), 1); nu.cars.push(c); } }
+    // distance, checkpoints, clock, police
+    const metres = dt * st.speed / 100; st.dist += metres;
+    if (st.dist >= st.nextCP) { st.stage++; st.nextCP += CHECKPOINT; st.time += 32 - Math.min(10, st.stage * 2); st.cpFlash = 2.2; chime(); }
+    st.time -= dt; st.cpFlash = Math.max(0, st.cpFlash - dt); st.crash = Math.max(0, st.crash - dt);
+    const copSpeed = MAX * (0.55 + Math.min(0.3, st.stage * 0.06));
+    st.gap = clamp(st.gap + dt * (st.speed - copSpeed) / 100, 0, 320);
+    if (st.gap <= 0) over("BUSTED!"); else if (st.time <= 0) { st.time = 0; over("OUT OF TIME"); }
+  }
+  function crash() { if (st.crash > 0) return; st.crash = 0.6; bang(); }
+  function over(m) { st.mode = "over"; st.msg = m; st.speed = 0; if (st.dist > best) { best = Math.floor(st.dist); localStorage.setItem("getaway.best", best); } }
+
+  // ------------------------------------------------------------ render
+  function project(p, cx, cy, cz) {
+    p.camera.x = -cx; p.camera.y = (p.world.y || 0) - cy; p.camera.z = p.world.z - cz;
+    p.screen.scale = DEPTH / p.camera.z;
+    p.screen.x = Math.round(W / 2 + p.screen.scale * p.camera.x * W / 2);
+    p.screen.y = Math.round(H / 2 - p.screen.scale * p.camera.y * H / 2);
+    p.screen.w = Math.round(p.screen.scale * ROAD * W / 2);
+  }
+  function quad(x1, y1, w1, x2, y2, w2, c) { ctx.fillStyle = c; ctx.beginPath(); ctx.moveTo(x1 - w1, y1); ctx.lineTo(x2 - w2, y2); ctx.lineTo(x2 + w2, y2); ctx.lineTo(x1 + w1, y1); ctx.fill(); }
+  function drawCar(x, y, w, color, o = {}) {
+    const h = w * 0.52, l = x - w / 2, t = y - h;
+    ctx.fillStyle = "#111"; ctx.fillRect(l + w * 0.04, y - h * 0.28, w * 0.16, h * 0.28); ctx.fillRect(l + w * 0.8, y - h * 0.28, w * 0.16, h * 0.28);
+    ctx.fillStyle = color; ctx.fillRect(l, t + h * 0.38, w, h * 0.5);
+    ctx.beginPath(); ctx.moveTo(l + w * 0.14, t + h * 0.4); ctx.lineTo(l + w * 0.24, t); ctx.lineTo(l + w * 0.76, t); ctx.lineTo(l + w * 0.86, t + h * 0.4); ctx.fill();
+    ctx.fillStyle = o.cop ? "#223" : "#1c2a3a"; ctx.beginPath(); ctx.moveTo(l + w * 0.22, t + h * 0.36); ctx.lineTo(l + w * 0.29, t + h * 0.08); ctx.lineTo(l + w * 0.71, t + h * 0.08); ctx.lineTo(l + w * 0.78, t + h * 0.36); ctx.fill();
+    ctx.fillStyle = "rgba(0,0,0,.35)"; ctx.fillRect(l, t + h * 0.74, w, h * 0.14);
+    ctx.fillStyle = o.brake ? "#ff2a2a" : "#a01010"; ctx.fillRect(l + w * 0.04, t + h * 0.48, w * 0.18, h * 0.12); ctx.fillRect(l + w * 0.78, t + h * 0.48, w * 0.18, h * 0.12);
+    ctx.fillStyle = "#e8e8e8"; ctx.fillRect(l + w * 0.4, t + h * 0.58, w * 0.2, h * 0.1);
+    if (o.cop) { const on = Math.floor(st.t * 8) % 2; ctx.fillStyle = on ? "#f22" : "#600"; ctx.fillRect(l + w * 0.3, t - h * 0.12, w * 0.18, h * 0.12); ctx.fillStyle = on ? "#006" : "#36f"; ctx.fillRect(l + w * 0.52, t - h * 0.12, w * 0.18, h * 0.12); }
+  }
+  function drawSprite(s, x, y, scale, dark) {
+    const k = scale * W / 2, u = v => v * k;
+    ctx.globalAlpha = 1;
+    if (s.kind === "palm") {
+      ctx.fillStyle = "#7a5a2a"; ctx.fillRect(x - u(40), y - u(1500), u(80), u(1500));
+      ctx.fillStyle = dark > 0.3 ? "#0e3a1a" : "#2a8a3a";
+      for (let a = 0; a < 6; a++) { ctx.beginPath(); const ang = a / 6 * Math.PI * 2; ctx.ellipse(x + Math.cos(ang) * u(280), y - u(1500) + Math.sin(ang) * u(110), u(320), u(80), ang, 0, Math.PI * 2); ctx.fill(); }
+    } else if (s.kind === "lamp") {
+      ctx.fillStyle = "#555"; ctx.fillRect(x - u(25), y - u(1600), u(50), u(1600)); ctx.fillRect(x - u(25) - (s.offset > 0 ? u(350) : 0), y - u(1600), u(375), u(40));
+      ctx.fillStyle = dark > 0.3 ? "#ffe9a0" : "#ddd"; ctx.fillRect(x + (s.offset > 0 ? -u(370) : u(300)), y - u(1570), u(90), u(40));
+    } else if (s.kind === "block") {
+      const bw = u(1400), bh = u(1800 + s.tint * 2200), c = ["#b08a6a", "#8a8aa0", "#a06a5a", "#7a8a7a"][Math.floor(s.tint * 4)];
+      ctx.fillStyle = c; ctx.fillRect(x - bw / 2, y - bh, bw, bh);
+      ctx.fillStyle = dark > 0.3 ? "#ffd86a" : "#2a3a5a";
+      for (let r = 0; r < 6; r++) for (let q = 0; q < 4; q++) if (dark < 0.3 || ((r * 7 + q * 3 + Math.floor(s.tint * 10)) % 3)) ctx.fillRect(x - bw / 2 + bw * (0.1 + q * 0.22), y - bh + bh * (0.08 + r * 0.15), bw * 0.12, bh * 0.08);
+    } else if (s.kind === "bush") {
+      ctx.fillStyle = dark > 0.3 ? "#0c2a12" : "#3a7a2a"; ctx.beginPath(); ctx.ellipse(x, y - u(200), u(420), u(220), 0, 0, Math.PI * 2); ctx.fill();
+    } else if (s.kind === "sign") {
+      ctx.fillStyle = "#444"; ctx.fillRect(x - u(30), y - u(1100), u(60), u(1100));
+      ctx.fillStyle = "#0a5"; ctx.fillRect(x - u(500), y - u(1500), u(1000), u(480));
+      ctx.fillStyle = "#fff"; ctx.font = `bold ${Math.max(1, u(200))}px Arial`; ctx.textAlign = "center"; ctx.fillText(["EXIT 95", "DOM 95", "NO U-TURN", "STATE LINE"][Math.floor(s.tint * 4)], x, y - u(1200));
+    }
+    if (dark > 0) { ctx.fillStyle = `rgba(0,0,20,${dark * 0.6})`; }
+  }
+  function render() {
+    const P = STAGES[st.stage % STAGES.length], base = seg(st.pos), bp = (st.pos % SEG) / SEG, ps = seg(st.pos + PLAYER_Z), pp = ((st.pos + PLAYER_Z) % SEG) / SEG;
+    const playerY = lerp(ps.p1.world.y, ps.p2.world.y, pp);
+    const g = ctx.createLinearGradient(0, 0, 0, H / 2); g.addColorStop(0, P.sky[0]); g.addColorStop(1, P.sky[1]); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    // skyline parallax
+    const off = (st.pos / TRACK * W * 4 + ps.curve * 0) % W;
+    ctx.fillStyle = P.dark > 0.3 ? "#0a1028" : "rgba(40,60,90,.45)";
+    for (let k = -1; k < 14; k++) { const bx = ((k * 61 - off * 0.3) % (W + 120) + W + 120) % (W + 120) - 60, bh = 20 + ((k * 37) % 50); ctx.fillRect(bx, H / 2 - bh, 46, bh + 2); }
+    let maxy = H, x = 0, dx = -(base.curve * bp);
+    for (let n = 0; n < DRAW; n++) {
+      const s = segs[(base.i + n) % N], loop = s.i < base.i ? TRACK : 0;
+      s.clip = maxy;
+      project(s.p1, st.x * ROAD - x, playerY + CAM_H, st.pos - loop);
+      project(s.p2, st.x * ROAD - x - dx, playerY + CAM_H, st.pos - loop);
+      x += dx; dx += s.curve;
+      if (s.p1.camera.z <= DEPTH || s.p2.screen.y >= s.p1.screen.y || s.p2.screen.y >= maxy) continue;
+      const a = s.p1.screen, b = s.p2.screen, c = s.alt;
+      ctx.fillStyle = P.grass[c]; ctx.fillRect(0, b.y, W, a.y - b.y);
+      quad(a.x, a.y, a.w * 1.18, b.x, b.y, b.w * 1.18, P.rumble[c]);
+      quad(a.x, a.y, a.w, b.x, b.y, b.w, P.road[c]);
+      if (c) { const lw1 = a.w / 40, lw2 = b.w / 40, l1 = a.w * 2 / LANES, l2 = b.w * 2 / LANES; for (let q = 1; q < LANES; q++) quad(a.x - a.w + l1 * q, a.y, lw1, b.x - b.w + l2 * q, b.y, lw2, P.lane); }
+      // checkpoint banner stripe
+      const cpSeg = Math.floor(((st.nextCP - st.dist) * 100 + st.pos + PLAYER_Z) / SEG) % N;
+      if (s.i === cpSeg) quad(a.x, a.y, a.w, b.x, b.y, b.w, Math.floor(st.t * 4) % 2 ? "#fff" : "#111");
+      if (P.dark) { ctx.fillStyle = `rgba(0,0,18,${P.dark * clamp(n / DRAW * 1.6, 0, 1)})`; ctx.fillRect(0, b.y, W, a.y - b.y); }
+      maxy = b.y;
+    }
+    for (let n = DRAW - 1; n > 0; n--) {
+      const s = segs[(base.i + n) % N]; if (!s.p1.screen.scale || s.p1.camera.z <= DEPTH) continue;
+      ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, s.clip); ctx.clip();
+      for (const sp of s.sprites) drawSprite(sp, s.p1.screen.x + s.p1.screen.scale * sp.offset * ROAD * W / 2, s.p1.screen.y, s.p1.screen.scale, P.dark);
+      for (const c of s.cars) {
+        const p = (c.z % SEG) / SEG, sc = lerp(s.p1.screen.scale, s.p2.screen.scale, p);
+        drawCar(lerp(s.p1.screen.x, s.p2.screen.x, p) + sc * c.offset * ROAD * W / 2, lerp(s.p1.screen.y, s.p2.screen.y, p), sc * 720 * W / 2, c.color);
+      }
+      // the checkpoint gantry
+      const cpSeg = Math.floor(((st.nextCP - st.dist) * 100 + st.pos + PLAYER_Z) / SEG) % N;
+      if (s.i === cpSeg && st.mode === "play") { const a = s.p1.screen, k = a.scale * W / 2; ctx.fillStyle = "#333"; ctx.fillRect(a.x - a.w * 1.25, a.y - k * 1900, k * 80, k * 1900); ctx.fillRect(a.x + a.w * 1.25 - k * 80, a.y - k * 1900, k * 80, k * 1900); ctx.fillStyle = "#c00"; ctx.fillRect(a.x - a.w * 1.25, a.y - k * 2200, a.w * 2.5, k * 400); ctx.fillStyle = "#fff"; ctx.font = `bold ${Math.max(1, k * 300)}px Arial`; ctx.textAlign = "center"; ctx.fillText("CHECKPOINT", a.x, a.y - k * 1900 - k * 80); }
+      ctx.restore();
+    }
+    // player car with a little bounce and lean
+    const bounce = (st.speed / MAX) * Math.sin(st.t * 40) * 1.2 + (st.crash ? Math.sin(st.t * 60) * 3 : 0);
+    const pw = W * 0.2, tilt = keys.left && st.speed ? -1 : keys.right && st.speed ? 1 : 0;
+    ctx.save(); ctx.translate(W / 2, H - 8 + bounce); ctx.rotate(tilt * 0.03); drawCar(0, 0, pw, "#d42020", { brake: keys.brake }); ctx.restore();
+    // police lights creeping in from the bottom corners when they're close
+    const near = clamp(1 - st.gap / 220, 0, 1);
+    if (near > 0 && st.mode === "play") {
+      const on = Math.floor(st.t * 6) % 2, r = H * (0.25 + near * 0.6);
+      const gl = (cx, col) => { const gr = ctx.createRadialGradient(cx, H, 0, cx, H, r); gr.addColorStop(0, col); gr.addColorStop(1, "rgba(0,0,0,0)"); ctx.fillStyle = gr; ctx.fillRect(0, 0, W, H); };
+      ctx.globalAlpha = 0.25 + near * 0.6; gl(0, on ? "rgba(255,30,30,.9)" : "rgba(40,60,255,.9)"); gl(W, on ? "rgba(40,60,255,.9)" : "rgba(255,30,30,.9)"); ctx.globalAlpha = 1;
+      if (near > 0.55) drawCar(W * 0.18, H + 30 - near * 40, pw * 0.9, "#f0f0f0", { cop: true }), drawCar(W * 0.82, H + 34 - near * 38, pw * 0.9, "#1a1a1a", { cop: true });
+    }
+    hud(P, near);
+  }
+  function text(s, x, y, size, color, align = "center", shadow = "#000") { ctx.font = `bold ${size}px "Arial Black", Impact, sans-serif`; ctx.textAlign = align; ctx.fillStyle = shadow; ctx.fillText(s, x + 2, y + 2); ctx.fillStyle = color; ctx.fillText(s, x, y); }
+  function hud(P, near) {
+    if (st.mode === "title") {
+      ctx.fillStyle = "rgba(0,0,0,.45)"; ctx.fillRect(0, 0, W, H);
+      text("GETAWAY", W / 2, H * 0.36, 44, "#ffd800", "center", "#b02000");
+      text("a tribute to On the Run", W / 2, H * 0.36 + 22, 11, "#8fd8ff");
+      text("The cops are on your tail. Reach each checkpoint", W / 2, H * 0.58, 10, "#fff");
+      text("before the clock runs out, and don't let them catch you.", W / 2, H * 0.58 + 14, 10, "#fff");
+      if (Math.floor(st.t * 2) % 2) text(matchMedia("(pointer: coarse)").matches ? "TAP TO DRIVE" : "PRESS ENTER", W / 2, H * 0.8, 16, "#ff4040");
+      if (best) text("BEST " + best + " m", W / 2, H * 0.9, 10, "#ccc");
+      return;
+    }
+    text("TIME", 12, 18, 10, "#ffd800", "left"); text(Math.ceil(st.time), 12, 40, 22, st.time < 10 && Math.floor(st.t * 4) % 2 ? "#f33" : "#fff", "left");
+    text(Math.round(st.speed / MAX * 240) + " km/h", W - 12, 22, 14, "#fff", "right");
+    text(Math.floor(st.dist) + " m", W - 12, 40, 11, "#8fd8ff", "right");
+    text(P.name, W / 2, 16, 10, "#ffd800");
+    text("NEXT CHECKPOINT " + Math.max(0, Math.ceil(st.nextCP - st.dist)) + " m", W / 2, 30, 8, "#ddd");
+    // heat meter
+    ctx.fillStyle = "#000"; ctx.fillRect(W / 2 - 52, 36, 104, 8); ctx.fillStyle = near > 0.6 ? "#f22" : "#fa0"; ctx.fillRect(W / 2 - 50, 38, 100 * clamp(1 - st.gap / 320, 0, 1), 4);
+    text("COPS", W / 2 - 58, 44, 7, "#f88", "right");
+    if (st.cpFlash) text("CHECKPOINT!  +TIME", W / 2, H * 0.32, 20, "#3f3", "center", "#030");
+    if (st.paused) { ctx.fillStyle = "rgba(0,0,0,.5)"; ctx.fillRect(0, 0, W, H); text("PAUSED", W / 2, H / 2, 24, "#fff"); text("press P or click to carry on", W / 2, H / 2 + 18, 9, "#ccc"); }
+    if (st.mode === "over") {
+      ctx.fillStyle = "rgba(0,0,0,.55)"; ctx.fillRect(0, 0, W, H);
+      text(st.msg, W / 2, H * 0.42, 36, st.msg === "BUSTED!" ? "#3a6aff" : "#ff4040", "center", "#000");
+      text(Math.floor(st.dist) + " m  ·  " + st.stage + " checkpoint" + (st.stage === 1 ? "" : "s"), W / 2, H * 0.55, 13, "#fff");
+      text("BEST " + best + " m", W / 2, H * 0.63, 10, "#ffd800");
+      if (Math.floor(st.t * 2) % 2) text("PRESS ENTER TO TRY AGAIN", W / 2, H * 0.78, 12, "#ff4040");
+    }
+  }
+  cv.addEventListener("pointerdown", () => { if (st.paused) st.paused = false; });
+
+  // ------------------------------------------------------------ loop
+  let last = performance.now(), acc = 0; const STEP = 1 / 60;
+  function frame(now) {
+    acc = Math.min(acc + (now - last) / 1000, 0.25); last = now;
+    while (acc >= STEP) { update(STEP); acc -= STEP; }
+    render(); sound(); requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+  cv.focus();
+  </script>
+</body>
+</html>
