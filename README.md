@@ -49,7 +49,8 @@ Double-click around. Drag icons wherever you like or rubber-band a few at once, 
 | 🎨 | **Paint** | 16 tools, the 28-color palette, magnifier, select/move, undo, and save as PNG. |
 | 👹 | **DOOM** | The real shareware episode, running in WebAssembly. |
 | 👦 | **Commander Keen 4** | Apogee's shareware episode, *Secret of the Oracle*, running in DOSBox (js-dos) from this repo. |
-| 🕹️ | **The arcade cabinets** | Arkanoid, *The Elder Scrolls: Arena* and *Daggerfall* (Internet Archive emulation), *Robot Rage* (itch.io embed) and *Victor Vector & Yondo* (yag.im), each behind an insert-coin title card in the Games folder. |
+| 🕹️ | **The arcade cabinets** | Arkanoid, *The Elder Scrolls: Arena* and *Daggerfall*, *King's Quest*, *The Settlers II*, *Day of the Tentacle*, *Fable*, *Lemmings*, *The Lost Vikings* and *I Have No Mouth, and I Must Scream* (Internet Archive emulation, scaled to fit the window), *Star Wars: Yoda Stories* (RetroGames.cc embed), *Robot Rage* (itch.io embed) and *Victor Vector & Yondo* (yag.im), each behind an insert-coin title card in the Games folder. |
+| 💾 | **Run my own copy** | The DOS cabinets can also boot **a copy you own** (e.g. from GOG) in this repo's DOSBox: choose a zip of the game folder and it's unpacked into an IndexedDB drive in your browser, never uploaded, and kept there with your saved games (`apps/dos/play.html`). |
 | 🚓 | **On the Run → Getaway** | Miniclip's *On the Run* can't be played anywhere now, so **Getaway** is an original pseudo-3D getaway driver in its honour: checkpoints, traffic and the cops on your tail. |
 | 🧃 | **Squeeze Play** | Cold-press juice recipes for the Nama J2. |
 | 📁 | **My Apps / Toolbox** | My full apps, and 21 tiny tools restyled as proper Win95 dialogs. |
@@ -148,7 +149,7 @@ blender -b --factory-startup -P icons.py               # toolbar bitmaps; then: 
 |-- img/nav/                  <- pre-rendered Navigator rooms
 |-- tools/nav3d/              <- Blender scenes that render them
 |-- apps/                     <- win95 games, DOOM, and my full apps
-|   |-- keen4/ · dos/          <- Commander Keen 4 shareware + js-dos (DOSBox)
+|   |-- keen4/ · dos/          <- Commander Keen 4 shareware + js-dos (DOSBox) + play.html (run your own copy)
 |   `-- games/                <- arcade.html (title cards + official embeds), getaway.html
 |-- terminal.html             <- the previous green-screen site, preserved
 `-- toolbox.html · apps.html · 404.html
@@ -174,7 +175,7 @@ python -m http.server 8000      # then open http://localhost:8000
 * **Windows** is a trademark of Microsoft. This desktop is a lookalike with original artwork and no Microsoft files. The wallpapers are painted in code "in the spirit of" each era.
 * **DOOM:** engine [jacobenget/doom.wasm](https://github.com/jacobenget/doom.wasm) (**GPL-2.0**). The game data is the freely distributable DOOM shareware WAD, © id Software. See [`apps/doom/NOTICE.txt`](apps/doom/NOTICE.txt).
 * **Commander Keen 4:** the unaltered Apogee shareware package (© 1991 id Software), freely distributable under its included LICENSE.DOC, run by [js-dos 6.22](https://github.com/caiiiycuk/js-dos) (**GPL-2.0**, DOSBox). See [`apps/keen4/NOTICE.txt`](apps/keen4/NOTICE.txt) and [`apps/dos/NOTICE.txt`](apps/dos/NOTICE.txt).
-* **Arcade cabinets:** no game files from Arkanoid (Taito), *Arena* / *Daggerfall* (Bethesda), *Robot Rage* (KonsomeJona) or *Victor Vector & Yondo* (Sanctuary Woods) are in this repo. They load from the Internet Archive, itch.io and yag.im. **Getaway** is original code and art, a tribute to *On the Run* (Officine Pixel / Miniclip).
+* **Arcade cabinets:** no game files from Arkanoid (Taito), *Arena* / *Daggerfall* (Bethesda), *King's Quest* (Sierra), *The Settlers II* (Blue Byte), *Day of the Tentacle* and *Yoda Stories* (LucasArts), *Fable* (Simbiosis), *Lemmings* (DMA Design / Psygnosis), *The Lost Vikings* (Silicon & Synapse / Blizzard), *I Have No Mouth, and I Must Scream* (Cyberdreams), *Robot Rage* (KonsomeJona) or *Victor Vector & Yondo* (Sanctuary Woods) are in this repo. They load from the Internet Archive, RetroGames.cc, itch.io and yag.im, or from a copy you own via `apps/dos/play.html` (which stays in your browser). **Getaway** is original code and art, a tribute to *On the Run* (Officine Pixel / Miniclip).
 * **Solitaire, Minesweeper, Space Pinball and Paint** are original recreations written for this site.
 * **Other credits:** the *Leviathan* excerpt is Hobbes (1651, public domain). "Khajiit has wares" nods to *Skyrim*.
 <pre align="center">

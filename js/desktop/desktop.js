@@ -47,7 +47,10 @@ WHAT'S ON THIS COMPUTER
   Toolbox .......... ${TRINKETS.length} tiny web tools (the junk drawer)
   Games ............ Solitaire, Minesweeper, Space Pinball, DOOM,
                      Commander Keen 4, Arkanoid, Elder Scrolls
-                     Arena + Daggerfall, Robot Rage, On the Run,
+                     Arena + Daggerfall, King's Quest, Settlers II,
+                     Day of the Tentacle, Yoda Stories, Fable,
+                     Lemmings, The Lost Vikings, I Have No Mouth
+                     and I Must Scream, Robot Rage, On the Run,
                      Victor Vector & Yondo
   Paint ............ go on, draw something
   Recycle Bin ...... my old green-screen homepage and the apps
@@ -98,6 +101,14 @@ const P = {
   arkanoid: { title: "Arkanoid", icon: "arkanoid", url: "apps/games/arcade.html?g=arkanoid", w: 760, h: 560, desc: "Taito's brick breaker (DOS, 1988) via the Internet Archive" },
   arena: { title: "The Elder Scrolls: Arena", icon: "arena", url: "apps/games/arcade.html?g=arena", w: 820, h: 600, label: "TES Arena", desc: "Bethesda, 1994, via the Internet Archive" },
   daggerfall: { title: "The Elder Scrolls II: Daggerfall", icon: "daggerfall", url: "apps/games/arcade.html?g=daggerfall", w: 820, h: 600, label: "TES Daggerfall", desc: "Bethesda, 1996, via the Internet Archive" },
+  kq1: { title: "King's Quest", icon: "kq1", url: "apps/games/arcade.html?g=kq1", w: 820, h: 600, label: "King's Quest", desc: "Quest for the Crown (Sierra, 1984) via the Internet Archive, or your own copy in DOSBox" },
+  settlers2: { title: "The Settlers II: Gold Edition", icon: "settlers2", url: "apps/games/arcade.html?g=settlers2", w: 860, h: 640, label: "Settlers II", desc: "Blue Byte, 1996, via the Internet Archive, or your own copy in DOSBox" },
+  dott: { title: "Day of the Tentacle", icon: "dott", url: "apps/games/arcade.html?g=dott", w: 820, h: 600, label: "Day of the Tentacle", desc: "LucasArts, 1993, via the Internet Archive, or your own copy in DOSBox" },
+  yoda: { title: "Star Wars: Yoda Stories", icon: "yoda", url: "apps/games/arcade.html?g=yoda", w: 720, h: 600, label: "Yoda Stories", desc: "LucasArts (Game Boy Color, 1999) via RetroGames.cc" },
+  fable: { title: "Fable (1996)", icon: "fable", url: "apps/games/arcade.html?g=fable", w: 820, h: 600, label: "Fable", desc: "Simbiosis, 1996, via the Internet Archive, or your own copy in DOSBox" },
+  lemmings: { title: "Lemmings", icon: "lemmings", url: "apps/games/arcade.html?g=lemmings", w: 820, h: 600, desc: "DMA Design / Psygnosis, 1991, via the Internet Archive, or your own copy in DOSBox" },
+  vikings: { title: "The Lost Vikings", icon: "vikings", url: "apps/games/arcade.html?g=vikings", w: 820, h: 600, label: "Lost Vikings", desc: "Blizzard / Interplay, 1993, via the Internet Archive, or your own copy in DOSBox" },
+  ihnm: { title: "I Have No Mouth, and I Must Scream", icon: "ihnm", url: "apps/games/arcade.html?g=ihnm", w: 820, h: 600, label: "I Have No Mouth", desc: "Cyberdreams, 1995, via the Internet Archive, or your own copy in DOSBox" },
   iexplore: { title: "dom 95 Start Page - Internet Explorer", icon: "iexplore", url: "apps/win95/iexplore.html?embed=1", w: 820, h: 600, label: "Internet Explorer", desc: "Browse the 1990s web through the Internet Archive's Wayback Machine" },
   domonline: { title: "dom Online", icon: "domonline", url: "apps/win95/domonline.html?embed=1", w: 780, h: 560, label: "dom Online", desc: "Dial in to dom Online (a parody of 90s online services). Speakers up." },
   inbox: { title: "Inbox - Outlook Express", icon: "inbox", url: "apps/win95/inbox.html?embed=1", w: 760, h: 540, label: "Inbox", desc: "Letters from Dom. Write back through LinkedIn." },
@@ -107,7 +118,7 @@ const P = {
   calc: { title: "Calculator", icon: "calc", url: "apps/win95/calc.html?embed=1", w: 262, h: 236 },
   wordpad: { title: "Document - WordPad", icon: "wordpad", url: "apps/win95/wordpad.html?embed=1", w: 646, h: 462, label: "WordPad" },
   apps: { title: "My Apps", icon: "apps", folder: [], w: 480, h: 300 },
-  games: { title: "Games", icon: "folder", w: 560, h: 380, folder: ["solitaire", "freecell", "hearts", "minesweeper", "pinball", "ski", "doom", "keen4", "ontherun", "robotrage", "victorvector", "arkanoid", "arena", "daggerfall", "app-kojima", "app-lostatsea", "app-everybodyisjohn"] },
+  games: { title: "Games", icon: "folder", w: 620, h: 440, folder: ["solitaire", "freecell", "hearts", "minesweeper", "pinball", "ski", "doom", "keen4", "ontherun", "robotrage", "victorvector", "arkanoid", "arena", "daggerfall", "kq1", "settlers2", "dott", "yoda", "fable", "lemmings", "vikings", "ihnm", "app-kojima", "app-lostatsea", "app-everybodyisjohn"] },
   accessories: { title: "Accessories", icon: "folder", folder: ["calc", "notepad", "paint", "wordpad", "iexplore", "inbox", "domonline"], w: 460, h: 260 },
   toolbox: { title: "Toolbox", icon: "toolbox", folder: [], w: 560, h: 380 },
   recycle: { title: "Recycle Bin", icon: "recycle", folder: ["archivedfolder", "oldsite"], w: 400, h: 250 },
@@ -546,10 +557,10 @@ const VIEWS = {
       <p><b>Getting around.</b> Double-click a desktop icon to open it (tap on phones). Drag windows by their title bars; resize from the bottom-right corner. Use the taskbar to switch between windows.</p>
       <p><b>The Start menu</b> has everything: Programs, Documents, Settings, Run… and Shut Down.</p>
       <p><b>Navigator 3.5 and 3.9</b> are 2D homages to Packard Bell Navigator, the house-shaped shell that came on 1990s family PCs. Every room holds some of my projects. Point at things to see what they are; click to use them; the red "i" InfoGuide explains anything. KidSpace is in there too.</p>
-      <p><b>Games.</b> Solitaire, FreeCell, Hearts, Minesweeper, SkiDom and Space Pinball are original recreations written for this site. DOOM is the freely-distributable shareware episode running on <a href="https://github.com/jacobenget/doom.wasm" target="_blank" rel="noopener">doom.wasm</a>, and Commander Keen 4 is Apogee's shareware episode running in <a href="https://github.com/caiiiycuk/js-dos" target="_blank" rel="noopener">js-dos</a>. The other classics (Arkanoid, Arena, Daggerfall, Robot Rage, Victor Vector &amp; Yondo) play from the sites that preserve them: the Internet Archive, itch.io and yag.im. On the Run's home is gone, so there's a tribute to it instead.</p>
+      <p><b>Games.</b> Solitaire, FreeCell, Hearts, Minesweeper, SkiDom and Space Pinball are original recreations written for this site. DOOM is the freely-distributable shareware episode running on <a href="https://github.com/jacobenget/doom.wasm" target="_blank" rel="noopener">doom.wasm</a>, and Commander Keen 4 is Apogee's shareware episode running in <a href="https://github.com/caiiiycuk/js-dos" target="_blank" rel="noopener">js-dos</a>. The other classics (Arkanoid, Arena, Daggerfall, King's Quest, The Settlers II, Day of the Tentacle, Yoda Stories, Fable, Lemmings, The Lost Vikings, I Have No Mouth and I Must Scream, Robot Rage, Victor Vector &amp; Yondo) play from the sites that preserve them: the Internet Archive, RetroGames.cc, itch.io and yag.im. Most of the DOS ones can also boot <b>your own copy</b> in this site's DOSBox: choose a zip of the game folder and it stays in your browser, saves and all. On the Run's home is gone, so there's a tribute to it instead.</p>
       <p><b>Getting online.</b> Internet Explorer visits the 1990s web through the Internet Archive's Wayback Machine: pick a year next to the address bar and type any site. dom Online dials in (speakers up), and the Inbox has letters from me. Writing back goes through LinkedIn.</p>
       <p><b>Screen savers and colour schemes</b> are in Display Properties (right-click the desktop, then Properties).</p>
-      <p><b>Run commands:</b> help, navigator, kidspace, notepad, wordpad, calc, paint, iexplore, mail, aol, doom, pinball, solitaire, freecell, hearts, ski, winmine, keen, arkanoid, arena, daggerfall, robotrage, ontherun, victor, linkedin, juice, dos, about.</p>
+      <p><b>Run commands:</b> help, navigator, kidspace, notepad, wordpad, calc, paint, iexplore, mail, aol, doom, pinball, solitaire, freecell, hearts, ski, winmine, keen, arkanoid, arena, daggerfall, kq, settlers, dott, yoda, fable, lemmings, vikings, ihnm, robotrage, ontherun, victor, linkedin, juice, dos, about.</p>
       <p style="color:#555">A fan-made homage. Windows is a trademark of Microsoft; Packard Bell Navigator was made by Ark Interface/Packard Bell. Not affiliated. All artwork here is original.</p></div>`;
   },
   run(win) {
@@ -613,7 +624,7 @@ function download(name, text) {
 }
 
 // ---------------------------------------------------------------- Run command
-const ALIASES = { winmine: "minesweeper", mines: "minesweeper", sol: "solitaire", mspaint: "paint", pbrush: "paint", paintbrush: "paint", cmd: "terminal", command: "terminal", dos: "terminal", explorer: "mycomputer", control: "controlpanel", kidspace: "navigator#kidspace", nav: "navigator", "doom.exe": "doom", pinball: "pinball", about: "about", "about.txt": "about", readme: "about", "readme.txt": "about", nav35: "navigator", "navigator3.5": "navigator", nav39: "navigator39", "navigator3.9": "navigator39", linkedin: "linkedin", calc: "calc", juice: "app-juicer", juicer: "app-juicer", nama: "app-juicer", iexplore: "iexplore", ie: "iexplore", internet: "iexplore", msie: "iexplore", outlook: "inbox", msimn: "inbox", mail: "inbox", inbox: "inbox", email: "inbox", aol: "domonline", online: "domonline", domonline: "domonline", dialup: "domonline", rasphone: "domonline", wordpad: "wordpad", write: "wordpad", freecell: "freecell", hearts: "hearts", mshearts: "hearts", ski: "ski", skifree: "ski", skidom: "ski", calculator: "calc", pmpcalc: "tk-pmpcalc", desk: "controlpanel", "desk.cpl": "controlpanel", ssaver: "controlpanel#ss", screensaver: "controlpanel#ss", accessories: "accessories", games: "games", keen: "keen4", keen4e: "keen4", commanderkeen: "keen4", ontherun: "ontherun", otr: "ontherun", getaway: "ontherun", robotrage: "robotrage", robot: "robotrage", victor: "victorvector", yondo: "victorvector", vector: "victorvector", arkanoid: "arkanoid", arena: "arena", tesarena: "arena", daggerfall: "daggerfall", dagger: "daggerfall", fall: "daggerfall", "dagger.exe": "daggerfall" };
+const ALIASES = { winmine: "minesweeper", mines: "minesweeper", sol: "solitaire", mspaint: "paint", pbrush: "paint", paintbrush: "paint", cmd: "terminal", command: "terminal", dos: "terminal", explorer: "mycomputer", control: "controlpanel", kidspace: "navigator#kidspace", nav: "navigator", "doom.exe": "doom", pinball: "pinball", about: "about", "about.txt": "about", readme: "about", "readme.txt": "about", nav35: "navigator", "navigator3.5": "navigator", nav39: "navigator39", "navigator3.9": "navigator39", linkedin: "linkedin", calc: "calc", juice: "app-juicer", juicer: "app-juicer", nama: "app-juicer", iexplore: "iexplore", ie: "iexplore", internet: "iexplore", msie: "iexplore", outlook: "inbox", msimn: "inbox", mail: "inbox", inbox: "inbox", email: "inbox", aol: "domonline", online: "domonline", domonline: "domonline", dialup: "domonline", rasphone: "domonline", wordpad: "wordpad", write: "wordpad", freecell: "freecell", hearts: "hearts", mshearts: "hearts", ski: "ski", skifree: "ski", skidom: "ski", calculator: "calc", pmpcalc: "tk-pmpcalc", desk: "controlpanel", "desk.cpl": "controlpanel", ssaver: "controlpanel#ss", screensaver: "controlpanel#ss", accessories: "accessories", games: "games", keen: "keen4", keen4e: "keen4", commanderkeen: "keen4", ontherun: "ontherun", otr: "ontherun", getaway: "ontherun", robotrage: "robotrage", robot: "robotrage", victor: "victorvector", yondo: "victorvector", vector: "victorvector", arkanoid: "arkanoid", arena: "arena", tesarena: "arena", daggerfall: "daggerfall", dagger: "daggerfall", fall: "daggerfall", "dagger.exe": "daggerfall", kq: "kq1", kq1: "kq1", kingsquest: "kq1", "sierra.com": "kq1", settlers: "settlers2", settlers2: "settlers2", s2: "settlers2", dott: "dott", tentacle: "dott", "tentacle.exe": "dott", yoda: "yoda", yodastories: "yoda", fable: "fable", lemmings: "lemmings", "vgalemmi.exe": "lemmings", vikings: "vikings", lostvikings: "vikings", ihnm: "ihnm", nomouth: "ihnm" };
 function runCommand(v) {
   const c = v.toLowerCase().replace(/\.exe$/, "");
   if (!c) return;
@@ -641,7 +652,7 @@ const startBtn = $("#startBtn"), startMenu = $("#startMenu");
 const START = [
   { label: "Programs", icon: "apps", sub: [
     { label: "Accessories", icon: "folder", sub: [{ label: "Games", icon: "folder", sub: ["freecell", "hearts", "minesweeper", "solitaire", "ski"] }, "-", "calc", "notepad", "paint", "wordpad", "find"] },
-    { label: "Games", icon: "folder", sub: ["solitaire", "freecell", "hearts", "minesweeper", "pinball", "ski", "doom", "-", "keen4", "ontherun", "robotrage", "victorvector", "arkanoid", "arena", "daggerfall"] },
+    { label: "Games", icon: "folder", sub: ["solitaire", "freecell", "hearts", "minesweeper", "pinball", "ski", "doom", "-", "keen4", "ontherun", "robotrage", "victorvector", "arkanoid", "arena", "daggerfall", "-", "kq1", "settlers2", "dott", "yoda", "fable", "lemmings", "vikings", "ihnm"] },
     { label: "My Apps", icon: "folder", sub: Object.keys(APPS).map(k => "app-" + k) },
     { label: "Online Services", icon: "folder", sub: ["domonline"] },
     { label: "Packard Bell", icon: "folder", sub: ["navigator", "navigator39"] }, "iexplore", "inbox", "linkedin", "toolbox", "terminal"] },
@@ -719,17 +730,13 @@ function shutdownDialog() {
 }
 
 // ---------------------------------------------------------------- CRT power off / on
-// "It's now safe to turn off your computer", then the tube collapses to a white line and a dot,
-// and we pull back to see the monitor sitting on the desk. Its power button turns dom 95 back on.
+// The tube collapses straight to a white line and a dot, and we pull back to see the monitor
+// sitting on the desk. Its power button turns dom 95 back on.
 let poweredOff = false;
 const POWER_SVG = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v8" stroke="#5a5446" stroke-width="2.6" stroke-linecap="round"/><path d="M7 6.5a7.5 7.5 0 1 0 10 0" fill="none" stroke="#5a5446" stroke-width="2.6" stroke-linecap="round"/></svg>`;
 function powerOff() {
   poweredOff = true; clearTimeout(saverT); closeStart(); closeMenus();
-  const s = h(`<div id="shutdown"><p>It's now safe to turn off<br>your computer.</p></div>`); document.body.appendChild(s);
-  let gone = false;
-  const go = () => { if (gone) return; gone = true; clearTimeout(t); collapse(); };
-  const t = setTimeout(go, 1600);
-  s.addEventListener("click", go);
+  collapse();
 }
 function collapse() {
   const body = document.body;
@@ -739,7 +746,7 @@ function collapse() {
   const after = () => {
     if (done) return; done = true;
     [...wins.values()].forEach(close);
-    document.querySelectorAll("#shutdown,#dim").forEach(e => e.remove());
+    document.querySelectorAll("#dim").forEach(e => e.remove());
     body.classList.remove("crt-off"); body.style.visibility = "hidden";
     showMonitor(false);
   };

@@ -1,0 +1,220 @@
+<!doctype html>
+<!--
+  dom 95 DOS player: runs YOUR OWN copy of a DOS game in DOSBox, entirely in the browser.
+  Emulator: js-dos 6.22 (GPL-2.0) from this folder, see NOTICE.txt.
+  No game files live in this repo. You pick a .zip of a game folder you own (e.g. from GOG),
+  js-dos unpacks it into an IndexedDB-backed drive (mounted at C:\<id>) that stays on this
+  browser only, so the next visit starts straight away and your saved games are kept.
+  Usage: play.html?g=<id>   (ids are the keys of GAMES below; ?g= on its own takes any game)
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <title>DOS</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #000; overflow: hidden; font: 12px Tahoma, "MS Sans Serif", sans-serif; color: #c0c0c0; user-select: none; }
+    #wrap { position: absolute; inset: 0 0 22px 0; display: grid; place-items: center; }
+    .dosbox-container { position: relative; }
+    canvas#jsdos { display: block; image-rendering: pixelated; image-rendering: crisp-edges; outline: none; background: #000; }
+    .dosbox-overlay, .dosbox-loader { display: none !important; }
+    #panel { position: absolute; inset: 0 0 22px 0; display: grid; place-items: center; overflow: auto; padding: 16px; box-sizing: border-box;
+      background: radial-gradient(ellipse at 50% 40%, #102030 0%, #000 70%); }
+    #panel[hidden] { display: none; }
+    .card { max-width: 520px; text-align: center; }
+    .card h1 { margin: 0; font: bold clamp(20px, 5vw, 32px)/1.1 "Arial Black", Impact, sans-serif; color: #ffd800; text-shadow: 3px 3px 0 #b02000; text-transform: uppercase; }
+    .card p { color: #ddd; font-size: 13px; line-height: 1.45; margin: 10px 0; }
+    .card .small { color: #8a8a8a; font-size: 11px; }
+    .card a { color: #8fd8ff; }
+    .btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 14px 0 6px; }
+    .btn { min-width: 120px; min-height: 26px; padding: 4px 14px; border: 0; background: #c0c0c0; color: #000; font: inherit; cursor: pointer;
+      box-shadow: inset -1px -1px #000, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf; }
+    .btn:active { box-shadow: inset -1px -1px #fff, inset 1px 1px #000, inset -2px -2px #dfdfdf, inset 2px 2px #808080; }
+    .btn.go { font-weight: bold; outline: 1px solid #000; }
+    select { font: inherit; max-width: 100%; }
+    #drop.over { outline: 2px dashed #ffd800; outline-offset: 6px; }
+    #msg { color: #ffd800; min-height: 1.4em; }
+    #bar { position: absolute; left: 0; right: 0; bottom: 0; height: 22px; display: flex; align-items: center; gap: 12px; padding: 0 8px; background: #c0c0c0; color: #000; white-space: nowrap; overflow: hidden; }
+    #bar a, #bar button.link { color: #000080; background: none; border: 0; padding: 0; font: inherit; text-decoration: underline; cursor: pointer; }
+    #bar .r { margin-left: auto; }
+  </style>
+</head>
+<body>
+  <div id="wrap"><canvas id="jsdos" tabindex="0"></canvas></div>
+  <div id="panel"><div class="card" id="drop">
+    <h1 id="name">DOS</h1>
+    <p id="blurb"></p>
+    <div class="btns" id="btns"></div>
+    <p id="msg"></p>
+    <p class="small" id="fine"></p>
+  </div></div>
+  <div id="bar"><span id="keys"></span><span class="r" id="credit"></span></div>
+  <input type="file" id="file" accept=".zip,application/zip" hidden>
+  <script src="js-dos.js"></script>
+  <script>
+    "use strict";
+    // exe: likely start files, first match wins (the zip is searched, any folder, any case).
+    // mouse: lock the pointer on click (point-and-click games). cycles: DOSBox cycles.
+    const GAMES = {
+      kq1: { name: "King's Quest", exe: ["SIERRA.EXE", "SIERRA.COM", "KQ1.EXE"], mouse: true, buy: ["GOG", "https://www.gog.com/en/game/kings_quest_1_2_3"],
+        keys: "Arrows walk · type commands and press Enter · F-keys for menus" },
+      settlers2: { name: "The Settlers II", exe: ["S2.EXE", "SETTLERS.EXE", "SETTLER2.EXE"], mouse: true, cycles: "max", buy: ["GOG", "https://www.gog.com/en/game/the_settlers_2_gold_edition"],
+        keys: "Mouse drives everything · click the screen to capture the mouse, Ctrl+F10 to release" },
+      dott: { name: "Day of the Tentacle", exe: ["TENTACLE.EXE", "DOTT.EXE"], mouse: true, buy: ["GOG (Remastered)", "https://www.gog.com/en/game/day_of_the_tentacle_remastered"],
+        keys: "Point and click · F5 save/load · Esc skips cutscenes · Ctrl+F10 releases the mouse" },
+      fable: { name: "Fable", exe: ["FABLE.EXE", "FABLE.BAT"], mouse: true,
+        keys: "Point and click · Ctrl+F10 releases the mouse" },
+      lemmings: { name: "Lemmings", exe: ["VGALEMMI.EXE", "LEMMINGS.BAT", "LEMMINGS.EXE"], mouse: true,
+        keys: "Pick a skill, click a lemming · P pause · F12 nuke · Ctrl+F10 releases the mouse" },
+      vikings: { name: "The Lost Vikings", exe: ["VIKINGS.EXE", "VIKINGS.BAT", "LV.EXE"], buy: ["Blizzard Arcade Collection", "https://shop.battle.net/product/blizzard-arcade-collection"],
+        keys: "Arrows move · Ctrl swaps viking · S/D/F/E abilities · Tab inventory" },
+      ihnm: { name: "I Have No Mouth, and I Must Scream", exe: ["IHNM.EXE", "IHNM.BAT"], mouse: true, buy: ["GOG", "https://www.gog.com/en/game/i_have_no_mouth_and_i_must_scream"],
+        keys: "Point and click · Ctrl+F10 releases the mouse" }
+    };
+
+    const $ = id => document.getElementById(id);
+    const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+    const qs = new URLSearchParams(location.search);
+    const id = (qs.get("g") || "dos").toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 8) || "dos";
+    const g = GAMES[id] || { name: "Your DOS game", exe: [], mouse: true, keys: "Ctrl+F10 releases the mouse" };
+    const KEY = "dos.byo." + id, MOUNT = "/" + id;
+    const canvas = $("jsdos"), panel = $("panel"), msg = $("msg");
+    let saved = null; try { saved = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
+
+    document.title = g.name;
+    $("name").textContent = g.name;
+    $("keys").textContent = g.keys;
+    if (GAMES[id]) $("keys").insertAdjacentHTML("afterbegin", `<a href="../games/arcade.html?g=${id}">← cabinet</a> · `);
+    $("credit").innerHTML = `your copy, on this browser only · <span id="forgetwrap" hidden><button class="link" id="forget">forget my copy</button> · </span>emulator <a href="https://github.com/caiiiycuk/js-dos" target="_blank" rel="noopener">js-dos</a> (GPL-2.0)`;
+    try { parent.postMessage({ type: "win-title", title: g.name + " (DOSBox)" }, location.origin); } catch (e) {}
+
+    // ---- scaling: DOS is 4:3 glass whatever the mode, so letterbox to the window and keep up with resizes
+    function fit() {
+      const W = innerWidth, H = innerHeight - 22, ar = 4 / 3;
+      let w = W, h = W / ar; if (h > H) { h = H; w = H * ar; }
+      canvas.style.width = Math.floor(w) + "px"; canvas.style.height = Math.floor(h) + "px";
+    }
+    addEventListener("resize", fit); fit();
+
+    // ---- zip prep: js-dos's unzipper only creates folders that have their own zip entry, and many
+    // zippers (Windows, PowerShell) leave those out. So read the central directory, then build a
+    // fixed zip: the original file data (a lazy Blob slice, nothing copied), a local header for each
+    // missing folder, and a new central directory listing the folders first, all with / separators.
+    async function prepZip(blob) {
+      const tail = new DataView(await blob.slice(Math.max(0, blob.size - 65557)).arrayBuffer());
+      let eo = -1;
+      for (let i = tail.byteLength - 22; i >= 0; i--) if (tail.getUint32(i, true) === 0x06054b50) { eo = i; break; }
+      if (eo < 0) throw new Error("That doesn't look like a .zip file.");
+      const count = tail.getUint16(eo + 10, true), size = tail.getUint32(eo + 12, true), off = tail.getUint32(eo + 16, true);
+      if (off === 0xffffffff || count === 0xffff) throw new Error("That zip is too big (ZIP64). Zip just the game folder.");
+      const cd = new Uint8Array(await blob.slice(off, off + size).arrayBuffer()), dv = new DataView(cd.buffer), dec = new TextDecoder("latin1"), names = [];
+      let slash = false;
+      for (let p = 0, n = 0; n < count && p + 46 <= cd.length; n++) {
+        if (dv.getUint32(p, true) !== 0x02014b50) throw new Error("That zip looks damaged.");
+        const nl = dv.getUint16(p + 28, true), xl = dv.getUint16(p + 30, true), cl = dv.getUint16(p + 32, true);
+        for (let k = p + 46; k < p + 46 + nl; k++) if (cd[k] === 0x5c) { cd[k] = 0x2f; slash = true; }   // "\" -> "/"
+        names.push(dec.decode(cd.subarray(p + 46, p + 46 + nl)));
+        p += 46 + nl + xl + cl;
+      }
+      const have = new Set(names.map(n => n.toLowerCase())), dirs = new Map();
+      names.forEach(n => { const s = n.split("/"); for (let i = 1; i < s.length; i++) { const d = s.slice(0, i).join("/") + "/"; if (!have.has(d.toLowerCase())) dirs.set(d.toLowerCase(), d); } });
+      const add = [...dirs.values()].sort((a, b) => a.split("/").length - b.split("/").length);
+      const enc = s => Uint8Array.from(s, c => c.charCodeAt(0) & 255);
+      const locals = [], cents = []; let lo = off;
+      for (const d of add) {
+        const nm = enc(d), l = new DataView(new ArrayBuffer(30)), c = new DataView(new ArrayBuffer(46));
+        l.setUint32(0, 0x04034b50, true); l.setUint16(4, 20, true); l.setUint16(12, 0x21, true); l.setUint16(26, nm.length, true);
+        c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true); c.setUint16(14, 0x21, true); c.setUint16(28, nm.length, true);
+        c.setUint32(38, 0x10, true); c.setUint32(42, lo, true);
+        locals.push(l.buffer, nm); cents.push(c.buffer, nm); lo += 30 + nm.length;
+      }
+      const cdSize = cents.reduce((s, b) => s + b.byteLength, 0) + cd.length, e = new DataView(new ArrayBuffer(22));
+      e.setUint32(0, 0x06054b50, true); e.setUint16(8, count + add.length, true); e.setUint16(10, count + add.length, true);
+      e.setUint32(12, cdSize, true); e.setUint32(16, lo, true);
+      return { names, blob: add.length || slash ? new Blob([blob.slice(0, off), ...locals, ...cents, cd, e.buffer]) : blob };
+    }
+    // DOSBox shows long host names as 8.3 short names (NAME~1.EXT)
+    const short = part => {
+      const up = part.toUpperCase(), dot = up.lastIndexOf("."), base = dot > 0 ? up.slice(0, dot) : up, ext = dot > 0 ? up.slice(dot + 1) : "";
+      const ok = s => /^[A-Z0-9_$~!#%&\-{}()@'`^]*$/.test(s);
+      if (base.length <= 8 && ext.length <= 3 && ok(base) && ok(ext) && base) return up;
+      const b = base.replace(/[^A-Z0-9_$~!#%&\-{}()@'`^]/g, "").slice(0, 6) || "FILE", e = ext.replace(/[^A-Z0-9_$~!#%&\-{}()@'`^]/g, "").slice(0, 3);
+      return b + "~1" + (e ? "." + e : "");
+    };
+    const runnable = names => names.filter(n => /\.(exe|com|bat)$/i.test(n) && !/\/$/.test(n));
+    function pick(names) {
+      const run = runnable(names), want = g.exe.map(e => e.toUpperCase());
+      for (const w of want) {
+        const hit = run.filter(n => n.split("/").pop().toUpperCase() === w).sort((a, b) => a.split("/").length - b.split("/").length)[0];
+        if (hit) return hit;
+      }
+      return null;
+    }
+
+    // ---- boot
+    function boot(file, start, name) {
+      panel.hidden = true; msg.textContent = "";
+      const url = file ? URL.createObjectURL(file) : "about:blank";
+      const parts = start.split("/"), exe = short(parts.pop()), dir = [id.toUpperCase(), ...parts.map(short)].join("\\");
+      Dos(canvas, { wdosboxUrl: "wdosbox.js", cycles: g.cycles || "auto", autolock: !!g.mouse, onprogress: (stage, total, loaded) => {
+        if (total) { panel.hidden = false; $("btns").innerHTML = ""; msg.textContent = "Loading… " + Math.round(loaded * 100 / total) + "%"; }
+      } }).ready((fs, main) => {
+        fs.extract(url, MOUNT).then(() => {
+          if (file) URL.revokeObjectURL(url);
+          localStorage.setItem(KEY, JSON.stringify({ start, name: name || (saved && saved.name), at: Date.now() }));
+          panel.hidden = true; fit(); canvas.focus();
+          return main(["-c", "C:", "-c", "CD \\" + dir, "-c", exe]);
+        }).catch(err => fail(err, file));
+      }).catch(err => fail(err, file));
+    }
+    function fail(err, file) {
+      if (!file) localStorage.removeItem(KEY);
+      panel.hidden = false; $("btns").innerHTML = "";
+      msg.textContent = "Couldn't start DOS: " + String(err && err.message || err) + " — reload to try again.";
+    }
+
+    // ---- choosing a copy (a new copy replaces the old drive: js-dos won't re-extract over one)
+    const wipe = () => new Promise(res => { localStorage.removeItem(KEY); const r = indexedDB.deleteDatabase(MOUNT); r.onsuccess = r.onerror = r.onblocked = res; });
+    const fresh = async (blob, start, name) => { if (saved) await wipe(); boot(blob, start, name); };
+    async function choose(file) {
+      if (!file) return;
+      msg.textContent = "Reading " + file.name + "…";
+      try {
+        const { names, blob } = await prepZip(file), found = pick(names);
+        if (found) return fresh(blob, found, file.name);
+        const run = runnable(names);
+        if (!run.length) { msg.textContent = "No .EXE, .COM or .BAT in that zip. Zip the folder the game is installed in."; return; }
+        msg.textContent = "Which file starts the game?";
+        const sel = document.createElement("select"); run.forEach(n => sel.add(new Option(n, n)));
+        const go = document.createElement("button"); go.className = "btn go"; go.textContent = "▶ Run";
+        go.addEventListener("click", () => fresh(blob, sel.value, file.name));
+        $("btns").replaceChildren(sel, go);
+      } catch (e) { msg.textContent = String(e.message || e); }
+    }
+    function forget() {
+      if (!confirm("Remove your copy of " + g.name + " (and its saved games) from this browser?")) return;
+      wipe().then(() => location.reload());
+    }
+
+    const btns = $("btns");
+    const mk = (label, cls, fn) => { const b = document.createElement("button"); b.className = "btn" + (cls ? " " + cls : ""); b.textContent = label; b.addEventListener("click", fn); btns.appendChild(b); return b; };
+    if (saved && saved.start) {
+      $("blurb").textContent = "Your copy" + (saved.name ? " (" + saved.name + ")" : "") + " is already on this browser.";
+      mk("▶ Play", "go", () => boot(null, saved.start));
+      mk("Load a different copy…", "", () => $("file").click());
+      $("forgetwrap").hidden = false; $("forget").addEventListener("click", forget);
+    } else {
+      $("blurb").innerHTML = "Run <b>your own copy</b> in DOSBox, right here. Zip the folder the DOS version is installed in and drop it on this window, or choose it below. It's unpacked into this browser only (nothing is uploaded) and remembered, saved games included.";
+      mk("Choose my game .zip…", "go", () => $("file").click());
+    }
+    const store = g.buy ? ` Don't have it? <a href="${esc(g.buy[1])}" target="_blank" rel="noopener">${esc(g.buy[0])}</a>.` : "";
+    $("fine").innerHTML = "No game files are hosted on this site." + store + (g.mouse ? " Click the game to capture the mouse; Ctrl+F10 lets it go." : "");
+    $("file").addEventListener("change", e => choose(e.target.files[0]));
+    const drop = document.body;
+    drop.addEventListener("dragover", e => { e.preventDefault(); $("drop").classList.add("over"); });
+    drop.addEventListener("dragleave", () => $("drop").classList.remove("over"));
+    drop.addEventListener("drop", e => { e.preventDefault(); $("drop").classList.remove("over"); if (!panel.hidden) choose(e.dataTransfer.files[0]); });
+    addEventListener("focus", () => { if (panel.hidden) canvas.focus(); });
+  </script>
+</body>
+</html>

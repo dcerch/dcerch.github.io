@@ -168,8 +168,6 @@ legend { padding: 0 3px; background: var(--face); }
 .flyout { position: fixed; z-index: 9600; padding: 3px; }
 
 /* ---------------- shutdown screen ---------------- */
-#shutdown { position: fixed; inset: 0; z-index: 99999; background: #000; display: grid; place-items: center; cursor: pointer; }
-#shutdown p { color: #ff8a00; font: bold 28px/1.4 "Courier New", monospace; text-align: center; padding: 20px; }
 #dim { position: fixed; inset: 0; background-image: repeating-conic-gradient(rgba(0,0,0,.5) 0 25%, transparent 0 50%); background-size: 2px 2px; }
 
 /* ---------------- CRT power off / on ----------------

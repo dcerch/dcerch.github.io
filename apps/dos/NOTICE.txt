@@ -9,4 +9,7 @@ js-dos 6.22.60 by Alexander Guryanov (caiiiycuk), a WebAssembly build of DOSBox.
         the js-dos@6.22.60 npm package. Complete corresponding source code is
         available at the URL above.
 
-Used by the DOS games in apps/ (currently apps/keen4).
+Used by the DOS games in apps/ (currently apps/keen4) and by play.html, which boots
+your OWN copy of a DOS game: you pick a zip of a game folder, it is unpacked into an
+IndexedDB-backed drive in your browser (never uploaded) and kept there with its saves.
+No commercial game files are stored in this repository.

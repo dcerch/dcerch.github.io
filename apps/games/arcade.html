@@ -2,7 +2,8 @@
 <!--
   dom 95 Arcade — a small cabinet that plays classic games from the places that host them.
   Nothing here is copied from the games: each one loads in its host's official player
-  (Miniplay embed, itch.io embed, Internet Archive emulation) or opens on the host's site.
+  (Miniplay embed, itch.io embed, Internet Archive emulation, RetroGames.cc embed) or
+  opens on the host's site. Games marked byo can also boot a copy you own in ../dos/play.html.
   Usage: arcade.html?g=<id>   (ids are the keys of GAMES below)
 -->
 <html lang="en">
@@ -50,7 +51,10 @@
   <script>
     "use strict";
     // host: who runs the game; embed: their official embeddable player (omit when the host can't be framed)
-    const IA = id => ({ embed: "https://archive.org/embed/" + id, page: "https://archive.org/details/" + id, host: "the Internet Archive", hostUrl: "https://archive.org/details/" + id });
+    // native: the player's fixed screen size, so the frame can be scaled to fit the window
+    const IA = id => ({ embed: "https://archive.org/embed/" + id, page: "https://archive.org/details/" + id, host: "the Internet Archive", hostUrl: "https://archive.org/details/" + id, native: [640, 480] });
+    const PC = path => "https://playclassic.games/games/" + path + "/play/";
+    // byo: the game can also boot from your own copy in this site's DOSBox (../dos/play.html)
     const GAMES = {
       ontherun: {
         name: "On the Run", sub: "Officine Pixel for Miniclip · Shockwave", look: ["#ff6a00", "#5a1600", "#3a1200"],
@@ -91,6 +95,56 @@
         blurb: "A map the size of Great Britain, dungeons you can actually get lost in for good, and a missing letter the Emperor wants back. Give DOS a minute to load it.",
         keys: "Click the power button to boot DOS (large download) · WASD/arrows move · mouse looks",
         more: [["Free on Steam", "https://store.steampowered.com/app/1812390/"], ["Daggerfall Unity", "https://www.dfworkshop.net/"], ["Also on DOS Zone", "https://dos.zone/daggerfall/"]]
+      }),
+      kq1: Object.assign(IA("msdos_Kings_Quest_I_-_Quest_for_the_Crown_1987"), {
+        name: "King's Quest", sub: "Quest for the Crown · Sierra On-Line, 1984 · this is the 1987 DOS release", look: ["#ffd84a", "#2a3ab0", "#101a4a"], byo: true,
+        blurb: "Sir Graham, the kingdom of Daventry, and three lost treasures: the magic mirror, the shield and the chest. Type what you want to do and hope the parser agrees.",
+        keys: "Click the power button to boot DOS · arrows walk · type commands (LOOK, GET DAGGER) and press Enter",
+        more: [["King's Quest 1+2+3 on GOG", "https://www.gog.com/en/game/kings_quest_1_2_3"], ["Also on PlayClassic", PC("adventure-dos-games-online/play-kings-quest-quest-crown-online")]]
+      }),
+      settlers2: Object.assign(IA("msdos_Settlers_II_The_Gold_Edition_1997"), {
+        name: "The Settlers II", sub: "Gold Edition · Blue Byte, 1996", look: ["#7ad84a", "#5a3a10", "#1a3010"], byo: true,
+        blurb: "Build roads, keep the goods flowing and watch hundreds of little settlers get on with it. Shipwrecked Romans, a new continent, and an economy that runs on planks and fish.",
+        keys: "Click the power button to boot DOS (large download) · mouse drives everything",
+        more: [["Gold Edition on GOG", "https://www.gog.com/en/game/the_settlers_2_gold_edition"], ["Also on PlayClassic", PC("real-time-strategy-dos-games-online/play-settlers-2-gold-edition-online")]]
+      }),
+      dott: Object.assign(IA("msdos_Day_of_the_Tentacle_1993"), {
+        name: "Day of the Tentacle", sub: "Maniac Mansion II · LucasArts, 1993", look: ["#c06aff", "#2a8a20", "#200a3a"], byo: true,
+        blurb: "Purple Tentacle drank the sludge and wants to take over the world. Bernard, Hoagie and Laverne get sent through time in Chron-O-Johns to stop him: one in the past, one in the present, one in the future.",
+        keys: "Click the power button to boot DOS (large download) · pick a verb, then a thing · Esc skips cutscenes",
+        more: [["Remastered on GOG", "https://www.gog.com/en/game/day_of_the_tentacle_remastered"], ["Also on PlayClassic", PC("point-n-click-adventure-dos-games-online/play-maniac-mansion-day-tentacle-online")]]
+      }),
+      yoda: {
+        name: "Star Wars: Yoda Stories", sub: "LucasArts, 1997 · Game Boy Color, 1999", look: ["#7aff6a", "#103a10", "#0a200a"],
+        blurb: "Luke goes to Dagobah and Yoda keeps sending him on errands: every game is a freshly generated little adventure. This is the Game Boy Color version.",
+        keys: "Arrows move · Z / X are A / B · Enter is Start",
+        embed: "https://www.retrogames.cc/embed/27549-yoda-stories-usa.html", page: "https://www.retrogames.cc/gameboycolor-games/yoda-stories-usa.html",
+        host: "RetroGames.cc", hostUrl: "https://www.retrogames.cc/gameboycolor-games/yoda-stories-usa.html",
+        why: "RetroGames.cc shows an ad before the game: close it with its ✕ (never its Download button), then press PLAY NOW."
+      },
+      fable: Object.assign(IA("msdos_Fable_1996"), {
+        name: "Fable", sub: "Simbiosis Interactive, 1996", look: ["#ffb04a", "#3a1a5a", "#1a0a2a"], byo: true,
+        blurb: "Quickthorpe sets out to find the four pieces of a broken stone and save a world sliding into chaos. A painted, hand-drawn point-and-click from 1996 (long before the other Fable).",
+        keys: "Click the power button to boot DOS (large download) · point and click",
+        more: [["Also on PlayClassic", PC("point-n-click-adventure-dos-games-online/play-fable-online")]]
+      }),
+      lemmings: Object.assign(IA("LEMMING"), {
+        name: "Lemmings", sub: "DMA Design / Psygnosis, 1991", look: ["#4aff4a", "#2a2ab0", "#0a1a3a"], byo: true,
+        blurb: "They walk. They don't stop. Give them jobs (climber, floater, bomber, blocker, builder, basher, miner, digger) and get enough of them home before the clock runs out.",
+        keys: "Click the power button to boot DOS · press 1, then Enter at the setup screens · pick a skill, click a lemming",
+        more: [["Also on DOS Zone", "https://dos.zone/lemmings-1991/"]]
+      }),
+      vikings: Object.assign(IA("msdos_Lost_Vikings_The_1993"), {
+        name: "The Lost Vikings", sub: "Silicon & Synapse (Blizzard) · Interplay, 1993", look: ["#ffd84a", "#b02020", "#3a0a0a"], byo: true,
+        blurb: "Erik the Swift, Baleog the Fierce and Olaf the Stout get beamed aboard an alien zoo. Only all three, working together, get out alive.",
+        keys: "Click the power button to boot DOS · arrows move · Ctrl swaps viking",
+        more: [["Blizzard Arcade Collection", "https://shop.battle.net/product/blizzard-arcade-collection"], ["Also on DOS Zone", "https://dos.zone/the-lost-vikings-1993/"]]
+      }),
+      ihnm: Object.assign(IA("msdos_I_Have_No_Mouth_and_I_Must_Scream_1995"), {
+        name: "I Have No Mouth, and I Must Scream", sub: "Cyberdreams / The Dreamers Guild, 1995", look: ["#ff3a3a", "#3a0000", "#1a0000"], byo: true,
+        blurb: "Harlan Ellison's story, as an adventure: AM has kept five humans alive for 109 years to torment them. Each gets a scenario of their own. Dark, and meant to be.",
+        keys: "Click the power button to boot DOS · point and click",
+        more: [["On GOG", "https://www.gog.com/en/game/i_have_no_mouth_and_i_must_scream"], ["Also on DOS Zone", "https://dos.zone/ihave-no-mouth-andi-must-scream/"]]
       })
     };
 
@@ -115,6 +169,13 @@
         play.addEventListener("click", () => {
           const f = document.createElement("iframe");
           f.src = g.embed; f.title = g.name; f.allow = "autoplay; fullscreen; gamepad"; f.allowFullscreen = true;
+          if (g.native) {
+            // the host's player has a fixed-size screen: frame it at that size and scale it to the window
+            const [nw, nh] = g.native, st = $("stage");
+            Object.assign(f.style, { width: nw + "px", height: nh + "px", left: "50%", top: "50%", inset: "auto", transformOrigin: "0 0" });
+            const fit = () => { const s = Math.min(st.clientWidth / nw, st.clientHeight / nh); f.style.left = (st.clientWidth - nw * s) / 2 + "px"; f.style.top = (st.clientHeight - nh * s) / 2 + "px"; f.style.transform = `scale(${s})`; };
+            addEventListener("resize", fit); requestAnimationFrame(fit);
+          }
           $("stage").appendChild(f); $("title").hidden = true; f.focus();
           try { parent.postMessage({ type: "win-title", title: g.name }, location.origin); } catch (e) {}
         });
@@ -122,6 +183,12 @@
       }
       const nw = document.createElement("button"); nw.className = "btn" + (g.embed ? "" : " go"); nw.textContent = g.altLabel || (g.embed ? "Open in new window" : "▶ Play on " + g.host);
       nw.addEventListener("click", openNew); btns.appendChild(nw);
+      if (g.byo) {
+        const own = document.createElement("button"); own.className = "btn"; own.textContent = "Run my own copy";
+        own.title = "Boot a copy you own in this site's DOSBox (stays in your browser)";
+        own.addEventListener("click", () => { location.href = "../dos/play.html?g=" + encodeURIComponent(new URLSearchParams(location.search).get("g")); });
+        btns.appendChild(own);
+      }
     }
   </script>
 </body>

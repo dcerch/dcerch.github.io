@@ -237,7 +237,58 @@ export const ICONS = {
     <circle cx="23" cy="8" r="3.5" fill="#eee" shape-rendering="geometricPrecision"/>
     <path d="M15 3 L18 3 L17.5 19 L15.5 19 Z" fill="#ddd" stroke="#000" shape-rendering="geometricPrecision"/>
     <rect x="11" y="19" width="11" height="2" fill="#c9a54a" stroke="#000"/>
-    <rect x="15" y="21" width="3" height="6" fill="#6a3a1a" stroke="#000"/><rect x="14.5" y="27" width="4" height="2" fill="#c9a54a" stroke="#000"/>`)
+    <rect x="15" y="21" width="3" height="6" fill="#6a3a1a" stroke="#000"/><rect x="14.5" y="27" width="4" height="2" fill="#c9a54a" stroke="#000"/>`),
+  kq1: svg(`
+    <rect x="2" y="2" width="28" height="28" fill="#2a3ab0" stroke="#000"/>
+    <path d="M5 23 V10 L10 16 L16 6 L22 16 L27 10 V23 Z" fill="#ffd84a" stroke="#000"/>
+    <rect x="5" y="23" width="22" height="4" fill="#e0a820" stroke="#000"/>
+    <rect x="15" y="12" width="2" height="3" fill="#e33"/><rect x="9" y="19" width="2" height="2" fill="#3c3"/><rect x="21" y="19" width="2" height="2" fill="#39f"/>
+    <rect x="15" y="24" width="2" height="2" fill="#e33"/>`),
+  settlers2: svg(`
+    <rect x="2" y="2" width="28" height="28" fill="#5aa83a" stroke="#000"/>
+    <path d="M2 24 Q16 20 30 24 V30 H2 Z" fill="#8a6a3a"/>
+    <path d="M6 14 L13 8 L20 14 Z" fill="#c33" stroke="#000"/><rect x="7" y="14" width="12" height="9" fill="#e8d8a8" stroke="#000"/><rect x="11" y="17" width="3" height="6" fill="#5a3a1a"/>
+    <circle cx="25" cy="13" r="2.5" fill="#ffccaa" stroke="#000" shape-rendering="geometricPrecision"/><path d="M22 10 H28 L25 7 Z" fill="#33c" stroke="#000"/>
+    <rect x="23" y="15" width="4" height="7" fill="#33c" stroke="#000"/><rect x="23" y="22" width="1.5" height="3" fill="#000"/><rect x="25.5" y="22" width="1.5" height="3" fill="#000"/>`),
+  dott: svg(`
+    <path d="M10 29 Q8 18 11 9 Q13 3 17 3 Q22 3 23 9 Q25 18 23 29 Z" fill="#a03ad8" stroke="#000" shape-rendering="geometricPrecision"/>
+    <circle cx="13.5" cy="10" r="2.5" fill="#fff" stroke="#000" shape-rendering="geometricPrecision"/><circle cx="20" cy="10" r="2.5" fill="#fff" stroke="#000" shape-rendering="geometricPrecision"/>
+    <rect x="13" y="9.5" width="1.5" height="1.5" fill="#000"/><rect x="19.5" y="9.5" width="1.5" height="1.5" fill="#000"/>
+    <path d="M10 17 Q16.5 21 23.5 17 L23.5 20 Q16.5 24 10 20 Z" fill="#702090" stroke="#000" shape-rendering="geometricPrecision"/>
+    <path d="M8 29 Q16 26 25 29" stroke="#3a1050" fill="none"/>`),
+  yoda: svg(`
+    <rect x="2" y="2" width="28" height="28" fill="#0a200a" stroke="#000"/>
+    <path d="M2 12 L10 13 L12 17 L10 15 L4 15 Z" fill="#7ab84a" stroke="#000"/><path d="M30 12 L22 13 L20 17 L22 15 L28 15 Z" fill="#7ab84a" stroke="#000"/>
+    <path d="M10 12 Q16 6 22 12 L22 20 Q16 25 10 20 Z" fill="#8ac85a" stroke="#000" shape-rendering="geometricPrecision"/>
+    <rect x="12" y="14" width="2" height="2" fill="#000"/><rect x="18" y="14" width="2" height="2" fill="#000"/><path d="M13 20 H19" stroke="#3a6a2a"/>
+    <rect x="6" y="24" width="20" height="3" fill="#5f5" stroke="#000"/><rect x="2" y="24" width="5" height="3" fill="#999" stroke="#000"/>`),
+  fable: svg(`
+    <path d="M3 7 Q9 5 16 8 Q23 5 29 7 V27 Q23 25 16 28 Q9 25 3 27 Z" fill="#f0e0b0" stroke="#000" shape-rendering="geometricPrecision"/>
+    <path d="M16 8 V28" stroke="#8a6a3a"/>
+    <path d="M6 11 H13 M6 14 H13 M6 17 H12 M6 20 H13" stroke="#8a6a3a"/>
+    <circle cx="23" cy="15" r="4" fill="#3a1a5a" stroke="#000" shape-rendering="geometricPrecision"/><path d="M23 11 V19 M19 15 H27" stroke="#ffb04a"/>
+    <path d="M19 22 H27" stroke="#8a6a3a"/>`),
+  lemmings: svg(`
+    <rect x="2" y="2" width="28" height="28" fill="#000" stroke="#000"/>
+    <rect x="2" y="25" width="28" height="5" fill="#8a5a2a"/>
+    <path d="M11 6 Q16 2 21 6 L20 9 H12 Z" fill="#3c3" stroke="#000"/>
+    <rect x="12" y="9" width="8" height="5" fill="#ffccaa" stroke="#000"/><rect x="17" y="10" width="2" height="2" fill="#000"/>
+    <rect x="11" y="14" width="10" height="7" fill="#33f" stroke="#000"/><rect x="21" y="14" width="4" height="2" fill="#ffccaa" stroke="#000"/>
+    <rect x="11" y="21" width="3" height="4" fill="#33f" stroke="#000"/><rect x="18" y="21" width="3" height="4" fill="#33f" stroke="#000"/>`),
+  vikings: svg(`
+    <path d="M3 4 Q4 12 10 14 L10 11 Q6 9 6 4 Z" fill="#f0f0e0" stroke="#000" shape-rendering="geometricPrecision"/>
+    <path d="M29 4 Q28 12 22 14 L22 11 Q26 9 26 4 Z" fill="#f0f0e0" stroke="#000" shape-rendering="geometricPrecision"/>
+    <path d="M8 16 Q8 7 16 7 Q24 7 24 16 Z" fill="#aab" stroke="#000" shape-rendering="geometricPrecision"/>
+    <rect x="7" y="15" width="18" height="3" fill="#c9a54a" stroke="#000"/>
+    <rect x="10" y="18" width="12" height="5" fill="#ffccaa" stroke="#000"/><rect x="12" y="19" width="2" height="2" fill="#000"/><rect x="18" y="19" width="2" height="2" fill="#000"/>
+    <path d="M9 22 H23 L21 29 L16 27 L11 29 Z" fill="#e8a020" stroke="#000"/>`),
+  ihnm: svg(`
+    <rect x="2" y="2" width="28" height="28" fill="#1a0000" stroke="#000"/>
+    <path d="M9 13 Q9 4 16 4 Q23 4 23 13 Q23 23 16 26 Q9 23 9 13 Z" fill="#c8b0a0" stroke="#000" shape-rendering="geometricPrecision"/>
+    <rect x="11" y="11" width="4" height="2" fill="#000"/><rect x="17" y="11" width="4" height="2" fill="#000"/>
+    <path d="M14 15 L16 17 L18 15" fill="none" stroke="#8a6a5a"/>
+    <path d="M12 21 Q16 22 20 21" stroke="#a89080" fill="none" shape-rendering="geometricPrecision"/>
+    <path d="M4 28 L8 22 M28 28 L24 22 M16 30 V27" stroke="#f33" stroke-width="1.5"/>`)
 };
 
 // Generic per-app icon for tools that live in the toolbox folder.
